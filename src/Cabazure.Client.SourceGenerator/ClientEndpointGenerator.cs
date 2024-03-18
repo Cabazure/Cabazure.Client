@@ -8,20 +8,11 @@ namespace Cabazure.Client.SourceGenerator;
 [Generator]
 public class ClientEndpointGenerator : IIncrementalGenerator
 {
-    private const string ClientEndpointAttribute = $"Cabazure.Client.ClientEndpointAttribute";
-    private const string ClientRequestOptions = "Cabazure.Client.ClientRequestOptions";
-    private const string GetAttribute = "Cabazure.Client.GetAttribute";
-    private const string PostAttribute = "Cabazure.Client.PostAttribute";
-    private const string QueryAttribute = "Cabazure.Client.QueryAttribute";
-    private const string PathAttribute = "Cabazure.Client.PathAttribute";
-    private const string BodyAttribute = "Cabazure.Client.BodyAttribute";
-    private const string HeaderAttribute = "Cabazure.Client.HeaderAttribute";
-
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var endpointsToGenerate = context.SyntaxProvider
             .ForAttributeWithMetadataName(
-                ClientEndpointAttribute,
+                TypeConstants.ClientEndpointAttribute,
                 static (s, _) => s is InterfaceDeclarationSyntax,
                 static (ctx, _) => (TargetNode: (InterfaceDeclarationSyntax)ctx.TargetNode, ctx.SemanticModel));
 
@@ -61,7 +52,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
     {
         var clientName = endpointSyntax.AttributeLists
             .SelectMany(l => l.Attributes)
-            .Where(a => semanticModel.GetSymbolInfo(a).Symbol?.ContainingType.ToString() == ClientEndpointAttribute)
+            .Where(a => semanticModel.GetSymbolInfo(a).Symbol?.ContainingType.ToString() == TypeConstants.ClientEndpointAttribute)
             .Select(a => semanticModel.GetConstantValue(a.ArgumentList!.Arguments[0].Expression).Value)
             .OfType<string>()
             .FirstOrDefault();
@@ -163,14 +154,14 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             foreach (var att in attList.Attributes)
             {
                 var attribute = semanticModel.GetSymbolInfo(att).Symbol?.ContainingType?.ToString();
-                if (attribute == GetAttribute)
+                if (attribute == TypeConstants.GetAttribute)
                 {
                     httpMethod = nameof(HttpMethod.Get);
                     routeTemplate = att.ArgumentList!.Arguments[0].ToFullString();
                     continue;
                 }
 
-                if (attribute == PostAttribute)
+                if (attribute == TypeConstants.PostAttribute)
                 {
                     httpMethod = nameof(HttpMethod.Post);
                     routeTemplate = att.ArgumentList!.Arguments[0].ToFullString();
@@ -184,7 +175,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         foreach (var parameter in method.ParameterList.Parameters)
         {
             var typeSymbol = semanticModel.GetSymbolInfo(parameter.Type!).Symbol;
-            if (typeSymbol?.ToString() == ClientRequestOptions)
+            if (typeSymbol?.ToString() == TypeConstants.ClientRequestOptions)
             {
                 clientOptions.Append($"\n            .WithRequestOptions({parameter.Identifier.ValueText})");
                 requestOptions.Append($"\n            .WithRequestOptions({parameter.Identifier.ValueText})");
@@ -201,7 +192,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                 foreach (var att in attList.Attributes)
                 {
                     var attribute = semanticModel.GetSymbolInfo(att).Symbol?.ContainingType?.ToString();
-                    if (attribute == BodyAttribute)
+                    if (attribute == TypeConstants.BodyAttribute)
                     {
                         requestOptions.Append($"\n            .WithBody({parameter.Identifier.ValueText})");
                         continue;
@@ -210,19 +201,19 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                     var argValue = att.ArgumentList?.Arguments.FirstOrDefault()?.ToFullString()
                         ?? $"\"{parameter.Identifier.ValueText}\"";
 
-                    if (attribute == PathAttribute)
+                    if (attribute == TypeConstants.PathAttribute)
                     {
                         requestOptions.Append($"\n            .WithPathParameter({argValue}, {parameter.Identifier.ValueText})");
                         continue;
                     }
 
-                    if (attribute == QueryAttribute)
+                    if (attribute == TypeConstants.QueryAttribute)
                     {
                         requestOptions.Append($"\n            .WithQueryParameter({argValue}, {parameter.Identifier.ValueText})");
                         continue;
                     }
 
-                    if (attribute == HeaderAttribute)
+                    if (attribute == TypeConstants.HeaderAttribute)
                     {
                         requestOptions.Append($"\n            .WithHeader({argValue}, {parameter.Identifier.ValueText})");
                         continue;

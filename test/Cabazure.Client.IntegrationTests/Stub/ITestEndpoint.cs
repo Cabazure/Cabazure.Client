@@ -1,6 +1,6 @@
 namespace Cabazure.Client.IntegrationTests;
 
-[ClientEndpoint("Test")]
+[ClientEndpoint("TestStub")]
 public interface ITestEndpoint
 {
     [Get("/items")]

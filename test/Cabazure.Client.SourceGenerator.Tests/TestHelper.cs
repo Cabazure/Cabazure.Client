@@ -19,6 +19,34 @@ public static class TestHelper
 
     public static SettingsTask Verify(params string[] sources)
     {
+        var compilation = CompileSources(sources);
+
+        var generator = new ClientEndpointGenerator();
+
+        var results = CSharpGeneratorDriver
+            .Create(generator)
+            .RunGenerators(compilation)
+            .GetRunResult();
+
+        return Verifier.Verify(results);
+    }
+
+    public static SettingsTask VerifyInitialization(params string[] sources)
+    {
+        var compilation = CompileSources(sources);
+
+        var generator = new ClientInitializationGenerator();
+
+        var results = CSharpGeneratorDriver
+            .Create(generator)
+            .RunGenerators(compilation)
+            .GetRunResult();
+
+        return Verifier.Verify(results);
+    }
+
+    private static CSharpCompilation CompileSources(string[] sources)
+    {
         var syntaxTrees = sources
             .Append(GlobalUsings)
             .Select(s => CSharpSyntaxTree.ParseText(s));
@@ -46,12 +74,6 @@ public static class TestHelper
             throw new ArgumentException(string.Join("\n", errors), nameof(sources));
         }
 
-        var generator = new ClientEndpointGenerator();
-
-        var driver = CSharpGeneratorDriver
-            .Create(generator)
-            .RunGenerators(compilation);
-
-        return Verifier.Verify(driver.GetRunResult());
+        return compilation;
     }
 }

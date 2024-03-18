@@ -1,4 +1,5 @@
 ﻿using Atc.Test;
+using Cabazure.Client.IntegrationTests.Stub;
 using FluentAssertions;
 
 namespace Cabazure.Client.IntegrationTests;
