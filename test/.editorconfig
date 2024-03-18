@@ -1,0 +1,27 @@
+# C# files
+[*.cs]
+dotnet_diagnostic.CA1707.severity = none            # Identifiers should not contain underscores
+dotnet_diagnostic.SA1133.severity = none            # Do Not Combine Attributes
+dotnet_diagnostic.CA1034.severity = none            # Allow nested types
+dotnet_diagnostic.SA1201.severity = none            # Allow nested types before other class members
+dotnet_diagnostic.MA0006.severity = none            # Test projects needs to be able to compare strings with "=="
+dotnet_diagnostic.CA2007.severity = none            # ConfigureAwait optimization is not necessary in tests
+dotnet_diagnostic.CA1062.severity = none            # Null checking input to test methods makes no sense
+dotnet_diagnostic.CA1812.severity = none            # Test classes used as generic arguments but not instantiated should be allowed.
+dotnet_diagnostic.SA1202.severity = none            # Private helper methods makes sense to keep at top of test classes, as tests are added to bottom.
+dotnet_diagnostic.CA2201.severity = none            # Instantiating Exceptions as test data should be allowed.
+dotnet_diagnostic.CA2012.severity = none            # Use ValueTasks Correctly
+dotnet_diagnostic.xUnit1026.severity = none         # Theory methods should use all of their parameters
+dotnet_diagnostic.CA1801.severity = none            # Review unused parameters
+dotnet_diagnostic.MA0075.severity = none            # Do not use implicit culture-sensitive ToString
+dotnet_diagnostic.MA0076.severity = none            # Do not use implicit culture-sensitive ToString in interpolated strings
+dotnet_diagnostic.CA1305.severity = none            # Specify IFormatProvider
+dotnet_diagnostic.CA1825.severity = none            # Avoid zero-length array allocations
+dotnet_diagnostic.CA2016.severity = none            # Forward the CancellationToken parameter to methods that take one
+dotnet_diagnostic.CA1068.severity = none            # CancellationToken parameters must come last
+dotnet_diagnostic.CA1002.severity = none            # Do not expose generic lists
+dotnet_diagnostic.SA1402.severity = none            # File may only contain a single type
+dotnet_diagnostic.S2344.severity = none             # Enumeration type names should not have "Flags" or "Enum" suffixes
+dotnet_diagnostic.CS8625.severity = none            # Cannot convert null literal to non-nullable reference type.
+dotnet_diagnostic.CS8602.severity = none            # Dereference of a possibly null reference.
+dotnet_diagnostic.CS8604.severity = none            # Possible null reference argument.
