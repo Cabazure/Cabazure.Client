@@ -10,6 +10,7 @@ public class ClientInitializationGenerator : ISourceGenerator, ISyntaxContextRec
 {
     private readonly Dictionary<string, string> endpoints = [];
     private readonly HashSet<string> namespaces = [];
+    private readonly Dictionary<MethodDeclarationSyntax, string> initMethods = [];
 
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -18,84 +19,154 @@ public class ClientInitializationGenerator : ISourceGenerator, ISyntaxContextRec
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var source = new StringBuilder();
-        if (namespaces.Count > 0)
+        try
         {
-            foreach (var ns in namespaces)
-            {
-                source.AppendLine($"using {ns};");
-            }
-            source.AppendLine();
+            GenerateInitialization(context);
         }
+        catch (InvalidOperationException ex)
+        {
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "CLIENT0001",
+                        "Cabazure.Client",
+                        "Failed to generate code: " + ex.Message,
+                        nameof(ClientInitializationGenerator),
+                        DiagnosticSeverity.Error,
+                        true),
+                    Location.None));
+        }
+    }
 
-        source.AppendLine("""
-            namespace Microsoft.Extensions.DependencyInjection;
+    private void GenerateInitialization(GeneratorExecutionContext context)
+    {
+        foreach (var initMethods in initMethods.GroupBy(p => p.Key.Parent))
+        {
+            if (initMethods.Key is not ClassDeclarationSyntax type || !type.IsPartial())
+            {
+                throw new InvalidOperationException(
+                    $"{TypeConstants.ClientInitializationAttribute} must be defined on a method of a partial class.");
+            }
 
-            public static partial class ServiceCollectionExtensions
+            var source = new StringBuilder();
+            var ns = type.GetNamespace();
+            var usingStatements = namespaces
+                .Append("System.Text.Json")
+                .Append("Cabazure.Client.Builder")
+                .Append("Microsoft.Extensions.DependencyInjection")
+                .Append("Microsoft.Extensions.DependencyInjection.Extensions")
+                .Distinct()
+                .Where(us => us != ns)
+                .OrderByDescending(us => us.StartsWith("System"))
+                .ThenBy(us => us)
+                .ToArray();
+            if (usingStatements.Length > 0)
+            {
+                foreach (var us in usingStatements)
+                {
+                    source.AppendLine($"using {us};");
+                }
+                source.AppendLine();
+            }
+
+            if (ns != null)
+            {
+                source.AppendLine($"namespace {ns};\n");
+            }
+
+            source.AppendLine($$"""
+            {{type.Modifiers}} class {{type.Identifier}}
             {
             """);
 
-        var clients = endpoints.GroupBy(e => e.Value, e => e.Key);
-        foreach (var client in clients)
-        {
-            source.AppendLine($$"""
-                    public static IServiceCollection Add{{client.Key}}Client(
-                        this IServiceCollection services)
-                    {
-                """);
-
-            foreach (var endpoint in client.AsEnumerable())
+            foreach (var initMethod in initMethods)
             {
-                var className = endpoint.Length > 1 && endpoint[0] == 'I'
-                    ? endpoint.Substring(1)
-                    : endpoint + "_Implementation";
+                var method = initMethod.Key;
+                var clientName = initMethod.Value;
 
                 source.AppendLine($$"""
-                            services.AddSingleton<{{endpoint}}, {{className}}>();
+                        {{method.Modifiers}} {{method.ReturnType}} {{method.Identifier}}{{method.ParameterList}}
+                        {
+                            var clientBuilder = services.AddHttpClient("{{clientName}}");
+                            builder?.Invoke(clientBuilder);
+
+                            services
+                                .AddOptions<JsonSerializerOptions>("{{clientName}}")
+                                .Configure(jsonOptions ?? new Action<JsonSerializerOptions>(_ => { }));
+
+                            services.TryAddSingleton<IClientSerializer, ClientSerializer>();
+                            services.TryAddSingleton<IMessageRequestFactory, MessageRequestFactory>();
+
+                    """);
+
+                var includedEndpoints = endpoints
+                    .Where(e => e.Value == clientName)
+                    .Select(e => e.Key);
+                foreach (var endpoint in includedEndpoints)
+                {
+                    var className = endpoint.Length > 1 && endpoint[0] == 'I'
+                        ? endpoint.Substring(1)
+                        : endpoint + "_Implementation";
+
+                    source.AppendLine($$"""
+                                services.AddSingleton<{{endpoint}}, {{className}}>();
+                        """);
+                }
+
+                source.AppendLine("""
+                        }
                     """);
             }
 
-            source.AppendLine("""
+            source.AppendLine("}");
 
-                        return services;
-                    }
-                """);
+            context.AddSource(
+                $"{type.Identifier.ValueText}.g.cs",
+                source.ToString());
         }
-
-        source.AppendLine("}");
-
-        context.AddSource(
-            "ServiceCollectionExtensions.g.cs",
-            source.ToString());
     }
 
     public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {
-        if (context.Node is not InterfaceDeclarationSyntax i)
+        if (context.Node is not AttributeSyntax attribute)
         {
             return;
         }
 
-        var clientName = i.AttributeLists
-            .SelectMany(al => al.Attributes)
-            .Where(a => context.SemanticModel.GetSymbolInfo(a).Symbol?.ContainingType.ToString() == TypeConstants.ClientEndpointAttribute)
-            .Select(a => context.SemanticModel.GetConstantValue(a.ArgumentList!.Arguments[0].Expression).Value)
-            .OfType<string>()
-            .FirstOrDefault();
+        var attributeType = context.SemanticModel
+            .GetSymbolInfo(attribute).Symbol?
+            .ContainingType
+            .ToString();
 
-        if (clientName != null)
+        if (attributeType == TypeConstants.ClientEndpointAttribute)
         {
-            endpoints.Add(i.Identifier.ValueText, clientName);
+            var value = context.SemanticModel
+                .GetConstantValue(attribute.ArgumentList!.Arguments[0].Expression)
+                .Value;
 
-            var ns = i.SyntaxTree
-                .GetCompilationUnitRoot()
-                .ChildNodes()
-                .OfType<BaseNamespaceDeclarationSyntax>()
-                .Select(ns => ns.Name.ToString())
-                .FirstOrDefault();
-            if (ns != null)
+            var parent = attribute.Parent?.Parent;
+
+            if (value is string clientName && parent is InterfaceDeclarationSyntax i)
             {
-                namespaces.Add(ns);
+                endpoints.Add(i.Identifier.ValueText, clientName);
+
+                if (attribute.GetNamespace() is { } ns)
+                {
+                    namespaces.Add(ns);
+                }
+            }
+        }
+        else if (attributeType == TypeConstants.ClientInitializationAttribute)
+        {
+            var value = context.SemanticModel
+                .GetConstantValue(attribute.ArgumentList!.Arguments[0].Expression)
+                .Value;
+
+            var parent = attribute.Parent?.Parent;
+
+            if (value is string clientName && parent is MethodDeclarationSyntax m)
+            {
+                initMethods.Add(m, clientName);
             }
         }
     }

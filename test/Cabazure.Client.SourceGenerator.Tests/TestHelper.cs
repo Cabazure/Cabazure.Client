@@ -1,5 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Text.Json;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Cabazure.Client.SourceGenerator.Tests;
 
@@ -55,6 +57,9 @@ public static class TestHelper
             .GetAssemblies()
             .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location))
             .Append(typeof(ClientEndpointAttribute).Assembly)
+            .Append(typeof(JsonSerializerOptions).Assembly)
+            .Append(typeof(IServiceCollection).Assembly)
+            .Append(typeof(IHttpClientBuilder).Assembly)
             .Select(x => MetadataReference.CreateFromFile(x.Location));
 
         CSharpCompilation compilation = CSharpCompilation.Create(

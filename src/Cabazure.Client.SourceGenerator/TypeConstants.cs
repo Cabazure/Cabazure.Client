@@ -3,6 +3,7 @@
 public static class TypeConstants
 {
     public const string ClientEndpointAttribute = $"Cabazure.Client.ClientEndpointAttribute";
+    public const string ClientInitializationAttribute = "Cabazure.Client.ClientInitializationAttribute";
     public const string ClientRequestOptions = "Cabazure.Client.ClientRequestOptions";
     public const string GetAttribute = "Cabazure.Client.GetAttribute";
     public const string PostAttribute = "Cabazure.Client.PostAttribute";

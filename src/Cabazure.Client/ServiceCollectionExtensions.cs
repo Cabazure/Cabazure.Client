@@ -10,8 +10,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddClient(
         this IServiceCollection services,
         string name,
+        Action<IHttpClientBuilder>? builder = null,
         Action<JsonSerializerOptions>? jsonOptions = null)
     {
+        var clientBuilder = services.AddHttpClient(name);
+        builder?.Invoke(clientBuilder);
+
         services
             .AddOptions<JsonSerializerOptions>(name)
             .Configure(jsonOptions ?? new Action<JsonSerializerOptions>(_ => { }));

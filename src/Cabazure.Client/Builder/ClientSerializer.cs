@@ -3,7 +3,8 @@ using Microsoft.Extensions.Options;
 
 namespace Cabazure.Client.Builder;
 
-public class ClientSerializer(IOptionsMonitor<JsonSerializerOptions> options)
+public class ClientSerializer(
+    IOptionsMonitor<JsonSerializerOptions> options)
     : IClientSerializer
 {
     public string Serialize(string clientName, object value)
