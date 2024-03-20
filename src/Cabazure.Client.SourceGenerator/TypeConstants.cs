@@ -11,4 +11,5 @@ public static class TypeConstants
     public const string PathAttribute = "Cabazure.Client.PathAttribute";
     public const string BodyAttribute = "Cabazure.Client.BodyAttribute";
     public const string HeaderAttribute = "Cabazure.Client.HeaderAttribute";
+    public const string CancellationToken = "System.Threading.CancellationToken";
 }

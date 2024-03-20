@@ -21,6 +21,14 @@ public static class RoslynExtensions
             .GetCompilationUnitRoot()
             .Usings;
 
+    public static string? GetName(
+        this SyntaxNode node)
+        => node switch
+        {
+            BaseTypeDeclarationSyntax t => t.Identifier.ValueText,
+            _ => null,
+        };
+
     public static bool IsPartial(
         this TypeDeclarationSyntax type)
         => type.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
