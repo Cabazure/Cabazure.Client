@@ -4,6 +4,6 @@ namespace Cabazure.Client.IntegrationTests;
 public interface ITestEndpoint
 {
     [Get("/items")]
-    public Task<EndpointResponse<string[]>> ExecuteAsync(
+    Task<EndpointResponse<string[]>> ExecuteAsync(
         CancellationToken cancellationToken);
 }

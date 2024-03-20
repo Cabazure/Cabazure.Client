@@ -21,11 +21,11 @@ public static class RoslynExtensions
             .GetCompilationUnitRoot()
             .Usings;
 
-    public static string? GetName(
+    public static SyntaxToken? GetIdentifier(
         this SyntaxNode node)
         => node switch
         {
-            BaseTypeDeclarationSyntax t => t.Identifier.ValueText,
+            BaseTypeDeclarationSyntax t => t.Identifier,
             _ => null,
         };
 

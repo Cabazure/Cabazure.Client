@@ -27,24 +27,6 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         InterfaceDeclarationSyntax endpointSyntax,
         SemanticModel semanticModel)
     {
-        try
-        {
-            GenerateEndpoint(context, endpointSyntax, semanticModel);
-        }
-        catch (SourceGeneratorException ex)
-        {
-            foreach (var diagnostic in ex.Diagnostics)
-            {
-                context.ReportDiagnostic(diagnostic);
-            }
-        }
-    }
-
-    private static void GenerateEndpoint(
-        SourceProductionContext context,
-        InterfaceDeclarationSyntax endpointSyntax,
-        SemanticModel semanticModel)
-    {
         var clientName = endpointSyntax.AttributeLists
             .SelectMany(l => l.Attributes)
             .Where(a => semanticModel.GetSymbolInfo(a).Symbol?.ContainingType.ToString() == TypeConstants.ClientEndpointAttribute)
@@ -130,32 +112,24 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         string clientName,
         SemanticModel semanticModel)
     {
-        if (method.ReturnType is not GenericNameSyntax { } taskType || taskType.Identifier.ToString() == "System.Threading.Task")
+        if (!IsValidEndpointReturnType(method, out var returnType))
         {
-            throw new SourceGeneratorException(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.UnsupportedEndpointReturnType,
-                    method.GetLocation(),
-                    method.Identifier));
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.UnsupportedEndpointReturnType,
+                method.GetLocation(),
+                method.Identifier));
+
+            return;
         }
 
-        if (taskType.TypeArgumentList.Arguments[0] is not SimpleNameSyntax endpointType || endpointType.Identifier.ToString() == "Cabazure.Client.EndpointResponse")
+        string? returnTypeString = null;
+        if (returnType is { } g)
         {
-            throw new SourceGeneratorException(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.UnsupportedEndpointReturnType,
-                    method.GetLocation(),
-                    method.Identifier));
+            returnTypeString = $"<{g}>";
         }
 
-        string? returnType = null;
-        if (endpointType is GenericNameSyntax g)
-        {
-            returnType = $"<{g.TypeArgumentList.Arguments[0]}>";
-        }
-
-        string httpMethod = nameof(HttpMethod.Get);
-        string routeTemplate = "/";
+        string? httpMethod = null;
+        string? routeTemplate = null;
         foreach (var attList in method.AttributeLists)
         {
             foreach (var att in attList.Attributes)
@@ -175,6 +149,17 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                     continue;
                 }
             }
+        }
+
+        if (httpMethod == null || routeTemplate == null)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.MissingEndpointRoute,
+                method.GetLocation(),
+                method.Parent?.GetIdentifier(),
+                method.Identifier));
+
+            return;
         }
 
         var clientOptions = new StringBuilder();
@@ -229,13 +214,11 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                     }
                 }
             }
-
-
         }
 
-        var returnTypeConversion = returnType == null
+        var returnTypeConversion = returnTypeString == null
             ? null
-            : $"\n                response => new EndpointResponse{returnType}(response),\n                ";
+            : $"\n                response => new EndpointResponse{returnTypeString}(response),\n                ";
 
         source.AppendLine($$"""
 
@@ -252,10 +235,41 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
                 return await requestFactory
                     .FromResponse("{{clientName}}", response)
-                    .AddSuccessResponse{{returnType}}(HttpStatusCode.OK)
+                    .AddSuccessResponse{{returnTypeString}}(HttpStatusCode.OK)
                     .GetAsync({{returnTypeConversion}}{{cancellationToken}});
             }
         """);
+    }
+
+    private static bool IsValidEndpointReturnType(MethodDeclarationSyntax method, out TypeSyntax? returnType)
+    {
+        returnType = null;
+        if (method.ReturnType is not GenericNameSyntax { } taskType)
+        {
+            return false;
+        }
+
+        if (taskType.Identifier.ToString() == "System.Threading.Task")
+        {
+            return false;
+        }
+
+        if (taskType.TypeArgumentList.Arguments[0] is not SimpleNameSyntax endpointType)
+        {
+            return false;
+        }
+
+        if (endpointType.Identifier.ToString() == "Cabazure.Client.EndpointResponse")
+        {
+            return false;
+        }
+
+        if (endpointType is GenericNameSyntax g)
+        {
+            returnType = g.TypeArgumentList.Arguments[0];
+        }
+
+        return true;
     }
 }
 

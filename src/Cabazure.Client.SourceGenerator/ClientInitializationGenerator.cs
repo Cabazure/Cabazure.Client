@@ -18,32 +18,64 @@ public class ClientInitializationGenerator : ISourceGenerator, ISyntaxContextRec
         context.RegisterForSyntaxNotifications(() => this);
     }
 
-    public void Execute(GeneratorExecutionContext context)
+    public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {
-        try
+        if (context.Node is not AttributeSyntax attribute)
         {
-            GenerateInitialization(context);
+            return;
         }
-        catch (SourceGeneratorException ex)
+
+        var attributeType = context.SemanticModel
+            .GetSymbolInfo(attribute).Symbol?
+            .ContainingType
+            .ToString();
+
+        if (attributeType == TypeConstants.ClientEndpointAttribute)
         {
-            foreach (var diagnostic in ex.Diagnostics)
+            var value = context.SemanticModel
+                .GetConstantValue(attribute.ArgumentList!.Arguments[0].Expression)
+                .Value;
+
+            var parent = attribute.Parent?.Parent;
+
+            if (value is string clientName && parent is InterfaceDeclarationSyntax i)
             {
-                context.ReportDiagnostic(diagnostic);
+                endpoints.Add(i.Identifier.ValueText, clientName);
+
+                if (attribute.GetNamespace() is { } ns)
+                {
+                    namespaces.Add(ns);
+                }
+            }
+        }
+        else if (attributeType == TypeConstants.ClientInitializationAttribute)
+        {
+            var value = context.SemanticModel
+                .GetConstantValue(attribute.ArgumentList!.Arguments[0].Expression)
+                .Value;
+
+            var parent = attribute.Parent?.Parent;
+
+            if (value is string clientName && parent is MethodDeclarationSyntax m)
+            {
+                initMethods.Add(m, clientName);
             }
         }
     }
 
-    private void GenerateInitialization(GeneratorExecutionContext context)
+    public void Execute(GeneratorExecutionContext context)
     {
         foreach (var initMethods in initMethods.GroupBy(p => p.Key.Parent))
         {
             if (initMethods.Key is not ClassDeclarationSyntax type || !type.IsPartial())
             {
-                throw new SourceGeneratorException(
+                context.ReportDiagnostic(
                     Diagnostic.Create(
                         DiagnosticDescriptors.InitializationNotInPartialClass,
                         initMethods.Key.GetLocation(),
-                        initMethods.Key.GetName()));
+                        initMethods.Key.GetIdentifier()));
+
+                continue;
             }
 
             var source = new StringBuilder();
@@ -123,51 +155,6 @@ public class ClientInitializationGenerator : ISourceGenerator, ISyntaxContextRec
             context.AddSource(
                 $"{type.Identifier.ValueText}.g.cs",
                 source.ToString());
-        }
-    }
-
-    public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
-    {
-        if (context.Node is not AttributeSyntax attribute)
-        {
-            return;
-        }
-
-        var attributeType = context.SemanticModel
-            .GetSymbolInfo(attribute).Symbol?
-            .ContainingType
-            .ToString();
-
-        if (attributeType == TypeConstants.ClientEndpointAttribute)
-        {
-            var value = context.SemanticModel
-                .GetConstantValue(attribute.ArgumentList!.Arguments[0].Expression)
-                .Value;
-
-            var parent = attribute.Parent?.Parent;
-
-            if (value is string clientName && parent is InterfaceDeclarationSyntax i)
-            {
-                endpoints.Add(i.Identifier.ValueText, clientName);
-
-                if (attribute.GetNamespace() is { } ns)
-                {
-                    namespaces.Add(ns);
-                }
-            }
-        }
-        else if (attributeType == TypeConstants.ClientInitializationAttribute)
-        {
-            var value = context.SemanticModel
-                .GetConstantValue(attribute.ArgumentList!.Arguments[0].Expression)
-                .Value;
-
-            var parent = attribute.Parent?.Parent;
-
-            if (value is string clientName && parent is MethodDeclarationSyntax m)
-            {
-                initMethods.Add(m, clientName);
-            }
         }
     }
 }

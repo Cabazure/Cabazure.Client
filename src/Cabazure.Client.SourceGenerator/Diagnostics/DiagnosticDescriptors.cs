@@ -21,4 +21,13 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor MissingEndpointRoute = new(
+        "ECL003",
+        "ClientEndpoint does not specify route",
+        "{0}.{1} does not have a route defined. Please add one of the [Get], [Post] or [Put] attributes.",
+        DiagnosticCategories.EndpointGenerator,
+        DiagnosticSeverity.Error,
+        true
+    );
 }
