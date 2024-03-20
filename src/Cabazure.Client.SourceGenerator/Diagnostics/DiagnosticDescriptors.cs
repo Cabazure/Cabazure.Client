@@ -30,4 +30,13 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor UnsupportedEndpointType = new(
+        "ECL004",
+        "ClientEndpoint is not an interface",
+        "{0} is not an interface",
+        DiagnosticCategories.EndpointGenerator,
+        DiagnosticSeverity.Error,
+        true
+    );
 }
