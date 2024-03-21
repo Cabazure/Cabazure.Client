@@ -13,8 +13,7 @@ public class ClientInitializationGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var receiver = context.SyntaxContextReceiver as ClientInitializationSyntaxReceiver;
-        if (receiver == null)
+        if (context.SyntaxContextReceiver is not ClientInitializationSyntaxReceiver receiver)
         {
             return;
         }

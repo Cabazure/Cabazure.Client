@@ -31,7 +31,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Cabazure.Client.SourceGenerator\Cabazure.Client.SourceGenerator.csproj" />
-    <ProjectReference Include="..\..\src\Cabazure.Client\Cabazure.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
