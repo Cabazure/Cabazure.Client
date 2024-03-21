@@ -1,6 +1,6 @@
 ﻿using Cabazure.Client.Builder;
 
-namespace Cabazure.Client.Tests.Builder;
+namespace Cabazure.Client.Runtime.Tests.Builder;
 
 public class MessageRequestFactoryTests
 {

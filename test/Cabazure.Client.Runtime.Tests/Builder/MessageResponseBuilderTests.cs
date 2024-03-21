@@ -2,7 +2,7 @@ using System.Net;
 using AutoFixture.Xunit2;
 using Cabazure.Client.Builder;
 
-namespace Cabazure.Client.Tests.Builder;
+namespace Cabazure.Client.Runtime.Tests.Builder;
 
 public class MessageResponseBuilderTests
 {

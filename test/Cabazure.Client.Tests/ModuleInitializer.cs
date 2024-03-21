@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Cabazure.Client.SourceGenerator.Tests;
+namespace Cabazure.Client.Tests;
 
 public static class ModuleInitializer
 {

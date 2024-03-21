@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client", "src\Cabazure.Client\Cabazure.Client.csproj", "{1B6861F5-7321-4D51-A924-7CDCF31E5A72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client.Runtime", "src\Cabazure.Client.Runtime\Cabazure.Client.Runtime.csproj", "{1B6861F5-7321-4D51-A924-7CDCF31E5A72}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client.SourceGenerator", "src\Cabazure.Client.SourceGenerator\Cabazure.Client.SourceGenerator.csproj", "{7FF34A7A-FAF1-4F35-A5C1-0D6186E65010}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client", "src\Cabazure.Client\Cabazure.Client.csproj", "{7FF34A7A-FAF1-4F35-A5C1-0D6186E65010}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client.SourceGenerator.Tests", "test\Cabazure.Client.SourceGenerator.Tests\Cabazure.Client.SourceGenerator.Tests.csproj", "{CED809C0-4423-4B2D-BAF8-0C942B52761B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client.Tests", "test\Cabazure.Client.Tests\Cabazure.Client.Tests.csproj", "{CED809C0-4423-4B2D-BAF8-0C942B52761B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabazure.Client.Tests", "test\Cabazure.Client.Tests\Cabazure.Client.Tests.csproj", "{91529749-D468-43A2-8713-9428234FADFF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabazure.Client.Runtime.Tests", "test\Cabazure.Client.Runtime.Tests\Cabazure.Client.Runtime.Tests.csproj", "{91529749-D468-43A2-8713-9428234FADFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabazure.Client.IntegrationTests", "test\Cabazure.Client.IntegrationTests\Cabazure.Client.IntegrationTests.csproj", "{A5A1DEAD-A6F6-47B5-B6A8-9ED08B5A0FD0}"
 EndProject

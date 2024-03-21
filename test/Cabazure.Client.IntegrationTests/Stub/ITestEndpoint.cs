@@ -1,4 +1,4 @@
-namespace Cabazure.Client.IntegrationTests;
+namespace Cabazure.Client.IntegrationTests.Stub;
 
 [ClientEndpoint("TestStub")]
 public interface ITestEndpoint

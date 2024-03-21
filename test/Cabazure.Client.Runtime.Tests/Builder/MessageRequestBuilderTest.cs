@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using Cabazure.Client.Builder;
 using Microsoft.Extensions.Primitives;
 
-namespace Cabazure.Client.Tests.Builder;
+namespace Cabazure.Client.Runtime.Tests.Builder;
 
 public class MessageRequestBuilderTest
 {

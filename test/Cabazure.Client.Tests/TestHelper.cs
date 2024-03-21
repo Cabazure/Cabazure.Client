@@ -1,9 +1,10 @@
 ﻿using System.Text.Json;
+using Cabazure.Client.SourceGenerator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Cabazure.Client.SourceGenerator.Tests;
+namespace Cabazure.Client.Tests;
 
 public static class TestHelper
 {

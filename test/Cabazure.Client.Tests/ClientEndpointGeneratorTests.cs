@@ -1,4 +1,4 @@
-namespace Cabazure.Client.SourceGenerator.Tests;
+namespace Cabazure.Client.Tests;
 
 public class ClientEndpointGeneratorTests
 {
