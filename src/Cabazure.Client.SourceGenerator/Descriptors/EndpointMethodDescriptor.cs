@@ -86,7 +86,9 @@ public record EndpointMethodDescriptor(
             var typeName = semanticModel.GetFullTypeName(parameter.Type!);
             var parameterName = parameter.Identifier.ValueText;
 
-            if (typeName == TypeConstants.ClientRequestOptions)
+            if (typeName
+                is TypeConstants.ClientRequestOptions
+                or TypeConstants.ClientPaginationOptions)
             {
                 optionsParameter = parameterName;
                 continue;

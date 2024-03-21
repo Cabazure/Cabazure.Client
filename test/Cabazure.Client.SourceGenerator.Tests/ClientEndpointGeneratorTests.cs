@@ -9,9 +9,43 @@ public class ClientEndpointGeneratorTests
             public interface ITestEndpoint
             {
                 [Get("/items")]
+                public Task<EndpointResponse<string[]>> ExecuteAsync();
+            }
+            """);
+
+    [Fact]
+    public Task CanGenerate_CancellationToken_Parameter()
+    => TestHelper.Verify("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items")]
                 public Task<EndpointResponse<string[]>> ExecuteAsync(
-                    ClientRequestOptions options,
                     CancellationToken cancellationToken);
+            }
+            """);
+
+    [Fact]
+    public Task CanGenerate_ClientRequestOptions_Parameter()
+        => TestHelper.Verify("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items")]
+                public Task<EndpointResponse<string[]>> ExecuteAsync(
+                    ClientRequestOptions options);
+            }
+            """);
+
+    [Fact]
+    public Task CanGenerate_ClientPaginationOptions_Parameter()
+        => TestHelper.Verify("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items")]
+                public Task<EndpointResponse<string[]>> ExecuteAsync(
+                    ClientPaginationOptions options);
             }
             """);
 
@@ -23,7 +57,7 @@ public class ClientEndpointGeneratorTests
             {
                 [Get("/items/{id}")]
                 public Task<EndpointResponse<string>> ExecuteAsync(
-                    [Path] string id,        
+                    [Path] string id,
                     ClientRequestOptions options,
                     CancellationToken cancellationToken);
             }

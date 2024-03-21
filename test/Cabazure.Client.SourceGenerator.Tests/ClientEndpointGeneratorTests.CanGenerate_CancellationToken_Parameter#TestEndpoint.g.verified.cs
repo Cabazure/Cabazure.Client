@@ -17,28 +17,23 @@ public partial class TestEndpoint : ITestEndpoint
         this.requestFactory = requestFactory;
     }
 
-    public async Task<EndpointResponse<string>> ExecuteAsync(
-        [Path] string id,
-        ClientRequestOptions options,
+    public async Task<EndpointResponse<string[]>> ExecuteAsync(
         CancellationToken cancellationToken)
     {
         var client = factory.CreateClient("ClientName");
 
         using var requestMessage = requestFactory
-            .FromTemplate("ClientName", "/items/{id}")
-            .WithPathParameter("id", id)
-            .WithRequestOptions(options)
+            .FromTemplate("ClientName", "/items")
             .Build(HttpMethod.Get);
 
         using var response = await client
-            .WithRequestOptions(options)
             .SendAsync(requestMessage, cancellationToken);
 
         return await requestFactory
             .FromResponse("ClientName", response)
-            .AddSuccessResponse<string>(HttpStatusCode.OK)
+            .AddSuccessResponse<string[]>(HttpStatusCode.OK)
             .GetAsync(
-                response => new EndpointResponse<string>(response),
+                response => new EndpointResponse<string[]>(response),
                 cancellationToken);
     }
 }
