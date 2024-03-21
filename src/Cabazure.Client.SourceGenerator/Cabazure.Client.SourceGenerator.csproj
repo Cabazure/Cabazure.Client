@@ -32,7 +32,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cabazure.Client\Cabazure.Client.csproj" />
+    <ProjectReference Include="..\Cabazure.Client\Cabazure.Client.csproj">
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <IncludeAssets>Cabazure.Client.dll</IncludeAssets>
+    </ProjectReference>
   </ItemGroup>
+
+  <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))"/>
+    </ItemGroup>
+  </Target>
 
 </Project>
