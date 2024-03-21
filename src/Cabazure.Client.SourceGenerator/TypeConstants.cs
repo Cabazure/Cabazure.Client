@@ -12,4 +12,7 @@ public static class TypeConstants
     public const string BodyAttribute = "Cabazure.Client.BodyAttribute";
     public const string HeaderAttribute = "Cabazure.Client.HeaderAttribute";
     public const string CancellationToken = "System.Threading.CancellationToken";
+    public const string ServiceCollection = "Microsoft.Extensions.DependencyInjection.IServiceCollection";
+    public const string BuilderDelegate = "System.Action<Microsoft.Extensions.DependencyInjection.IHttpClientBuilder>";
+    public const string JsonOptionsDelegate = "System.Action<System.Text.Json.JsonSerializerOptions>";
 }

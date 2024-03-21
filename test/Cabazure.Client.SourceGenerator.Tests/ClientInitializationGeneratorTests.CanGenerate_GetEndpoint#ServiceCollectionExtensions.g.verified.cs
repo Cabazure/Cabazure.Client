@@ -18,7 +18,7 @@ public static partial class ServiceCollectionExtensions
 
         services
             .AddOptions<JsonSerializerOptions>("ClientName")
-            .Configure(jsonOptions ?? new Action<JsonSerializerOptions>(_ => { }));
+            .Configure(jsonOptions);
 
         services.TryAddSingleton<IClientSerializer, ClientSerializer>();
         services.TryAddSingleton<IMessageRequestFactory, MessageRequestFactory>();
