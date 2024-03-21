@@ -9,7 +9,7 @@ public record EndpointDescriptor(
     string ClassName,
     string? Namespace)
 {
-    public static EndpointDescriptor FromAttribute(
+    public static EndpointDescriptor Create(
         SemanticModel semanticModel,
         AttributeSyntax attribute)
     {
@@ -28,7 +28,7 @@ public record EndpointDescriptor(
             ns);
     }
 
-    public static EndpointDescriptor FromInterface(
+    public static EndpointDescriptor Create(
         InterfaceDeclarationSyntax interfaceSyntax,
         GeneratorAttributeSyntaxContext context)
     {

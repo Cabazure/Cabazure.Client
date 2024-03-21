@@ -38,7 +38,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             return;
         }
 
-        var endpoint = EndpointDescriptor.FromInterface(
+        var endpoint = EndpointDescriptor.Create(
             endpointSyntax,
             syntax);
 

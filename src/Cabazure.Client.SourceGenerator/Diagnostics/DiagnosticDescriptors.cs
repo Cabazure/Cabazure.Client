@@ -1,7 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace Cabazure.Client.SourceGenerator.Diagnostics;
 
+[SuppressMessage(
+    "MicrosoftCodeAnalysisReleaseTracking",
+    "RS2008:Enable analyzer release tracking",
+    Justification = "Not relevant yet")]
 public static class DiagnosticDescriptors
 {
     public static readonly DiagnosticDescriptor UnsupportedEndpointReturnType = new(
@@ -35,6 +40,24 @@ public static class DiagnosticDescriptors
         "ECL004",
         "ClientEndpoint is not an interface",
         "{0} is not an interface",
+        DiagnosticCategories.EndpointGenerator,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor UnsupportedInitializationParameter = new(
+        "ECL005",
+        "ClientInitialization has unsupported parameter",
+        "{0} has an unsupported parameter {1}",
+        DiagnosticCategories.EndpointGenerator,
+        DiagnosticSeverity.Warning,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor MissingRequiredInitializationParameter = new(
+        "ECL006",
+        "ClientInitialization is missing required parameter",
+        "{0} is missing required parameter {1}",
         DiagnosticCategories.EndpointGenerator,
         DiagnosticSeverity.Error,
         true

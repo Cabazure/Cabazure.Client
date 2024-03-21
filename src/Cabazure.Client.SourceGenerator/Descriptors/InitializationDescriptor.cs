@@ -4,52 +4,42 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Cabazure.Client.SourceGenerator.Descriptors;
 
 public record InitializationDescriptor(
-    TypeDescriptor DeclaringType,
-    string ClientName,
-    string MethodName,
-    string Signature,
-    string? ServicesName,
-    string? BuilderName,
-    string? JsonOptionsName)
+    InitializationClassDescriptor Class,
+    InitializationMethodDescriptor Method,
+    string ClientName)
 {
-    public static InitializationDescriptor FromAttribute(
+    public static InitializationDescriptor? Create(
+        Action<Diagnostic> diagnostics,
         SemanticModel semanticModel,
         AttributeSyntax attribute)
     {
-        var clientName = (string)semanticModel.GetConstantValue(attribute.ArgumentList!.Arguments[0].Expression).Value!;
-        var method = (MethodDeclarationSyntax)attribute.Parent!.Parent!;
-        var methodName = method.Identifier.ValueText;
-        var methodSignature = $"{method.Modifiers} {method.ReturnType} {method.Identifier}{method.ParameterList}";
-
-        var type = TypeDescriptor.FromType((TypeDeclarationSyntax)method.Parent!);
-
-        string? servicesName = null;
-        string? builderName = null;
-        string? jsonOptionsName = null;
-        foreach (var parameter in method.ParameterList.Parameters)
+        var expression = attribute.ArgumentList?.Arguments.Select(a => a.Expression).FirstOrDefault();
+        if (expression == null)
         {
-            var parameterType = semanticModel.GetFullTypeName(parameter.Type!);
-            if (parameterType == TypeConstants.ServiceCollection)
-            {
-                servicesName = parameter.Identifier.ValueText;
-            }
-            else if (parameterType == TypeConstants.BuilderDelegate)
-            {
-                builderName = parameter.Identifier.ValueText;
-            }
-            else if (parameterType == TypeConstants.JsonOptionsDelegate)
-            {
-                jsonOptionsName = parameter.Identifier.ValueText;
-            }
+            return null;
         }
 
-        return new(
-            type,
-            clientName,
-            methodName,
-            methodSignature,
-            servicesName,
-            builderName,
-            jsonOptionsName);
+        var clientName = semanticModel.GetConstantValue(expression).Value as string;
+        if (clientName == null)
+        {
+            return null;
+        }
+
+        var classDescriptor = InitializationClassDescriptor.Create(diagnostics, attribute);
+        if (classDescriptor == null)
+        {
+            return null;
+        }
+
+        var methodDescriptor = InitializationMethodDescriptor.Create(diagnostics, semanticModel, attribute);
+        if (methodDescriptor == null)
+        {
+            return null;
+        }
+
+        return new InitializationDescriptor(
+            classDescriptor,
+            methodDescriptor,
+            clientName);
     }
 }
