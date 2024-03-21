@@ -6,7 +6,7 @@ public static class HttpClientExtensions
         this HttpClient httpClient,
         ClientRequestOptions? requestOptions)
     {
-        if (requestOptions is { Timeout: { } timeout })
+        if (requestOptions is { Timeout: { Ticks: > 0 } timeout })
         {
             httpClient.Timeout = timeout;
         }

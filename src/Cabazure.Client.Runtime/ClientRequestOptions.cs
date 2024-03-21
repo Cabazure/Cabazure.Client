@@ -6,7 +6,7 @@ public class ClientRequestOptions
 
     public string? OnBehalfOf { get; set; }
 
-    public TimeSpan Timeout { get; set; }
+    public TimeSpan? Timeout { get; set; }
 }
 
 public class ClientPaginationOptions : ClientRequestOptions
