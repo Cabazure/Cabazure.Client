@@ -1,0 +1,88 @@
+name: Release
+
+run-name: v0.1.${{ github.run_number }} • ${{ github.event.head_commit.message }}
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  packages: write
+
+env:
+  VERSION: 0.1.${{ github.run_number }}
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup dotnet 8.0.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: 🧹 Clean
+        run: dotnet clean -c Release && dotnet nuget locals all --clear
+
+      - name: 📦 Restore dependencies
+        run: dotnet restore
+
+      - name: 🛠️ Build solution
+        run: dotnet build --no-restore -c:Release -p:SourceRevisionId=${{ env.VERSION }} -p:Version=${{ env.VERSION }}
+
+      - name: 🧪 Run tests
+        run: dotnet test --no-build -c:Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" || true
+
+      - name: 📋 Test Report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Test Report
+          path: "**/test-results.trx"
+          reporter: dotnet-trx
+          fail-on-error: true
+
+      - name: 📭 Restore coverage history
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          name: CoverageHistory
+          path: CoverageHistory
+        continue-on-error: true
+
+      - name: 📝 Generate Coverage report
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
+        with:
+          reports: "**/coverage.cobertura.xml"
+          targetdir: CoverageReports
+          historydir: CoverageHistory
+          reporttypes: MarkdownSummaryGithub;MarkdownDeltaSummary;HtmlInline
+          filefilters: -*.g.cs
+          tag: '${{ github.run_number }}_${{ github.run_id }}'
+
+      - name: 📨 Post code coverage results
+        run: |
+          cat CoverageReports/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+      - name: 📬 Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoverageReports
+          path: CoverageReports
+
+      - name: 📬 Upload coverage history
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoverageHistory
+          path: CoverageHistory
+
+      - name: 🛠️ Upload library to GitHub Package Repository
+        run: dotnet nuget push **/Cabazure.*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/Cabazure/index.json --skip-duplicate --no-symbols
