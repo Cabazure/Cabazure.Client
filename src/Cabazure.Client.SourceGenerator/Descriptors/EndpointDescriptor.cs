@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Cabazure.Client.SourceGenerator.Diagnostics;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cabazure.Client.SourceGenerator.Descriptors;
@@ -7,42 +9,63 @@ public record EndpointDescriptor(
     string ClientName,
     string InterfaceName,
     string ClassName,
-    string? Namespace)
+    string? Namespace,
+    ImmutableArray<string> Usings,
+    ImmutableArray<EndpointMethodDescriptor> Methods)
 {
-    public static EndpointDescriptor Create(
-        SemanticModel semanticModel,
-        AttributeSyntax attribute)
-    {
-        var clientName = (string)semanticModel.GetConstantValue(attribute.ArgumentList!.Arguments[0].Expression).Value!;
-        var interfaceSyntax = (InterfaceDeclarationSyntax)attribute.Parent!.Parent!;
-        var interfaceName = interfaceSyntax.Identifier.ValueText;
-        var className = interfaceName.Length > 1 && interfaceName[0] == 'I'
-            ? interfaceName.Substring(1)
-            : interfaceName + "_Implementation";
-        var ns = interfaceSyntax.GetNamespace();
-
-        return new(
-            clientName,
-            interfaceName,
-            className,
-            ns);
-    }
-
-    public static EndpointDescriptor Create(
-        InterfaceDeclarationSyntax interfaceSyntax,
+    public static EndpointDescriptor? Create(
+        Action<Diagnostic> diagnostics,
         GeneratorAttributeSyntaxContext context)
     {
-        var clientName = (string)context.Attributes[0].ConstructorArguments[0].Value!;
-        var interfaceName = interfaceSyntax.Identifier.ValueText;
+        if (context.TargetNode is not InterfaceDeclarationSyntax @interface)
+        {
+            diagnostics.Invoke(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.UnsupportedEndpointReturnType,
+                    context.TargetNode.GetLocation(),
+                    context.TargetNode.GetIdentifier()));
+
+            return null;
+        }
+
+        var clientName = context.Attributes
+            .SelectMany(a => a.ConstructorArguments)
+            .Select(a => a.Value)
+            .OfType<string>()
+            .FirstOrDefault();
+        if (clientName == null)
+        {
+            return null;
+        }
+
+        var interfaceName = @interface.Identifier.ValueText;
         var className = interfaceName.Length > 1 && interfaceName[0] == 'I'
            ? interfaceName.Substring(1)
            : interfaceName + "_Implementation";
-        var ns = interfaceSyntax.GetNamespace();
+        var ns = @interface.GetNamespace();
 
-        return new(
+        var usings = @interface
+            .GetUsings()
+            .Select(u => u.Name?.ToString())
+            .OfType<string>()
+            .ToImmutableArray();
+
+        var methods = @interface
+            .Members
+            .OfType<MethodDeclarationSyntax>()
+            .Select(m => EndpointMethodDescriptor.Create(
+                diagnostics,
+                context.SemanticModel,
+                m))
+            .OfType<EndpointMethodDescriptor>()
+            .ToImmutableArray();
+
+        return new EndpointDescriptor(
             clientName,
             interfaceName,
             className,
-            ns);
+            ns,
+            usings,
+            methods);
     }
 }

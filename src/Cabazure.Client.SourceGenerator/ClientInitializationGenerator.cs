@@ -9,7 +9,7 @@ namespace Cabazure.Client.SourceGenerator;
 [Generator]
 public class ClientInitializationGenerator : ISourceGenerator, ISyntaxContextReceiver
 {
-    private readonly List<EndpointDescriptor> endpoints = [];
+    private readonly List<EndpointReferenceDescriptor> endpoints = [];
     private readonly List<InitializationDescriptor> initializations = [];
     private readonly List<Diagnostic> diagnostics = new List<Diagnostic>();
 
@@ -32,10 +32,15 @@ public class ClientInitializationGenerator : ISourceGenerator, ISyntaxContextRec
 
         if (attributeType == TypeConstants.ClientEndpointAttribute)
         {
-            endpoints.Add(
-                EndpointDescriptor.Create(
-                    context.SemanticModel,
-                    attribute));
+            var endpoint = EndpointReferenceDescriptor.Create(
+                diagnostics.Add,
+                context.SemanticModel,
+                attribute);
+
+            if (endpoint != null)
+            {
+                endpoints.Add(endpoint);
+            }
         }
         else if (attributeType == TypeConstants.ClientInitializationAttribute)
         {

@@ -7,6 +7,8 @@ public static class TypeConstants
     public const string ClientRequestOptions = "Cabazure.Client.ClientRequestOptions";
     public const string GetAttribute = "Cabazure.Client.GetAttribute";
     public const string PostAttribute = "Cabazure.Client.PostAttribute";
+    public const string PutAttribute = "Cabazure.Client.PutAttribute";
+    public const string DeleteAttribute = "Cabazure.Client.DeleteAttribute";
     public const string QueryAttribute = "Cabazure.Client.QueryAttribute";
     public const string PathAttribute = "Cabazure.Client.PathAttribute";
     public const string BodyAttribute = "Cabazure.Client.BodyAttribute";
