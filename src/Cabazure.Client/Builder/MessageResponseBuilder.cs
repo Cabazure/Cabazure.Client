@@ -32,6 +32,9 @@ public class MessageResponseBuilder(
     public IMessageResponseBuilder AddSuccessResponse<TResponseContent>(HttpStatusCode statusCode)
         => AddTypedResponse<TResponseContent>(statusCode, true);
 
+    public Task<EndpointResponse> GetAsync(CancellationToken cancellationToken)
+        => GetAsync(r => r, cancellationToken);
+
     public async Task<TResult> GetAsync<TResult>(Func<EndpointResponse, TResult> factory, CancellationToken cancellationToken)
     {
         if (response is null)

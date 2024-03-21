@@ -13,20 +13,5 @@ public class ClientInitializationGeneratorTests
                     ClientRequestOptions options,
                     CancellationToken cancellationToken);
             }
-            """,
-            """
-            using System.Text.Json;
-            using Cabazure.Client;
-
-            namespace Microsoft.Extensions.DependencyInjection;
-
-            public static partial class ServiceCollectionExtensions
-            {
-                [ClientInitialization("ClientName")]
-                static partial void ClientInitialization(
-                    this IServiceCollection services,
-                    Action<IHttpClientBuilder> builder,
-                    Action<JsonSerializerOptions> jsonOptions);
-            }
             """);
 }

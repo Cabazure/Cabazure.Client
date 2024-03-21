@@ -1,19 +1,11 @@
-﻿using System.Text.Json;
-using Cabazure.Client;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection;
-
-public static partial class ServiceCollectionExtensions
+public static class ServiceCollectionExtensions
 {
     public static void AddTestStubClient(
         this IServiceCollection services)
-        => services.RegisterTestStubClient(
+        => services.ConfigureClient(
+            "TestStub",
             c => c.ConfigureHttpClient(c => c.BaseAddress = new("http://test.org")),
             j => { });
-
-    [ClientInitialization("TestStub")]
-    static partial void RegisterTestStubClient(
-        this IServiceCollection services,
-        Action<IHttpClientBuilder> builder,
-        Action<JsonSerializerOptions> jsonOptions);
 }

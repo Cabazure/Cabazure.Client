@@ -15,4 +15,7 @@ public interface IMessageResponseBuilder
     Task<TResult> GetAsync<TResult>(
         Func<EndpointResponse, TResult> factory,
         CancellationToken cancellationToken);
+
+    Task<EndpointResponse> GetAsync(
+        CancellationToken cancellationToken);
 }
