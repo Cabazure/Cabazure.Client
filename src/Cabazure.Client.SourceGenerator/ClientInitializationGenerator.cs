@@ -15,6 +15,10 @@ public class ClientInitializationGenerator : ISourceGenerator, ISyntaxContextRec
 
     public void Initialize(GeneratorInitializationContext context)
     {
+        endpoints.Clear();
+        initializations.Clear();
+        diagnostics.Clear();
+
         context.RegisterForSyntaxNotifications(() => this);
     }
 
