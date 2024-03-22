@@ -18,4 +18,7 @@ public static class TypeConstants
     public const string ServiceCollection = "Microsoft.Extensions.DependencyInjection.IServiceCollection";
     public const string BuilderDelegate = "System.Action<Microsoft.Extensions.DependencyInjection.IHttpClientBuilder>";
     public const string JsonOptionsDelegate = "System.Action<System.Text.Json.JsonSerializerOptions>";
+    public const string Task = "System.Threading.Tasks.Task";
+    public const string EndpointResponse = "Cabazure.Client.EndpointResponse";
+    public const string PagedResponse = "Cabazure.Client.PagedResponse";
 }

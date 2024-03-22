@@ -213,4 +213,19 @@ public class ClientEndpointGeneratorTests
                     CancellationToken cancellationToken);
             }
             """);
+
+    [Fact]
+    public Task CanGenerate_Pagination_Endpoint()
+    => TestHelper.Verify("""
+            namespace Test;
+            
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/routes")]
+                public Task<PagedResponse<string[]>> ExecuteAsync(
+                    ClientPaginationOptions options,
+                    CancellationToken cancellationToken);
+            }
+            """);
 }

@@ -5,26 +5,30 @@ namespace Cabazure.Client.SourceGenerator;
 
 public static class SemanticModelExtensions
 {
-    public static string? GetFullTypeName(
+    public static string? GetTypeName(
         this SemanticModel semanticModel,
         TypeSyntax type)
         => semanticModel
             .GetTypeInfo(type)
             .Type?
-            .ToDisplayString(
-                SymbolDisplayFormat.FullyQualifiedFormat
-                .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining));
+            .GetName();
 
-    public static string? GetFullTypeName(
+    public static string? GetTypeName(
         this SemanticModel semanticModel,
         AttributeSyntax attribute)
         => semanticModel
             .GetSymbolInfo(attribute)
             .Symbol?
             .ContainingType?
+            .GetName();
+
+    public static string? GetName(
+        this ITypeSymbol typeSymbol)
+        => typeSymbol
             .ToDisplayString(
                 SymbolDisplayFormat.FullyQualifiedFormat
-                .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining));
+                    .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining)
+                    .WithGenericsOptions(SymbolDisplayGenericsOptions.None));
 
     public static string? GetAttributeValue(
         this SemanticModel semanticModel,

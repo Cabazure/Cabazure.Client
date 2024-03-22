@@ -8,7 +8,7 @@ public record EndpointResponse<T>(
     string? Content,
     object? ContentObject,
     T? OkContent,
-    IDictionary<string, IEnumerable<string>> Headers)
+    IReadOnlyDictionary<string, IEnumerable<string>> Headers)
     : EndpointResponse(
         IsSuccess,
         StatusCode,
@@ -36,7 +36,7 @@ public record EndpointResponse(
     HttpStatusCode StatusCode,
     string? Content,
     object? ContentObject,
-    IDictionary<string, IEnumerable<string>> Headers)
+    IReadOnlyDictionary<string, IEnumerable<string>> Headers)
 {
     public bool IsOk
         => StatusCode == HttpStatusCode.OK;

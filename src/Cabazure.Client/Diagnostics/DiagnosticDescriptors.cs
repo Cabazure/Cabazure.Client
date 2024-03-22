@@ -12,7 +12,7 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor UnsupportedEndpointReturnType = new(
         "ECL001",
         "ClientEndpoint has unsupported return type",
-        "{0} has an unsupported return type. Return type must be either Task<EndpointResponse> or Task<EndpointResponse<T>>.",
+        "{0} has an unsupported return type. Return type must be either Task<EndpointResponse>, Task<EndpointResponse<T>> or Task<PagedResponse<T>>.",
         DiagnosticCategories.EndpointGenerator,
         DiagnosticSeverity.Error,
         true

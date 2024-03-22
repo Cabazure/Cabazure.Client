@@ -9,6 +9,7 @@ public record EndpointMethodDescriptor(
     string Name,
     string Signature,
     string? ResultType,
+    string? ResponseType,
     string HttpMethod,
     string RouteTemplate,
     string? OptionsParameter,
@@ -27,7 +28,7 @@ public record EndpointMethodDescriptor(
         string? routeTemplate = null;
         foreach (var attribute in method.AttributeLists.SelectMany(a => a.Attributes))
         {
-            var attributeTypeName = semanticModel.GetFullTypeName(attribute);
+            var attributeTypeName = semanticModel.GetTypeName(attribute);
             switch (attributeTypeName)
             {
                 case TypeConstants.GetAttribute:
@@ -63,7 +64,7 @@ public record EndpointMethodDescriptor(
             return null;
         }
 
-        if (!IsValidEndpointReturnType(method, out var returnType))
+        if (!IsValidEndpointReturnType(semanticModel, method, out var returnType, out var responseType))
         {
             diagnostics.Invoke(
                 Diagnostic.Create(
@@ -83,7 +84,7 @@ public record EndpointMethodDescriptor(
 
         foreach (var parameter in method.ParameterList.Parameters)
         {
-            var typeName = semanticModel.GetFullTypeName(parameter.Type!);
+            var typeName = semanticModel.GetTypeName(parameter.Type!);
             var parameterName = parameter.Identifier.ValueText;
 
             if (typeName
@@ -102,7 +103,7 @@ public record EndpointMethodDescriptor(
 
             foreach (var attribute in parameter.AttributeLists.SelectMany(a => a.Attributes))
             {
-                var attributeTypeName = semanticModel.GetFullTypeName(attribute);
+                var attributeTypeName = semanticModel.GetTypeName(attribute);
                 if (attributeTypeName == TypeConstants.BodyAttribute)
                 {
                     bodyParameter = parameterName;
@@ -133,7 +134,8 @@ public record EndpointMethodDescriptor(
         return new EndpointMethodDescriptor(
             method.Identifier.ValueText,
             $"public async {method.ReturnType} {method.Identifier}{method.ParameterList}",
-            returnType?.ToString(),
+            returnType,
+            responseType,
             httpMethod,
             routeTemplate,
             optionsParameter,
@@ -144,32 +146,41 @@ public record EndpointMethodDescriptor(
             bodyParameter);
     }
 
-    private static bool IsValidEndpointReturnType(MethodDeclarationSyntax method, out TypeSyntax? resultType)
+    private static bool IsValidEndpointReturnType(
+        SemanticModel semanticModel,
+        MethodDeclarationSyntax method,
+        out string? resultType,
+        out string? responseType)
     {
         resultType = null;
+        responseType = null;
+
         if (method.ReturnType is not GenericNameSyntax { } taskType)
         {
             return false;
         }
 
-        if (taskType.Identifier.ToString() == "System.Threading.Task")
+        if (semanticModel.GetTypeName(taskType) != TypeConstants.Task)
         {
             return false;
         }
 
-        if (taskType.TypeArgumentList.Arguments[0] is not SimpleNameSyntax endpointType)
+        if (taskType.TypeArgumentList.Arguments[0] is not TypeSyntax endpointType)
         {
             return false;
         }
 
-        if (endpointType.Identifier.ToString() == "Cabazure.Client.EndpointResponse")
+        if (semanticModel.GetTypeName(endpointType)
+            is not TypeConstants.EndpointResponse
+            and not TypeConstants.PagedResponse)
         {
             return false;
         }
 
-        if (endpointType is GenericNameSyntax g)
+        if (endpointType is GenericNameSyntax g && g.TypeArgumentList.Arguments[0] is TypeSyntax r)
         {
-            resultType = g.TypeArgumentList.Arguments[0];
+            responseType = endpointType.ToString();
+            resultType = r.ToString();
         }
 
         return true;

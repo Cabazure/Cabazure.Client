@@ -132,9 +132,9 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             resultGeneric = $"<{rt}>";
         }
 
-        var resultConversion = resultGeneric == null
+        var resultConversion = method.ResponseType == null
             ? null
-            : $"\n                response => new EndpointResponse{resultGeneric}(response),\n                ";
+            : $"\n                response => new {method.ResponseType}(response),\n                ";
 
         source.AppendLine($$"""
 

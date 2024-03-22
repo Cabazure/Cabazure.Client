@@ -26,14 +26,8 @@ public static class RoslynExtensions
         => node switch
         {
             BaseTypeDeclarationSyntax t => t.Identifier,
+            PropertyDeclarationSyntax f => f.Identifier,
+            MethodDeclarationSyntax m => m.Identifier,
             _ => null,
         };
-
-    public static bool IsPartial(
-        this TypeDeclarationSyntax type)
-        => type.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
-
-    public static bool IsPartial(
-        this MethodDeclarationSyntax type)
-        => type.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
 }
