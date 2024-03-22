@@ -20,7 +20,7 @@ public static class TestHelper
         global using global::Cabazure.Client;
         """;
 
-    public static SettingsTask Verify(params string[] sources)
+    public static Task VerifyEndpoint(params string[] sources)
     {
         var compilation = CompileSources(sources);
 
@@ -34,7 +34,7 @@ public static class TestHelper
         return Verifier.Verify(results);
     }
 
-    public static SettingsTask VerifyInitialization(params string[] sources)
+    public static Task VerifyInitialization(params string[] sources)
     {
         var compilation = CompileSources(sources);
 
@@ -46,6 +46,21 @@ public static class TestHelper
             .GetRunResult();
 
         return Verifier.Verify(results);
+    }
+
+    public static IEnumerable<DiagnosticDescriptor> GetDiagnostics(params string[] sources)
+    {
+        var compilation = CompileSources(sources);
+
+        var endpointGenerator = new ClientEndpointGenerator();
+        var initializationGenerator = new ClientEndpointGenerator();
+
+        var results = CSharpGeneratorDriver
+            .Create(endpointGenerator, initializationGenerator)
+            .RunGenerators(compilation)
+            .GetRunResult();
+
+        return results.Diagnostics.Select(d => d.Descriptor);
     }
 
     private static CSharpCompilation CompileSources(string[] sources)

@@ -19,12 +19,6 @@ public record EndpointDescriptor(
     {
         if (context.TargetNode is not InterfaceDeclarationSyntax @interface)
         {
-            diagnostics.Invoke(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.UnsupportedEndpointReturnType,
-                    context.TargetNode.GetLocation(),
-                    context.TargetNode.GetIdentifier()));
-
             return null;
         }
 
@@ -33,8 +27,14 @@ public record EndpointDescriptor(
             .Select(a => a.Value)
             .OfType<string>()
             .FirstOrDefault();
-        if (clientName == null)
+        if (string.IsNullOrWhiteSpace(clientName))
         {
+            diagnostics.Invoke(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ClientNameIsEmpty,
+                    @interface.GetLocation(),
+                    @interface.Identifier));
+
             return null;
         }
 
@@ -50,15 +50,30 @@ public record EndpointDescriptor(
             .OfType<string>()
             .ToImmutableArray();
 
-        var methods = @interface
-            .Members
-            .OfType<MethodDeclarationSyntax>()
+        var methodDeclarations = @interface.Members.OfType<MethodDeclarationSyntax>().ToArray();
+        if (methodDeclarations.Length == 0)
+        {
+            diagnostics.Invoke(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.EndpointHasNoMethods,
+                    @interface.GetLocation(),
+                    @interface.Identifier));
+
+            return null;
+        }
+
+        var methods = methodDeclarations
             .Select(m => EndpointMethodDescriptor.Create(
                 diagnostics,
                 context.SemanticModel,
                 m))
             .OfType<EndpointMethodDescriptor>()
             .ToImmutableArray();
+
+        if (methods.Length == 0)
+        {
+            return null;
+        }
 
         return new EndpointDescriptor(
             clientName,

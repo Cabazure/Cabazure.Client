@@ -18,10 +18,10 @@ public static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor InitializationNotInPartialClass = new(
+    public static readonly DiagnosticDescriptor EndpointHasNoMethods = new(
         "ECL002",
-        "ClientInitialization must be defined in a partial class",
-        "{0} is not a partial class",
+        "ClientEndpoint definition has no methods",
+        "{0} has no methods defined",
         DiagnosticCategories.EndpointGenerator,
         DiagnosticSeverity.Error,
         true
@@ -36,28 +36,19 @@ public static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor UnsupportedEndpointType = new(
+    public static readonly DiagnosticDescriptor ClientNameIsEmpty = new(
         "ECL004",
-        "ClientEndpoint is not an interface",
-        "{0} is not an interface",
+        "ClientName is empty",
+        "{0} is defining an empty ClientName",
         DiagnosticCategories.EndpointGenerator,
         DiagnosticSeverity.Error,
         true
     );
 
-    public static readonly DiagnosticDescriptor UnsupportedInitializationParameter = new(
+    public static readonly DiagnosticDescriptor UnsupportedEndpointParameter = new(
         "ECL005",
-        "ClientInitialization has unsupported parameter",
-        "{0} has an unsupported parameter {1}",
-        DiagnosticCategories.EndpointGenerator,
-        DiagnosticSeverity.Warning,
-        true
-    );
-
-    public static readonly DiagnosticDescriptor MissingRequiredInitializationParameter = new(
-        "ECL006",
-        "ClientInitialization is missing required parameter",
-        "{0} is missing required parameter {1}",
+        "ClientEndpoint has unsupported parameter",
+        "{0}.{1} has an unsupported parameter {2}. Please decorate with either [Body], [Path], [Query] or [Header] attribute.",
         DiagnosticCategories.EndpointGenerator,
         DiagnosticSeverity.Error,
         true

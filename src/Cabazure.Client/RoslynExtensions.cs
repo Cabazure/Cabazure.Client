@@ -26,8 +26,9 @@ public static class RoslynExtensions
         => node switch
         {
             BaseTypeDeclarationSyntax t => t.Identifier,
-            PropertyDeclarationSyntax f => f.Identifier,
+            PropertyDeclarationSyntax p => p.Identifier,
             MethodDeclarationSyntax m => m.Identifier,
+            ParameterSyntax p => p.Identifier,
             _ => null,
         };
 }

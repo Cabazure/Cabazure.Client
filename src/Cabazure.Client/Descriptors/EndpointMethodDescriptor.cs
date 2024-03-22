@@ -101,11 +101,13 @@ public record EndpointMethodDescriptor(
                 continue;
             }
 
+            var isValid = false;
             foreach (var attribute in parameter.AttributeLists.SelectMany(a => a.Attributes))
             {
                 var attributeTypeName = semanticModel.GetTypeName(attribute);
                 if (attributeTypeName == TypeConstants.BodyAttribute)
                 {
+                    isValid = true;
                     bodyParameter = parameterName;
                     continue;
                 }
@@ -113,21 +115,37 @@ public record EndpointMethodDescriptor(
                 var attributeValue = semanticModel.GetAttributeValue(attribute);
                 if (attributeTypeName == TypeConstants.PathAttribute)
                 {
+                    isValid = true;
                     pathParameters.Add(new(parameterName, attributeValue));
                     continue;
                 }
 
                 if (attributeTypeName == TypeConstants.QueryAttribute)
                 {
+                    isValid = true;
                     queryParameters.Add(new(parameterName, attributeValue));
                     continue;
                 }
 
                 if (attributeTypeName == TypeConstants.HeaderAttribute)
                 {
+                    isValid = true;
                     headerParameters.Add(new(parameterName, attributeValue));
                     continue;
                 }
+            }
+
+            if (!isValid)
+            {
+                diagnostics.Invoke(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.UnsupportedEndpointParameter,
+                        parameter.GetLocation(),
+                        method.Parent?.GetIdentifier(),
+                        method.Identifier,
+                        parameter.Identifier));
+
+                return null;
             }
         }
 

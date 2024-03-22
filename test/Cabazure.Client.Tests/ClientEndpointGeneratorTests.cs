@@ -4,7 +4,7 @@ public class ClientEndpointGeneratorTests
 {
     [Fact]
     public Task CanGenerate_GetEndpoint()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -15,7 +15,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_CancellationToken_Parameter()
-    => TestHelper.Verify("""
+    => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -27,7 +27,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_ClientRequestOptions_Parameter()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -39,7 +39,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_ClientPaginationOptions_Parameter()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -51,7 +51,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_PathParameter()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -65,7 +65,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_NamedPathParameter()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -79,7 +79,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_QueryParameter()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -93,7 +93,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_NamedQueryParameter()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -107,7 +107,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_HeaderParameter()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -121,7 +121,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_PostEndpoint()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -135,7 +135,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_Usings()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             using System.Text;
 
             [ClientEndpoint("ClientName")]
@@ -150,7 +150,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_Namespace()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             namespace Test
             {
                 [ClientEndpoint("ClientName")]
@@ -166,7 +166,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_FileScopedNamespace()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             namespace Test;
             
             [ClientEndpoint("ClientName")]
@@ -181,7 +181,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_ClientName_From_Constant()
-        => TestHelper.Verify("""
+        => TestHelper.VerifyEndpoint("""
             namespace Test;
 
             [ClientEndpoint(Constants.ClientName)]
@@ -201,7 +201,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_ClientName_From_NameOf()
-    => TestHelper.Verify("""
+    => TestHelper.VerifyEndpoint("""
             namespace Test;
             
             [ClientEndpoint(nameof(String))]
@@ -216,7 +216,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_Pagination_Endpoint()
-    => TestHelper.Verify("""
+    => TestHelper.VerifyEndpoint("""
             namespace Test;
             
             [ClientEndpoint("ClientName")]
