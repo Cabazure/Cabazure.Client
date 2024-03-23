@@ -15,7 +15,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_CancellationToken_Parameter()
-    => TestHelper.VerifyEndpoint("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -201,7 +201,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_ClientName_From_NameOf()
-    => TestHelper.VerifyEndpoint("""
+        => TestHelper.VerifyEndpoint("""
             namespace Test;
             
             [ClientEndpoint(nameof(String))]
@@ -216,7 +216,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_Pagination_Endpoint()
-    => TestHelper.VerifyEndpoint("""
+        => TestHelper.VerifyEndpoint("""
             namespace Test;
             
             [ClientEndpoint("ClientName")]
@@ -225,6 +225,33 @@ public class ClientEndpointGeneratorTests
                 [Get("/routes")]
                 public Task<PagedResponse<string[]>> ExecuteAsync(
                     ClientPaginationOptions options,
+                    CancellationToken cancellationToken);
+            }
+            """);
+
+    [Fact]
+    public Task CanGenerate_PutEndpoint()
+        => TestHelper.VerifyEndpoint("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Put("/items/{id}")]
+                public Task<EndpointResponse> ExecuteAsync(
+                    [Path("id")] string id,
+                    [Body] string body,
+                    CancellationToken cancellationToken);
+            }
+            """);
+
+    [Fact]
+    public Task CanGenerate_DeleteEndpoint()
+    => TestHelper.VerifyEndpoint("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Delete("/items/{id}")]
+                public Task<EndpointResponse> ExecuteAsync(
+                    [Path] string id,
                     CancellationToken cancellationToken);
             }
             """);

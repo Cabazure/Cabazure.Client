@@ -91,4 +91,37 @@ public class GeneratorDiagnosticsTests
                 """)
             .Should()
             .Contain(DiagnosticDescriptors.UnsupportedEndpointParameter);
+
+    [Fact]
+    public void ReportDiagnostics_When_PathParameterNotInRouteTemplate()
+        => TestHelper
+            .GetDiagnostics("""
+                [ClientEndpoint("ClientName")]
+                public interface ITestEndpoint
+                {
+                    [Put("/items/{itemId}")]
+                    public Task<EndpointResponse> ExecuteAsync(
+                        [Path("id")] string id,
+                        [Body] string body,
+                        CancellationToken cancellationToken);
+                }
+                """)
+            .Should()
+            .Contain(DiagnosticDescriptors.PathParameterNotInRouteTemplate);
+
+    [Fact]
+    public void ReportDiagnostics_When_RouteTemplateHasUnmappedPathParameter()
+        => TestHelper
+            .GetDiagnostics("""
+                [ClientEndpoint("ClientName")]
+                public interface ITestEndpoint
+                {
+                    [Put("/items/{id}")]
+                    public Task<EndpointResponse> ExecuteAsync(
+                        [Body] string body,
+                        CancellationToken cancellationToken);
+                }
+                """)
+            .Should()
+            .Contain(DiagnosticDescriptors.RouteTemplateHasUnmappedPathParameter);
 }

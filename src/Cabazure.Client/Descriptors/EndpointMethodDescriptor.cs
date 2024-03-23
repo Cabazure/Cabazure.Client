@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Text.RegularExpressions;
 using Cabazure.Client.SourceGenerator.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -19,6 +20,11 @@ public record EndpointMethodDescriptor(
     ImmutableArray<EndpointParameter> PathParameters,
     string? BodyParameter)
 {
+    private static readonly Regex TokenRegex = new(
+        "\\{(?<id>[^}]*?)\\}",
+        RegexOptions.Compiled,
+        TimeSpan.FromMilliseconds(100));
+
     public static EndpointMethodDescriptor? Create(
         Action<Diagnostic> diagnostics,
         SemanticModel semanticModel,
@@ -70,6 +76,7 @@ public record EndpointMethodDescriptor(
                 Diagnostic.Create(
                     DiagnosticDescriptors.UnsupportedEndpointReturnType,
                     method.GetLocation(),
+                    method.Parent?.GetIdentifier(),
                     method.Identifier));
 
             return null;
@@ -112,9 +119,22 @@ public record EndpointMethodDescriptor(
                     continue;
                 }
 
-                var attributeValue = semanticModel.GetAttributeValue(attribute);
+                var attributeValue = semanticModel.GetAttributeValue(attribute)
+                    ?? parameterName;
                 if (attributeTypeName == TypeConstants.PathAttribute)
                 {
+                    if (!routeTemplate.Contains($"{{{attributeValue}}}"))
+                    {
+                        diagnostics.Invoke(
+                            Diagnostic.Create(
+                                DiagnosticDescriptors.PathParameterNotInRouteTemplate,
+                                parameter.GetLocation(),
+                                method.Parent?.GetIdentifier(),
+                                method.Identifier,
+                                parameter.Identifier,
+                                routeTemplate,
+                                attributeValue));
+                    }
                     isValid = true;
                     pathParameters.Add(new(parameterName, attributeValue));
                     continue;
@@ -146,6 +166,22 @@ public record EndpointMethodDescriptor(
                         parameter.Identifier));
 
                 return null;
+            }
+        }
+
+        foreach (Match m in TokenRegex.Matches(routeTemplate))
+        {
+            var token = m.Groups["id"].Value;
+            if (!pathParameters.Any(p => p.AttributeValue == token))
+            {
+                diagnostics.Invoke(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.RouteTemplateHasUnmappedPathParameter,
+                        method.GetLocation(),
+                        method.Parent?.GetIdentifier(),
+                        method.Identifier,
+                        token,
+                        routeTemplate));
             }
         }
 

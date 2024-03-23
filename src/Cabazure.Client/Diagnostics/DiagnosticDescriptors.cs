@@ -12,7 +12,7 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor UnsupportedEndpointReturnType = new(
         "ECL001",
         "ClientEndpoint has unsupported return type",
-        "{0} has an unsupported return type. Return type must be either Task<EndpointResponse>, Task<EndpointResponse<T>> or Task<PagedResponse<T>>.",
+        "{0}.{1} has an unsupported return type. Return type must be either Task<EndpointResponse>, Task<EndpointResponse<T>> or Task<PagedResponse<T>>.",
         DiagnosticCategories.EndpointGenerator,
         DiagnosticSeverity.Error,
         true
@@ -49,6 +49,24 @@ public static class DiagnosticDescriptors
         "ECL005",
         "ClientEndpoint has unsupported parameter",
         "{0}.{1} has an unsupported parameter {2}. Please decorate with either [Body], [Path], [Query] or [Header] attribute.",
+        DiagnosticCategories.EndpointGenerator,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor PathParameterNotInRouteTemplate = new(
+        "ECL006",
+        "ClientEndpoint has unused path parameter",
+        "{0}.{1} has an unused path parameter {2}. The route template \"{3}\" does not contain a \"{{{4}}}\" placeholder.",
+        DiagnosticCategories.EndpointGenerator,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor RouteTemplateHasUnmappedPathParameter = new(
+        "ECL007",
+        "ClientEndpoint is missing a path parameter for the specified route template",
+        "{0}.{1} has no path parameter specified for the \"{{{2}}}\" placeholder in the route template \"{3}\"",
         DiagnosticCategories.EndpointGenerator,
         DiagnosticSeverity.Error,
         true

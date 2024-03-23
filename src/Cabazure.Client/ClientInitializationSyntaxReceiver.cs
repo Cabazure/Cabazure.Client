@@ -14,6 +14,8 @@ public class ClientInitializationSyntaxReceiver : ISyntaxContextReceiver
 
     public IEnumerable<Diagnostic> Diagnostics => diagnostics;
 
+    public bool IsInitializationCalled { get; set; }
+
     void ISyntaxContextReceiver.OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {
         if (context.Node is not AttributeSyntax attribute)

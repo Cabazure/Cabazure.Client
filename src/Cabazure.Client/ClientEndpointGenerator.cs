@@ -99,17 +99,17 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
         foreach (var p in method.PathParameters)
         {
-            requestOptions.Append($"\n            .WithPathParameter(\"{p.AttributeValue ?? p.ParameterName}\", {p.ParameterName})");
+            requestOptions.Append($"\n            .WithPathParameter(\"{p.AttributeValue}\", {p.ParameterName})");
         }
 
         foreach (var p in method.QueryParameters)
         {
-            requestOptions.Append($"\n            .WithQueryParameter(\"{p.AttributeValue ?? p.ParameterName}\", {p.ParameterName})");
+            requestOptions.Append($"\n            .WithQueryParameter(\"{p.AttributeValue}\", {p.ParameterName})");
         }
 
         foreach (var p in method.HeaderParameters)
         {
-            requestOptions.Append($"\n            .WithHeader(\"{p.AttributeValue ?? p.ParameterName}\", {p.ParameterName})");
+            requestOptions.Append($"\n            .WithHeader(\"{p.AttributeValue}\", {p.ParameterName})");
         }
 
         if (method.BodyParameter is { } b)
