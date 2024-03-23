@@ -3,6 +3,7 @@ using Cabazure.Client.SourceGenerator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 
 namespace Cabazure.Client.Tests;
 
@@ -20,47 +21,70 @@ public static class TestHelper
         global using global::Cabazure.Client;
         """;
 
-    public static Task VerifyEndpoint(params string[] sources)
+    public static async Task VerifyEndpoint(params string[] sources)
     {
-        var compilation = CompileSources(sources);
+        var initialCompilation = CompileSources(sources);
 
         var generator = new ClientEndpointGenerator();
 
-        var results = CSharpGeneratorDriver
+        var driver = CSharpGeneratorDriver
             .Create(generator)
-            .RunGenerators(compilation)
-            .GetRunResult();
+            .RunGeneratorsAndUpdateCompilation(
+                initialCompilation,
+                out var finalCompilation,
+                out _);
 
-        return Verifier.Verify(results);
+        await Verifier.Verify(driver);
+
+        ThrowOnCompilationErrors(finalCompilation);
     }
 
-    public static Task VerifyInitialization(params string[] sources)
+    public static async Task VerifyInitialization(params string[] sources)
     {
-        var compilation = CompileSources(sources);
+        var initialCompilation = CompileSources(sources);
 
-        var generator = new ClientInitializationGenerator();
+        var endpointGenerator = new ClientEndpointGenerator();
+        CSharpGeneratorDriver
+            .Create(endpointGenerator)
+            .RunGeneratorsAndUpdateCompilation(
+                initialCompilation,
+                out var endpointCompilation,
+                out _);
 
-        var results = CSharpGeneratorDriver
-            .Create(generator)
-            .RunGenerators(compilation)
-            .GetRunResult();
+        var initializationGenerator = new ClientInitializationGenerator();
+        var driver = CSharpGeneratorDriver
+            .Create(initializationGenerator)
+            .RunGeneratorsAndUpdateCompilation(
+                endpointCompilation,
+                out var finalCompilation,
+                out _);
 
-        return Verifier.Verify(results);
+        await Verifier.Verify(driver);
+
+        ThrowOnCompilationErrors(finalCompilation);
     }
 
     public static IEnumerable<DiagnosticDescriptor> GetDiagnostics(params string[] sources)
     {
-        var compilation = CompileSources(sources);
+        var initialCompilation = CompileSources(sources);
 
-        var endpointGenerator = new ClientEndpointGenerator();
-        var initializationGenerator = new ClientEndpointGenerator();
+        CSharpGeneratorDriver
+            .Create(new ClientEndpointGenerator())
+            .RunGeneratorsAndUpdateCompilation(
+                initialCompilation,
+                out var endpointCompilation,
+                out var endpointDiagnostics);
 
-        var results = CSharpGeneratorDriver
-            .Create(endpointGenerator, initializationGenerator)
-            .RunGenerators(compilation)
-            .GetRunResult();
+        CSharpGeneratorDriver
+            .Create(new ClientInitializationGenerator())
+            .RunGeneratorsAndUpdateCompilation(
+                endpointCompilation,
+                out _,
+                out var initializationDiagnostics);
 
-        return results.Diagnostics.Select(d => d.Descriptor);
+        return endpointDiagnostics
+            .Union(initializationDiagnostics)
+            .Select(d => d.Descriptor);
     }
 
     private static CSharpCompilation CompileSources(string[] sources)
@@ -76,14 +100,19 @@ public static class TestHelper
             .Append(typeof(JsonSerializerOptions).Assembly)
             .Append(typeof(IServiceCollection).Assembly)
             .Append(typeof(IHttpClientBuilder).Assembly)
+            .Append(typeof(StringValues).Assembly)
+            .Append(typeof(OptionsServiceCollectionExtensions).Assembly)
             .Select(x => MetadataReference.CreateFromFile(x.Location));
 
-        CSharpCompilation compilation = CSharpCompilation.Create(
+        return CSharpCompilation.Create(
             assemblyName: "Tests",
             syntaxTrees,
             references,
             new(OutputKind.DynamicallyLinkedLibrary));
+    }
 
+    private static void ThrowOnCompilationErrors(Compilation compilation)
+    {
         var errors = compilation
             .GetDiagnostics()
             .Where(d => d.Severity == DiagnosticSeverity.Error)
@@ -92,9 +121,7 @@ public static class TestHelper
 
         if (errors.Length > 0)
         {
-            throw new ArgumentException(string.Join("\n", errors), nameof(sources));
+            throw new ArgumentException(string.Join("\n", errors));
         }
-
-        return compilation;
     }
 }
