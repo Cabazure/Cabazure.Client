@@ -20,6 +20,14 @@ public record EndpointReferenceDescriptor(
         var className = interfaceName.Length > 1 && interfaceName[0] == 'I'
             ? interfaceName.Substring(1)
             : interfaceName + "_Implementation";
+
+        var interfaceParent = interfaceSyntax.Parent;
+        while (interfaceParent is ClassDeclarationSyntax c)
+        {
+            interfaceName = string.Concat(c.Identifier.ValueText, ".", interfaceName);
+            interfaceParent = c.Parent;
+        }
+
         var ns = interfaceSyntax.GetNamespace();
 
         return new EndpointReferenceDescriptor(

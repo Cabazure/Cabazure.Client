@@ -245,7 +245,7 @@ public class ClientEndpointGeneratorTests
 
     [Fact]
     public Task CanGenerate_DeleteEndpoint()
-    => TestHelper.VerifyEndpoint("""
+        => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
@@ -253,6 +253,24 @@ public class ClientEndpointGeneratorTests
                 public Task<EndpointResponse> ExecuteAsync(
                     [Path] string id,
                     CancellationToken cancellationToken);
+            }
+            """);
+
+    [Fact]
+    public Task CanGenerate_NestedType()
+        => TestHelper.VerifyEndpoint("""
+            public static class Endpoints
+            {
+                public class Items
+                {
+                    [ClientEndpoint("ClientName")]
+                    public interface ITestEndpoint
+                    {
+                        [Get("/items")]
+                        public Task<EndpointResponse<string>> ExecuteAsync(
+                            CancellationToken cancellationToken);
+                    }
+                }
             }
             """);
 }
