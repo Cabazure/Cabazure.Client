@@ -1,4 +1,6 @@
-﻿using Cabazure.Client.Builder;
+﻿using System.Net;
+using Cabazure.Client.Builder;
+using NSubstitute.ReceivedExtensions;
 
 namespace Cabazure.Client.IntegrationTests;
 
@@ -17,9 +19,9 @@ public class PostEndpointTests()
     public interface IPostEndpoint
     {
         [Post(RouteTemplate)]
-        Task<EndpointResponse<string[]>> ExecuteAsync(
+        Task<EndpointResponse<string>> ExecuteAsync(
             [Body] string item,
-            ClientPaginationOptions options,
+            ClientRequestOptions options,
             CancellationToken cancellationToken);
     }
 
@@ -28,7 +30,7 @@ public class PostEndpointTests()
         [Frozen] IMessageRequestBuilder builder,
         PostEndpoint sut,
         string item,
-        ClientPaginationOptions options,
+        ClientRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -46,7 +48,7 @@ public class PostEndpointTests()
         [Frozen] IMessageRequestBuilder builder,
         PostEndpoint sut,
         string item,
-        ClientPaginationOptions options,
+        ClientRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -64,7 +66,7 @@ public class PostEndpointTests()
         [Frozen] IMessageRequestBuilder builder,
         PostEndpoint sut,
         string id,
-        ClientPaginationOptions options,
+        ClientRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -75,5 +77,89 @@ public class PostEndpointTests()
         builder
             .Received(1)
             .Build(HttpMethod.Post);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Should_Set_Timeout_On_HttpClient(
+        [Frozen] IHttpClientFactory factory,
+        [Frozen, Substitute] HttpClient client,
+        PostEndpoint sut,
+        string item,
+        ClientRequestOptions options,
+        TimeSpan timeout,
+        CancellationToken cancellationToken)
+    {
+        _ = factory
+            .CreateClient(default)
+            .ReturnsForAnyArgs(client);
+        options.Timeout = timeout;
+
+        await sut.ExecuteAsync(
+            item,
+            options,
+            cancellationToken);
+
+        client.Timeout.Should().Be(timeout);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Should_Configure_SuccessResponse(
+        [Frozen] IMessageResponseBuilder builder,
+        PostEndpoint sut,
+        string item,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            item,
+            options,
+            cancellationToken);
+
+        builder
+            .Received(1)
+            .AddSuccessResponse<string>(HttpStatusCode.OK);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Should_Create_Result(
+        [Frozen] IMessageResponseBuilder builder,
+        PostEndpoint sut,
+        string item,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            item,
+            options,
+            cancellationToken);
+
+        _ = builder
+            .Received(1)
+            .GetAsync(
+                Arg.Any<Func<EndpointResponse, EndpointResponse<string>>>(),
+                cancellationToken);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Should_Return_Result(
+        [Frozen] IMessageResponseBuilder builder,
+        PostEndpoint sut,
+        EndpointResponse<string> response,
+        string item,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        builder
+            .GetAsync(Arg.Any<Func<EndpointResponse, EndpointResponse<string>>>(), cancellationToken)
+            .ReturnsForAnyArgs(response);
+
+        var result = await sut.ExecuteAsync(
+            item,
+            options,
+            cancellationToken);
+
+        result
+            .Should()
+            .Be(response);
     }
 }

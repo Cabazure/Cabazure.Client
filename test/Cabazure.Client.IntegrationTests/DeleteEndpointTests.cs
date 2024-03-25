@@ -1,4 +1,5 @@
-﻿using Cabazure.Client.Builder;
+﻿using System.Net;
+using Cabazure.Client.Builder;
 
 namespace Cabazure.Client.IntegrationTests;
 
@@ -52,5 +53,58 @@ public class DeleteEndpointTests()
         builder
             .Received(1)
             .Build(HttpMethod.Delete);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Should_Configure_SuccessResponse(
+        [Frozen] IMessageResponseBuilder builder,
+        DeleteEndpoint sut,
+        string item,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            item,
+            cancellationToken);
+
+        builder
+            .Received(1)
+            .AddSuccessResponse(HttpStatusCode.OK);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Should_Create_Result(
+        [Frozen] IMessageResponseBuilder builder,
+        DeleteEndpoint sut,
+        string item,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            item,
+            cancellationToken);
+
+        _ = builder
+            .Received(1)
+            .GetAsync(cancellationToken);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Should_Return_Result(
+        [Frozen] IMessageResponseBuilder builder,
+        DeleteEndpoint sut,
+        EndpointResponse response,
+        string item,
+        CancellationToken cancellationToken)
+    {
+        builder
+            .GetAsync(cancellationToken)
+            .ReturnsForAnyArgs(response);
+
+        var result = await sut.ExecuteAsync(
+            item,
+            cancellationToken);
+
+        result
+            .Should()
+            .Be(response);
     }
 }

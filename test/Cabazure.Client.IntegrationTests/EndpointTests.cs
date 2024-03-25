@@ -46,7 +46,6 @@ public abstract class EndpointTests<TClass, TInterface>(
 
     [Theory, AutoNSubstituteData]
     public async Task Should_Create_Request(
-        [Frozen] IHttpClientFactory factory,
         [Frozen] IMessageRequestFactory requestFactory,
         TClass sut)
     {
@@ -55,5 +54,31 @@ public abstract class EndpointTests<TClass, TInterface>(
         requestFactory
             .Received(1)
             .FromTemplate(clientName, routeTemplate);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Should_Send_Request(
+        [Frozen] HttpClient client,
+        [Frozen] HttpRequestMessage request,
+        TClass sut)
+    {
+        await ExecuteAsync(sut);
+
+        _ = client
+            .Received(1)
+            .SendAsync(request, Arg.Any<CancellationToken>());
+    }
+
+    [Theory, AutoNSubstituteData]
+    public async Task Should_Create_Builder_From_Response(
+        [Frozen] IMessageRequestFactory requestFactory,
+        [Frozen] HttpResponseMessage response,
+        TClass sut)
+    {
+        await ExecuteAsync(sut);
+
+        requestFactory
+            .Received(1)
+            .FromResponse(clientName, response);
     }
 }

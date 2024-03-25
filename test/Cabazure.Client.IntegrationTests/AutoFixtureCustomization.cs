@@ -34,24 +34,31 @@ public class AutoFixtureCustomization : ICustomization
     {
         var factory = Substitute.For<IHttpClientFactory>();
         factory
-            .CreateClient(Arg.Any<string>())
-            .Returns(c => fixture.Create<HttpClient>());
+            .CreateClient(default)
+            .ReturnsForAnyArgs(c => fixture.Create<HttpClient>());
 
         return factory;
     }
 
     private static HttpClient CreateHttpClient(IFixture fixture)
-        => Substitute.For<HttpClient>();
+    {
+        var client = Substitute.For<HttpClient>();
+        var invoker = (HttpMessageInvoker)client;
+        invoker
+            .SendAsync(default, default)
+            .ReturnsForAnyArgs(c => fixture.Create<HttpResponseMessage>());
+        return client;
+    }
 
     private static IMessageRequestFactory CreateMessageRequestFactory(IFixture fixture)
     {
         var factory = Substitute.For<IMessageRequestFactory>();
         factory
-            .FromTemplate(Arg.Any<string>(), Arg.Any<string>())
-            .Returns(c => fixture.Create<IMessageRequestBuilder>());
+            .FromTemplate(default, default)
+            .ReturnsForAnyArgs(c => fixture.Create<IMessageRequestBuilder>());
         factory
-            .FromResponse(Arg.Any<string>(), Arg.Any<HttpResponseMessage>())
-            .Returns(c => fixture.Create<IMessageResponseBuilder>());
+            .FromResponse(default, default)
+            .ReturnsForAnyArgs(c => fixture.Create<IMessageResponseBuilder>());
 
         return factory;
     }
@@ -86,10 +93,10 @@ public class AutoFixtureCustomization : ICustomization
         var builder = Substitute.For<IMessageResponseBuilder>();
         builder
             .AddSuccessResponse(default)
-            .Returns(builder);
+            .ReturnsForAnyArgs(c => builder);
         builder
             .AddSuccessResponse<object>(default)
-            .ReturnsForAnyArgs(builder);
+            .ReturnsForAnyArgs(c => builder);
         builder
             .AddErrorResponse(default)
             .ReturnsForAnyArgs(builder);
