@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Cabazure.Client.SourceGenerator.Diagnostics;
 using Microsoft.CodeAnalysis;
@@ -30,34 +31,7 @@ public record EndpointMethodDescriptor(
         SemanticModel semanticModel,
         MethodDeclarationSyntax method)
     {
-        string? httpMethod = null;
-        string? routeTemplate = null;
-        foreach (var attribute in method.AttributeLists.SelectMany(a => a.Attributes))
-        {
-            var attributeTypeName = semanticModel.GetTypeName(attribute);
-            switch (attributeTypeName)
-            {
-                case TypeConstants.GetAttribute:
-                    httpMethod = nameof(System.Net.Http.HttpMethod.Get);
-                    routeTemplate = semanticModel.GetAttributeValue(attribute);
-                    break;
-
-                case TypeConstants.PostAttribute:
-                    httpMethod = nameof(System.Net.Http.HttpMethod.Post);
-                    routeTemplate = semanticModel.GetAttributeValue(attribute);
-                    break;
-
-                case TypeConstants.PutAttribute:
-                    httpMethod = nameof(System.Net.Http.HttpMethod.Put);
-                    routeTemplate = semanticModel.GetAttributeValue(attribute);
-                    break;
-
-                case TypeConstants.DeleteAttribute:
-                    httpMethod = nameof(System.Net.Http.HttpMethod.Delete);
-                    routeTemplate = semanticModel.GetAttributeValue(attribute);
-                    break;
-            }
-        }
+        TryGetEndpointRoute(semanticModel, method, out var httpMethod, out var routeTemplate);
 
         if (httpMethod == null || routeTemplate == null)
         {
@@ -198,6 +172,45 @@ public record EndpointMethodDescriptor(
             queryParameters.ToImmutableArray(),
             pathParameters.ToImmutableArray(),
             bodyParameter);
+    }
+
+    private static bool TryGetEndpointRoute(
+        SemanticModel semanticModel,
+        MethodDeclarationSyntax method,
+        [NotNullWhen(true)] out string? httpMethod,
+        [NotNullWhen(true)] out string? routeTemplate)
+    {
+        httpMethod = null;
+        routeTemplate = null;
+        foreach (var attribute in method.AttributeLists.SelectMany(a => a.Attributes))
+        {
+            var attributeTypeName = semanticModel.GetTypeName(attribute);
+            switch (attributeTypeName)
+            {
+                case TypeConstants.GetAttribute:
+                    httpMethod = nameof(System.Net.Http.HttpMethod.Get);
+                    routeTemplate = semanticModel.GetAttributeValue(attribute);
+                    return true;
+
+                case TypeConstants.PostAttribute:
+                    httpMethod = nameof(System.Net.Http.HttpMethod.Post);
+                    routeTemplate = semanticModel.GetAttributeValue(attribute);
+                    return true;
+
+                case TypeConstants.PutAttribute:
+                    httpMethod = nameof(System.Net.Http.HttpMethod.Put);
+                    routeTemplate = semanticModel.GetAttributeValue(attribute);
+                    return true;
+
+                case TypeConstants.DeleteAttribute:
+                    httpMethod = nameof(System.Net.Http.HttpMethod.Delete);
+                    routeTemplate = semanticModel.GetAttributeValue(attribute);
+                    return true;
+
+            }
+        }
+
+        return false;
     }
 
     private static bool IsValidEndpointReturnType(
