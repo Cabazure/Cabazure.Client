@@ -5,6 +5,7 @@ run-name: v0.1.${{ github.run_number }} • ${{ github.event.head_commit.message
 on:
   push:
     branches: [ "main" ]
+    paths-ignore: [ 'docs/**', '*.md' ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
