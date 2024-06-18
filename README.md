@@ -6,7 +6,7 @@ The main design choices in the Cabazure.Client are:
 * Contracts are shared via library used by both Client and Server
 * Endpoints are represented as interfaces, for easy mocking in unit testing
 * Dependency Injection is used for registering endpoints
-* *Pending: Azure.Identity is used for Authorization*
+* Azure.Identity is used for Authentication
 
 ## Getting started
 
@@ -67,8 +67,11 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services)
         => services.ConfigureClient(
             "CustomerClient",
-            b => b.ConfigureHttpClient(
-                c => c.BaseAddress = new("https://customer.api")),
+            b => b
+              .SetBaseAddress(new Uri("https://customer-api.contoso.com"))
+              .AddAuthentication(
+                scope: "app://contoso.com/customer-api/.default",
+                credential: new DefaultAzureCredential()),
             j => j.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
 }
 ```
