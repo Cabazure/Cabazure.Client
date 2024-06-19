@@ -11,19 +11,4 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup Label="configurations">
-    <Configurations>Debug;Release;Debug.AOT;Release.AOT</Configurations>
-    <Platforms>AnyCPU</Platforms>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug.AOT' ">
-    <DefineConstants>TRACE;AOT;</DefineConstants>
-    <PublishAot>true</PublishAot>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release.AOT' ">
-    <DefineConstants>TRACE;AOT;</DefineConstants>
-    <PublishAot>true</PublishAot>
-  </PropertyGroup>
-
 </Project>
