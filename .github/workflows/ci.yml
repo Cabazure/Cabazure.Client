@@ -1,11 +1,13 @@
-name: Release
+name: Build and Test
 
-run-name: ${{ github.ref_name }} • ${{ github.event.head_commit.message }}
+run-name: ${{ github.run_number }} • ${{ github.event.head_commit.message }}
 
 on:
   push:
-    tags:
-    - "v[0-9]+.[0-9]+.[0-9]+"
+    branches: [main]
+    paths-ignore: ['docs/**', '*.md']
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -14,19 +16,12 @@ permissions:
   packages: write
 
 jobs:
-  Build:
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: 🛒 Checkout repository
         uses: actions/checkout@v4
-
-      - name: 🛟 Verify commit exists in origin/main
-        run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
-          git branch --remote --contains | grep origin/main
-
-      - name: 🏷️ Set VERSION variable from tag
-        run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
 
       - name: ⚙️ Setup dotnet 8.0.x
         uses: actions/setup-dotnet@v4
@@ -40,19 +35,10 @@ jobs:
         run: dotnet restore
 
       - name: 🛠️ Build solution
-        run: dotnet build --no-restore -c:Release -p:SourceRevisionId=${VERSION} -p:Version=${VERSION}
+        run: dotnet build --no-restore -c:Release
 
       - name: 🧪 Run tests
         run: dotnet test --no-build -c:Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" || true
-
-      - name: 📋 Test Report
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: Test Report
-          path: "**/test-results.trx"
-          reporter: dotnet-trx
-          fail-on-error: true
 
       - name: 📋 Test Report
         uses: dorny/test-reporter@v1
@@ -96,5 +82,3 @@ jobs:
           name: CoverageHistory
           path: CoverageHistory
 
-      - name: 📦 Push packages to NuGet
-        run: dotnet nuget push **/Cabazure.*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_KEY }} --skip-duplicate --no-symbols

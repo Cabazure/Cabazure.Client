@@ -9,6 +9,8 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Cabazure/Cabazure.Client</RepositoryUrl>
   </PropertyGroup>
 
 </Project>
