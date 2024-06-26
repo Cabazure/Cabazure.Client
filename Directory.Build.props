@@ -9,8 +9,22 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Cabazure/Cabazure.Client</RepositoryUrl>
+  </PropertyGroup>
+
+  <!--
+  By default builds are non-deterministic, meaning there is no guarantee that building the same code twice(on the same or different machines)
+  will produce exactly the same binary output. Deterministic builds are important as they enable verification that the resulting
+  binary was built from the specified source and provides traceability.
+
+  To enable deterministic builds a property should be set to through: ContinuousIntegrationBuild.
+
+  Important: This property should not be enabled during local development as the debugger won't be able to find the local source files.
+  -->
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
 </Project>
