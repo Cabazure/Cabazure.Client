@@ -5,6 +5,7 @@
   <PropertyGroup Label="Assembly Naming">
     <Company>Cabazure</Company>
     <Authors>Cabazure</Authors>
+    <Description>Library for creating .NET Clients for your AspNetCore REST APIs, using Source Generators directed by attributes.</Description>
     <NeutralLanguage>en</NeutralLanguage>
     <DefaultLanguage>en-US</DefaultLanguage>
     <DebugSymbols>true</DebugSymbols>
