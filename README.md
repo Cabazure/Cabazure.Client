@@ -42,7 +42,7 @@ The return type of `Task<EndpointResponse<Customer>>`, is a wrapper for the actu
 | `Task<EndpointResponse<T>>` | Used for endpoints with a response object |
 | `Task<PagedResponse<T[]>>`  | Used for endpoints with a paged response  |
 
-The `Path` attribute on the `customerId` parameter of the endpoint method, declares that this parameter corresponds to the endpoint path placeholder. Parameters containing data for an endpoint method should have one of the following attributes describing how they are passed to the endpoint: `Path`, `Query`, `Header` or `Body`.
+The `[Path]` attribute on the `customerId` parameter of the endpoint method, declares that this parameter corresponds to the endpoint path placeholder. Parameters containing data for an endpoint method should have one of the following attributes describing how they are passed to the endpoint: `[Path]`, `[Query]`, `[Header]` or `[Body]`.
 
 Apart from the data parameters, the following parameter types are supported:
 
@@ -54,7 +54,7 @@ Apart from the data parameters, the following parameter types are supported:
 
 ### Adding the bootstrap
 
-To register relevant dependencies for the Client, the generated `ConfigureClient` extension method on `IServiceCollection` needs to be called.
+To register relevant dependencies for the Client, the generated `AddCabazureClient` extension method on `IServiceCollection` needs to be called. This will register all the endpoints for the specified `HttpClient` instance as singletons in the `IServiceCollection`.
 
 To make it easy for the user of the Client, it is recommended to do this in a bootstrap method like this:
 
@@ -65,7 +65,7 @@ public static class ServiceCollectionExtensions
 {
     public static void AddCustomerClient(
         this IServiceCollection services)
-        => services.ConfigureClient(
+        => services.AddCabazureClient(
             "CustomerClient",
             b => b
               .SetBaseAddress(new Uri("https://customer-api.contoso.com"))
@@ -76,7 +76,7 @@ public static class ServiceCollectionExtensions
 }
 ```
 
-The call to `ConfigureClient` needs the following:
+The call to `AddCabazureClient` needs the following:
 * The name of the `HttpClient` instance (matching the one specified on the endpoints)
 * Configuration of the `HttpClient` (using an `IHttpClientBuilder`)
 * Configuration of the `JsonSerializerOptions` used for serialization of the contracts
@@ -88,8 +88,6 @@ To use the Client library, the bootstrap method should be called during composit
 ```csharp
 builder.Services.AddCustomerClient();
 ```
-
-This will register the client endpoints into the DependencyInjection container.
 
 An endpoint can be constructor injected by adding the endpoint interface as a constructor parameter, like this:
 

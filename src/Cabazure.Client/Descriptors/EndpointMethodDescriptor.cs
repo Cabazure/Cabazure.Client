@@ -189,22 +189,22 @@ public record EndpointMethodDescriptor(
             {
                 case TypeConstants.GetAttribute:
                     httpMethod = nameof(System.Net.Http.HttpMethod.Get);
-                    routeTemplate = semanticModel.GetAttributeValue(attribute);
+                    routeTemplate = semanticModel.GetAttributeValue(attribute)!;
                     return true;
 
                 case TypeConstants.PostAttribute:
                     httpMethod = nameof(System.Net.Http.HttpMethod.Post);
-                    routeTemplate = semanticModel.GetAttributeValue(attribute);
+                    routeTemplate = semanticModel.GetAttributeValue(attribute)!;
                     return true;
 
                 case TypeConstants.PutAttribute:
                     httpMethod = nameof(System.Net.Http.HttpMethod.Put);
-                    routeTemplate = semanticModel.GetAttributeValue(attribute);
+                    routeTemplate = semanticModel.GetAttributeValue(attribute)!;
                     return true;
 
                 case TypeConstants.DeleteAttribute:
                     httpMethod = nameof(System.Net.Http.HttpMethod.Delete);
-                    routeTemplate = semanticModel.GetAttributeValue(attribute);
+                    routeTemplate = semanticModel.GetAttributeValue(attribute)!;
                     return true;
 
             }

@@ -13,7 +13,7 @@ public class ConfigureClientTests
         [Substitute] Action<IHttpClientBuilder> builder,
         [Substitute] Action<JsonSerializerOptions> jsonOptions)
     {
-        services.ConfigureClient("TestClient", builder, jsonOptions);
+        services.AddCabazureClient("TestClient", builder, jsonOptions);
 
         services
             .Should()
@@ -29,7 +29,7 @@ public class ConfigureClientTests
         [Substitute] Action<IHttpClientBuilder> builder,
         [Substitute] Action<JsonSerializerOptions> jsonOptions)
     {
-        services.ConfigureClient("TestClient", builder, jsonOptions);
+        services.AddCabazureClient("TestClient", builder, jsonOptions);
 
         services
             .Should()
@@ -45,7 +45,7 @@ public class ConfigureClientTests
         [Substitute] Action<IHttpClientBuilder> builder,
         [Substitute] Action<JsonSerializerOptions> jsonOptions)
     {
-        services.ConfigureClient("TestClient", builder, jsonOptions);
+        services.AddCabazureClient("TestClient", builder, jsonOptions);
 
         services
             .Should()
@@ -70,7 +70,7 @@ public class ConfigureClientTests
         [Substitute] Action<IHttpClientBuilder> builder,
         [Substitute] Action<JsonSerializerOptions> jsonOptions)
     {
-        services.ConfigureClient("TestClient", builder, jsonOptions);
+        services.AddCabazureClient("TestClient", builder, jsonOptions);
 
         services
             .Should()
