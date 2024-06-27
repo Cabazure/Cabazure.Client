@@ -10,10 +10,10 @@ public class ConfigureClientTests
     [Theory, AutoNSubstituteData]
     public void Should_Register_MessageRequestFactory(
         ServiceCollection services,
-        [Substitute] Action<IHttpClientBuilder> builder,
-        [Substitute] Action<JsonSerializerOptions> jsonOptions)
+        [Substitute] Action<JsonSerializerOptions> jsonOptions,
+        [Substitute] Action<IHttpClientBuilder> builder)
     {
-        services.AddCabazureClient("TestClient", builder, jsonOptions);
+        services.AddCabazureClient("TestClient", jsonOptions, builder);
 
         services
             .Should()
@@ -26,10 +26,10 @@ public class ConfigureClientTests
     [Theory, AutoNSubstituteData]
     public void Should_Register_ClientSerializer(
         ServiceCollection services,
-        [Substitute] Action<IHttpClientBuilder> builder,
-        [Substitute] Action<JsonSerializerOptions> jsonOptions)
+        [Substitute] Action<JsonSerializerOptions> jsonOptions,
+        [Substitute] Action<IHttpClientBuilder> builder)
     {
-        services.AddCabazureClient("TestClient", builder, jsonOptions);
+        services.AddCabazureClient("TestClient", jsonOptions, builder);
 
         services
             .Should()
@@ -42,10 +42,10 @@ public class ConfigureClientTests
     [Theory, AutoNSubstituteData]
     public void Should_Register_JsonOptions(
         ServiceCollection services,
-        [Substitute] Action<IHttpClientBuilder> builder,
-        [Substitute] Action<JsonSerializerOptions> jsonOptions)
+        [Substitute] Action<JsonSerializerOptions> jsonOptions,
+        [Substitute] Action<IHttpClientBuilder> builder)
     {
-        services.AddCabazureClient("TestClient", builder, jsonOptions);
+        services.AddCabazureClient("TestClient", jsonOptions, builder);
 
         services
             .Should()
@@ -67,10 +67,10 @@ public class ConfigureClientTests
     [Theory, AutoNSubstituteData]
     public void Should_Register_HttpClient(
         ServiceCollection services,
-        [Substitute] Action<IHttpClientBuilder> builder,
-        [Substitute] Action<JsonSerializerOptions> jsonOptions)
+        [Substitute] Action<JsonSerializerOptions> jsonOptions,
+        [Substitute] Action<IHttpClientBuilder> builder)
     {
-        services.AddCabazureClient("TestClient", builder, jsonOptions);
+        services.AddCabazureClient("TestClient", jsonOptions, builder);
 
         services
             .Should()

@@ -1,4 +1,11 @@
+
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Cabazure/Cabazure.Client/.github%2Fworkflows%2Fci.yml)
+![GitHub Release Date](https://img.shields.io/github/release-date/Cabazure/Cabazure.Client?display_date=published_at)
+![GitHub Release](https://img.shields.io/github/v/release/Cabazure/Cabazure.Client?link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCabazure.Client%2F)
+![NuGet Downloads](https://img.shields.io/nuget/dt/Cabazure.Client?color=blue)
+
 # Cabazure.Client
+
 The Cabazure.Client is a library for creating .NET Clients for your AspNetCore REST APIs, using Source Generators directed by attributes.
 
 The main design choices in the Cabazure.Client are:
@@ -67,12 +74,12 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services)
         => services.AddCabazureClient(
             "CustomerClient",
+            j => j.PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             b => b
               .SetBaseAddress(new Uri("https://customer-api.contoso.com"))
               .AddAuthentication(
                 scope: "app://contoso.com/customer-api/.default",
-                credential: new DefaultAzureCredential()),
-            j => j.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
+                credential: new DefaultAzureCredential()));
 }
 ```
 

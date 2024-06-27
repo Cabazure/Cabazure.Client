@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Azure.Core;
 using Cabazure.Client.SourceGenerator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -102,6 +103,7 @@ public static class TestHelper
             .Append(typeof(IHttpClientBuilder).Assembly)
             .Append(typeof(StringValues).Assembly)
             .Append(typeof(OptionsServiceCollectionExtensions).Assembly)
+            .Append(typeof(TokenCredential).Assembly)
             .Select(x => MetadataReference.CreateFromFile(x.Location));
 
         return CSharpCompilation.Create(

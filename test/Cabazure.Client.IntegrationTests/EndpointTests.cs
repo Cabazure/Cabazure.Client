@@ -19,10 +19,10 @@ public abstract class EndpointTests<TClass, TInterface>(
     [Theory, AutoNSubstituteData]
     public void Should_Get_Registered_By_AddCabazureClient(
         ServiceCollection services,
-        [Substitute] Action<IHttpClientBuilder> builder,
-        [Substitute] Action<JsonSerializerOptions> jsonOptions)
+        [Substitute] Action<JsonSerializerOptions> jsonOptions,
+        [Substitute] Action<IHttpClientBuilder> builder)
     {
-        services.AddCabazureClient(clientName, builder, jsonOptions);
+        services.AddCabazureClient(clientName, jsonOptions, builder);
 
         services
             .Should()
