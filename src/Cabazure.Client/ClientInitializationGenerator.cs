@@ -36,21 +36,21 @@ public class ClientInitializationGenerator : ISourceGenerator
                     if (clientOptions != null)
                     {
                         services
-                            .AddOptions<TOptions>(clientName)
+                            .AddOptions<TOptions>()
                             .Configure(clientOptions);
                     }
 
                     void ConfigureHttpClient(IServiceProvider services, HttpClient client)
                         => client.BaseAddress = services
-                            .GetRequiredService<IOptionsMonitor<TOptions>>()
-                            .Get(clientName)
+                            .GetRequiredService<IOptions<TOptions>>()
+                            .Value
                             .GetBaseAddress();
 
                     void ConfigureAuthHandler(IList<DelegatingHandler> handlers, IServiceProvider services)
                     {
                         var options = services
-                            .GetRequiredService<IOptionsMonitor<TOptions>>()
-                            .Get(clientName);
+                            .GetRequiredService<IOptions<TOptions>>()
+                            .Value;
 
                         if (options is ICabazureAuthClientOptions authOptions)
                         {
