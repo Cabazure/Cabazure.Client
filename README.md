@@ -1,8 +1,11 @@
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Cabazure/Cabazure.Client/.github%2Fworkflows%2Fci.yml)
-![code coverage](https://raw.githubusercontent.com/Cabazure/Cabazure.Client/coverage-artifacts/badge_shieldsio_branchcoverage_brightgreen.svg?raw=true)
-![GitHub Release Date](https://img.shields.io/github/release-date/Cabazure/Cabazure.Client?display_date=published_at)
-![GitHub Release](https://img.shields.io/github/v/release/Cabazure/Cabazure.Client?link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCabazure.Client%2F)
-![NuGet Downloads](https://img.shields.io/nuget/dt/Cabazure.Client?color=blue)
+<a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Cabazure/Cabazure.Client/.github%2Fworkflows%2Fci.yml" /></a>
+<a href="https://github.com/Cabazure/Cabazure.Client/releases"><img alt="GitHub Release Date" src="https://img.shields.io/github/release-date/Cabazure/Cabazure.Client" /></a>
+<a href="https://www.nuget.org/packages/Cabazure.Client"><img alt="NuGet Version" src="https://img.shields.io/nuget/v/Cabazure.Client?color=blue" /></a>
+<a href="https://www.nuget.org/packages/Cabazure.Client"><img alt="NuGet Downloads" src="https://img.shields.io/nuget/dt/Cabazure.Client?color=blue" /></a>
+
+<a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="Branch Coverage" src="https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_branchcoverage.svg?raw=true" /></a>
+<a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="Line Coverage" src="https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_linecoverage.svg?raw=true" /></a>
+<a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="Method Coverage" src="https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_methodcoverage.svg?raw=true" /></a>
 
 # Cabazure.Client
 
