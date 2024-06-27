@@ -1,7 +1,7 @@
 using Azure.Core;
 using Cabazure.Client.Authentication;
 
-namespace Cabazure.Client.Tests.Authentication;
+namespace Cabazure.Client.Runtime.Tests.Authentication;
 
 public class BearerTokenProviderTests
 {

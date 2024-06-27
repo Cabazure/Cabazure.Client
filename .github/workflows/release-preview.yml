@@ -1,6 +1,6 @@
 name: Release Preview
 
-run-name: ${{ github.ref_name }} • ${{ github.event.head_commit.message }}
+run-name: Preview • ${{ github.ref_name }} • ${{ github.event.head_commit.message }}
 
 on:
   push:
