@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 using AutoFixture.AutoNSubstitute;
 using Cabazure.Client.Authentication;
 
-namespace Cabazure.Client.Tests.Authentication;
+namespace Cabazure.Client.Runtime.Tests.Authentication;
 
 public class AzureAuthenticationHandlerTests
 {

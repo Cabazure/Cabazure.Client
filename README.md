@@ -1,4 +1,5 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Cabazure/Cabazure.Client/.github%2Fworkflows%2Fci.yml)
+![code coverage](https://raw.githubusercontent.com/Cabazure/Cabazure.Client/coverage-artifacts/badge_shieldsio_branchcoverage_brightgreen.svg?raw=true)
 ![GitHub Release Date](https://img.shields.io/github/release-date/Cabazure/Cabazure.Client?display_date=published_at)
 ![GitHub Release](https://img.shields.io/github/v/release/Cabazure/Cabazure.Client?link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCabazure.Client%2F)
 ![NuGet Downloads](https://img.shields.io/nuget/dt/Cabazure.Client?color=blue)
@@ -16,7 +17,7 @@ The main design choices in the Cabazure.Client are:
 
 ## Getting started
 
-Ensure your Client project has a reference to the  Cabazure.Client package and the contract data types used by your service.
+Ensure your Client project has a reference to the Cabazure.Client package and the contract data types used by your service.
 
 ### 1. Adding an endpoint
 
@@ -36,7 +37,7 @@ public interface IGetCustomerEndpoint
 
 The `[ClientEndpoint]` attribute declares that this is an endpoint, that should have the implementation generated. The client name (`"CustomerClient"`), is used for identifying which `HttpClient` instance name this endpoint should use. The client name should be unique for this Client, and needs to match the client name used when [adding the boot strap](#2-adding-a-bootstrap).
 
-The `[Get]` attribute declares that the interface method is targeting a GET endpoint on the specified path. The path can have place holders like `{customerId}` which can be referenced by one of the method parameters using the `[Path]` attribute. 
+The `[Get]` attribute declares that the interface method is targeting a GET endpoint on the specified path. The path can have place holders like `{customerId}` which can be referenced by one of the method parameters using the `[Path]` attribute.
 
 The following HTTP methods are supported by corresponding attributes: `[Get]`, `[Post]`, `[Put]` or `[Delete]`.
 
