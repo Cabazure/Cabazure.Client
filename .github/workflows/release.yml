@@ -76,7 +76,7 @@ jobs:
           reports: "**/coverage.cobertura.xml"
           targetdir: CoverageReports
           historydir: CoverageHistory
-          reporttypes: MarkdownSummaryGithub;MarkdownDeltaSummary;HtmlInline
+          reporttypes: MarkdownSummaryGithub;MarkdownDeltaSummary;HtmlInline;Badges
           filefilters: -*.g.cs
           tag: '${{ github.run_number }}_${{ github.run_id }}'
 
