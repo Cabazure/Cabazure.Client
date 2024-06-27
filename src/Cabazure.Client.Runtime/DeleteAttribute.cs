@@ -1,7 +1,14 @@
-﻿namespace Cabazure.Client;
+﻿using System.Diagnostics.CodeAnalysis;
 
-[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class DeleteAttribute(string routeTemplate) : Attribute
+namespace Cabazure.Client;
+
+[ExcludeFromCodeCoverage]
+[AttributeUsage(
+    AttributeTargets.Method,
+    Inherited = false,
+    AllowMultiple = false)]
+public sealed class DeleteAttribute(
+    string routeTemplate) : Attribute
 {
     public string RouteTemplate { get; } = routeTemplate;
 }

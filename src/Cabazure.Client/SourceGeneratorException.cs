@@ -1,8 +1,10 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
 namespace Cabazure.Client.SourceGenerator;
 
+[ExcludeFromCodeCoverage]
 public class SourceGeneratorException : Exception
 {
     public SourceGeneratorException(

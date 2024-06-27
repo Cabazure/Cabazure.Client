@@ -1,12 +1,16 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Cabazure.Client;
 
+[ExcludeFromCodeCoverage]
 [AttributeUsage(
     AttributeTargets.Parameter | AttributeTargets.Property,
     Inherited = false,
     AllowMultiple = false)]
-public sealed class PathAttribute([CallerMemberName] string? name = null) : Attribute
+public sealed class PathAttribute(
+    [CallerMemberName] string? name = null)
+    : Attribute
 {
     public string? Name { get; } = name;
 }

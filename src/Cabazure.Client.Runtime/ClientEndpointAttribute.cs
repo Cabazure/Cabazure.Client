@@ -1,7 +1,15 @@
-﻿namespace Cabazure.Client;
+﻿using System.Diagnostics.CodeAnalysis;
 
-[AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
-public sealed class ClientEndpointAttribute(string clientName) : Attribute
+namespace Cabazure.Client;
+
+[ExcludeFromCodeCoverage]
+[AttributeUsage(
+    AttributeTargets.Interface,
+    Inherited = false,
+    AllowMultiple = false)]
+public sealed class ClientEndpointAttribute(
+    string clientName)
+    : Attribute
 {
     public string ClientName { get; } = clientName;
 }
