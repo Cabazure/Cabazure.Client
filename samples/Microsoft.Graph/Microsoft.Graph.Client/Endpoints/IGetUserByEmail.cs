@@ -9,5 +9,5 @@ public interface IGetUserByEmail
     [Get("v1.0/users/{email}")]
     Task<EndpointResponse<User>> ExecuteAsync(
         [Path] string email,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

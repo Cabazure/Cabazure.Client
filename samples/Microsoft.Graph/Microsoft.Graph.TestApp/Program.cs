@@ -13,7 +13,7 @@ var app = builder.Build();
 
 var endpoint = app.Services.GetRequiredService<IGetUserByEmail>();
 
-var result = await endpoint.ExecuteAsync(args[0], default) switch
+var result = await endpoint.ExecuteAsync("frannis@contoso.com") switch
 {
     { OkContent: { } r } => r.DisplayName,
     var r => r.StatusCode.ToString(),
