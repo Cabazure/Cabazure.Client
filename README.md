@@ -1,7 +1,7 @@
 <a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Cabazure/Cabazure.Client/.github%2Fworkflows%2Fci.yml" /></a>
 <a href="https://github.com/Cabazure/Cabazure.Client/releases"><img alt="GitHub Release Date" src="https://img.shields.io/github/release-date/Cabazure/Cabazure.Client" /></a>
 <a href="https://www.nuget.org/packages/Cabazure.Client"><img alt="NuGet Version" src="https://img.shields.io/nuget/v/Cabazure.Client?color=blue" /></a>
-<a href="https://www.nuget.org/packages/Cabazure.Client"><img alt="NuGet Downloads" src="https://img.shields.io/nuget/dt/Cabazure.Client?color=blue" /></a>
+<a href="https://www.nuget.org/stats/packages/Cabazure.Client?groupby=Version"><img alt="NuGet Downloads" src="https://img.shields.io/nuget/dt/Cabazure.Client?color=blue" /></a>
 
 <a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="Branch Coverage" src="https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_branchcoverage.svg?raw=true" /></a>
 <a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="Line Coverage" src="https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_linecoverage.svg?raw=true" /></a>
@@ -15,8 +15,8 @@ The main design choices in the Cabazure.Client are:
 * Code is used to describe the API, rather than an api specification
 * Contracts are shared via code used by both Client and Server
 * Endpoints are represented as interfaces, for easy mocking in unit testing
-* Align with AspNetCore defaults like DependencyInjection and Options
-* Use Azure.Identity for Authentication
+* Dependencies are limited to AspNetCore defaults, like DependencyInjection and Options
+* Azure.Identity is used for Authentication
 
 ## Getting started
 
