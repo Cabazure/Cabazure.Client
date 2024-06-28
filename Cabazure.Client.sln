@@ -9,13 +9,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client", "src\Caba
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client.Tests", "test\Cabazure.Client.Tests\Cabazure.Client.Tests.csproj", "{CED809C0-4423-4B2D-BAF8-0C942B52761B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabazure.Client.Runtime.Tests", "test\Cabazure.Client.Runtime.Tests\Cabazure.Client.Runtime.Tests.csproj", "{91529749-D468-43A2-8713-9428234FADFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client.Runtime.Tests", "test\Cabazure.Client.Runtime.Tests\Cabazure.Client.Runtime.Tests.csproj", "{91529749-D468-43A2-8713-9428234FADFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabazure.Client.IntegrationTests", "test\Cabazure.Client.IntegrationTests\Cabazure.Client.IntegrationTests.csproj", "{A5A1DEAD-A6F6-47B5-B6A8-9ED08B5A0FD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cabazure.Client.IntegrationTests", "test\Cabazure.Client.IntegrationTests\Cabazure.Client.IntegrationTests.csproj", "{A5A1DEAD-A6F6-47B5-B6A8-9ED08B5A0FD0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9FD398E9-51D6-4C0E-AD0A-D85A4B9D014F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{115ACFA6-5271-4A7B-844D-FFEA0A4F6BB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Graph.Client", "samples\Microsoft.Graph\Microsoft.Graph.Client\Microsoft.Graph.Client.csproj", "{9D7D550E-15AA-4F2D-869D-53450E345FE7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{3932F1A3-4272-4E08-83F6-E1EB7DCED0FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.Graph", "Microsoft.Graph", "{3DF0DD77-F029-418F-96B9-5E977F11E8C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Graph.TestApp", "samples\Microsoft.Graph\Microsoft.Graph.TestApp\Microsoft.Graph.TestApp.csproj", "{84D328C1-9835-4CDC-865F-8A1FD1D65489}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Graph.Contracts", "samples\Microsoft.Graph\Microsoft.Graph.Contracts\Microsoft.Graph.Contracts.csproj", "{733A2A34-8B64-4A54-B996-EB84F07FE989}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +75,30 @@ Global
 		{A5A1DEAD-A6F6-47B5-B6A8-9ED08B5A0FD0}.Release.AOT|Any CPU.Build.0 = Release.AOT|Any CPU
 		{A5A1DEAD-A6F6-47B5-B6A8-9ED08B5A0FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5A1DEAD-A6F6-47B5-B6A8-9ED08B5A0FD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D7D550E-15AA-4F2D-869D-53450E345FE7}.Debug.AOT|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D7D550E-15AA-4F2D-869D-53450E345FE7}.Debug.AOT|Any CPU.Build.0 = Debug|Any CPU
+		{9D7D550E-15AA-4F2D-869D-53450E345FE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D7D550E-15AA-4F2D-869D-53450E345FE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D7D550E-15AA-4F2D-869D-53450E345FE7}.Release.AOT|Any CPU.ActiveCfg = Release|Any CPU
+		{9D7D550E-15AA-4F2D-869D-53450E345FE7}.Release.AOT|Any CPU.Build.0 = Release|Any CPU
+		{9D7D550E-15AA-4F2D-869D-53450E345FE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D7D550E-15AA-4F2D-869D-53450E345FE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84D328C1-9835-4CDC-865F-8A1FD1D65489}.Debug.AOT|Any CPU.ActiveCfg = Debug|Any CPU
+		{84D328C1-9835-4CDC-865F-8A1FD1D65489}.Debug.AOT|Any CPU.Build.0 = Debug|Any CPU
+		{84D328C1-9835-4CDC-865F-8A1FD1D65489}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84D328C1-9835-4CDC-865F-8A1FD1D65489}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84D328C1-9835-4CDC-865F-8A1FD1D65489}.Release.AOT|Any CPU.ActiveCfg = Release|Any CPU
+		{84D328C1-9835-4CDC-865F-8A1FD1D65489}.Release.AOT|Any CPU.Build.0 = Release|Any CPU
+		{84D328C1-9835-4CDC-865F-8A1FD1D65489}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84D328C1-9835-4CDC-865F-8A1FD1D65489}.Release|Any CPU.Build.0 = Release|Any CPU
+		{733A2A34-8B64-4A54-B996-EB84F07FE989}.Debug.AOT|Any CPU.ActiveCfg = Debug|Any CPU
+		{733A2A34-8B64-4A54-B996-EB84F07FE989}.Debug.AOT|Any CPU.Build.0 = Debug|Any CPU
+		{733A2A34-8B64-4A54-B996-EB84F07FE989}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{733A2A34-8B64-4A54-B996-EB84F07FE989}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{733A2A34-8B64-4A54-B996-EB84F07FE989}.Release.AOT|Any CPU.ActiveCfg = Release|Any CPU
+		{733A2A34-8B64-4A54-B996-EB84F07FE989}.Release.AOT|Any CPU.Build.0 = Release|Any CPU
+		{733A2A34-8B64-4A54-B996-EB84F07FE989}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{733A2A34-8B64-4A54-B996-EB84F07FE989}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,5 +109,12 @@ Global
 		{CED809C0-4423-4B2D-BAF8-0C942B52761B} = {115ACFA6-5271-4A7B-844D-FFEA0A4F6BB7}
 		{91529749-D468-43A2-8713-9428234FADFF} = {115ACFA6-5271-4A7B-844D-FFEA0A4F6BB7}
 		{A5A1DEAD-A6F6-47B5-B6A8-9ED08B5A0FD0} = {115ACFA6-5271-4A7B-844D-FFEA0A4F6BB7}
+		{9D7D550E-15AA-4F2D-869D-53450E345FE7} = {3DF0DD77-F029-418F-96B9-5E977F11E8C2}
+		{3DF0DD77-F029-418F-96B9-5E977F11E8C2} = {3932F1A3-4272-4E08-83F6-E1EB7DCED0FC}
+		{84D328C1-9835-4CDC-865F-8A1FD1D65489} = {3DF0DD77-F029-418F-96B9-5E977F11E8C2}
+		{733A2A34-8B64-4A54-B996-EB84F07FE989} = {3DF0DD77-F029-418F-96B9-5E977F11E8C2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3DD1DF42-FFAB-4F35-B264-B128D2778D40}
 	EndGlobalSection
 EndGlobal
