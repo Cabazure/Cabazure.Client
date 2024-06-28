@@ -3,7 +3,11 @@ using System.Runtime.CompilerServices;
 
 namespace Cabazure.Client;
 
-[ExcludeFromCodeCoverage]
+/// <summary>
+/// Specifies that a parameter should be added to a placeholder in the request path.
+/// </summary>
+/// <param name="name">The name of the placeholder in the path. If obmitted, the parameter name will be used.</param>
+[ExcludeFromCodeCoverage]   
 [AttributeUsage(
     AttributeTargets.Parameter | AttributeTargets.Property,
     Inherited = false,

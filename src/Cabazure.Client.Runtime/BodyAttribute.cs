@@ -2,6 +2,9 @@
 
 namespace Cabazure.Client;
 
+/// <summary>
+/// Specifies that a parameter should be bound to the request body.
+/// </summary>
 [ExcludeFromCodeCoverage]
 [AttributeUsage(
     AttributeTargets.Parameter | AttributeTargets.Property,
