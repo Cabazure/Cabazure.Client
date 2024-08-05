@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 
 namespace Cabazure.Client;
 
@@ -13,8 +12,11 @@ namespace Cabazure.Client;
     Inherited = false,
     AllowMultiple = false)]
 public sealed class QueryAttribute(
-    [CallerMemberName] string? name = null)
+    string? name = null,
+    string? formatString = null)
     : Attribute
 {
     public string? Name { get; } = name;
+
+    public string? FormatString { get; } = formatString;
 }

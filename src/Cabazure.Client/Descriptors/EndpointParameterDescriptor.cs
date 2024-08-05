@@ -1,5 +1,7 @@
 ﻿namespace Cabazure.Client.SourceGenerator.Descriptors;
 
 public record EndpointParameter(
+    string Name,
     string ParameterName,
-    string? AttributeValue);
+    string ParameterType,
+    string? FormatString);

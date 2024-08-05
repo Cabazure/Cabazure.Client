@@ -101,17 +101,17 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
         foreach (var p in method.PathParameters)
         {
-            requestOptions.Append($"\n            .WithPathParameter(\"{p.AttributeValue}\", {p.ParameterName})");
+            requestOptions.Append($"\n            .WithPathParameter(\"{p.Name}\", {GetParameterValue(p)})");
         }
 
         foreach (var p in method.QueryParameters)
         {
-            requestOptions.Append($"\n            .WithQueryParameter(\"{p.AttributeValue}\", {p.ParameterName})");
+            requestOptions.Append($"\n            .WithQueryParameter(\"{p.Name}\", {GetParameterValue(p)})");
         }
 
         foreach (var p in method.HeaderParameters)
         {
-            requestOptions.Append($"\n            .WithHeader(\"{p.AttributeValue}\", {p.ParameterName})");
+            requestOptions.Append($"\n            .WithHeader(\"{p.Name}\", {GetParameterValue(p)})");
         }
 
         if (method.BodyParameter is { } b)
@@ -158,6 +158,14 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             }
         """);
     }
+
+    private static string GetParameterValue(EndpointParameter parameter)
+        => parameter switch
+        {
+            { ParameterType: "System.String" or "string" } => parameter.ParameterName,
+            { FormatString: { } f } => $"{parameter.ParameterName}.ToString(\"{f}\")",
+            _ => $"{parameter.ParameterName}.ToString()",
+        };
 }
 
 
