@@ -44,7 +44,7 @@ internal static partial class ClientInitialization
                 var credential = authOptions.GetCredential();
 
                 var tokenProvider = new BearerTokenProvider(
-                    new TokenRequestContext([scope]),
+                    new TokenRequestContext(new [] { scope }),
                     credential,
                     new DateTimeProvider());
 

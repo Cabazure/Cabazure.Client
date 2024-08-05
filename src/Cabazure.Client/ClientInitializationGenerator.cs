@@ -59,7 +59,7 @@ public class ClientInitializationGenerator : ISourceGenerator
                             var credential = authOptions.GetCredential();
 
                             var tokenProvider = new BearerTokenProvider(
-                                new TokenRequestContext([scope]),
+                                new TokenRequestContext(new [] { scope }),
                                 credential,
                                 new DateTimeProvider());
 
