@@ -163,7 +163,9 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         => parameter switch
         {
             { ParameterType: "System.String" or "string" } => parameter.ParameterName,
+            { FormatString: { } f, IsNullable: true } => $"{parameter.ParameterName}?.ToString(\"{f}\")",
             { FormatString: { } f } => $"{parameter.ParameterName}.ToString(\"{f}\")",
+            { IsNullable: true } => $"{parameter.ParameterName}?.ToString()",
             _ => $"{parameter.ParameterName}.ToString()",
         };
 }

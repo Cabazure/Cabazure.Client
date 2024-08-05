@@ -19,7 +19,7 @@ public partial class TestEndpoint : ITestEndpoint
     }
 
     public async Task<EndpointResponse<string[]>> ExecuteAsync(
-        [Query(formatString: "O", name: "time")] DateTimeOffset time,        
+        [Query(formatString: "O", name: "time")] DateTimeOffset? time,        
         ClientRequestOptions options,
         CancellationToken cancellationToken)
     {
@@ -27,7 +27,7 @@ public partial class TestEndpoint : ITestEndpoint
 
         using var requestMessage = requestFactory
             .FromTemplate("ClientName", "/items")
-            .WithQueryParameter("time", time.ToString("O"))
+            .WithQueryParameter("time", time?.ToString("O"))
             .WithRequestOptions(options)
             .Build(HttpMethod.Get);
 
