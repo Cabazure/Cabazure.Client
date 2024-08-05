@@ -65,10 +65,10 @@ public record EndpointMethodDescriptor(
 
         foreach (var parameter in method.ParameterList.Parameters)
         {
-            var typeName = semanticModel.GetTypeName(parameter.Type!);
+            var parameterType = semanticModel.GetTypeName(parameter.Type!)!;
             var parameterName = parameter.Identifier.ValueText;
 
-            if (typeName
+            if (parameterType
                 is TypeConstants.ClientRequestOptions
                 or TypeConstants.ClientPaginationOptions)
             {
@@ -76,7 +76,7 @@ public record EndpointMethodDescriptor(
                 continue;
             }
 
-            if (typeName == TypeConstants.CancellationToken)
+            if (parameterType == TypeConstants.CancellationToken)
             {
                 cancellationTokenParameter = parameterName;
                 continue;
@@ -93,11 +93,13 @@ public record EndpointMethodDescriptor(
                     continue;
                 }
 
-                var attributeValue = semanticModel.GetAttributeValue(attribute)
-                    ?? parameterName;
+                var attributeValues = semanticModel.GetAttributeValues(attribute);
+                var name = attributeValues.GetValueOrDefault("name") ?? parameterName;
+                var formatString = attributeValues.GetValueOrDefault("formatString");
+
                 if (attributeTypeName == TypeConstants.PathAttribute)
                 {
-                    if (!routeTemplate.Contains($"{{{attributeValue}}}"))
+                    if (!routeTemplate.Contains($"{{{name}}}"))
                     {
                         diagnostics.Invoke(
                             Diagnostic.Create(
@@ -107,24 +109,24 @@ public record EndpointMethodDescriptor(
                                 method.Identifier,
                                 parameter.Identifier,
                                 routeTemplate,
-                                attributeValue));
+                                name));
                     }
                     isValid = true;
-                    pathParameters.Add(new(parameterName, attributeValue));
+                    pathParameters.Add(new(name, parameterName, parameterType, formatString));
                     continue;
                 }
 
                 if (attributeTypeName == TypeConstants.QueryAttribute)
                 {
                     isValid = true;
-                    queryParameters.Add(new(parameterName, attributeValue));
+                    queryParameters.Add(new(name, parameterName, parameterType, formatString));
                     continue;
                 }
 
                 if (attributeTypeName == TypeConstants.HeaderAttribute)
                 {
                     isValid = true;
-                    headerParameters.Add(new(parameterName, attributeValue));
+                    headerParameters.Add(new(name, parameterName, parameterType, formatString));
                     continue;
                 }
             }
@@ -146,7 +148,7 @@ public record EndpointMethodDescriptor(
         foreach (Match m in TokenRegex.Matches(routeTemplate))
         {
             var token = m.Groups["id"].Value;
-            if (!pathParameters.Any(p => p.AttributeValue == token))
+            if (!pathParameters.Any(p => p.Name == token))
             {
                 diagnostics.Invoke(
                     Diagnostic.Create(

@@ -1,5 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Cabazure.Client.SourceGenerator;
 
@@ -43,5 +45,21 @@ public static class SemanticModelExtensions
         return expression != null
             ? semanticModel.GetConstantValue(expression).Value as string
             : null;
+    }
+
+    public static ImmutableDictionary<string, string?> GetAttributeValues(
+        this SemanticModel semanticModel,
+        AttributeSyntax attribute)
+    {
+        var op = semanticModel.GetOperation(attribute) as IAttributeOperation;
+        var oco = op?.Operation as IObjectCreationOperation;
+
+        return oco?
+            .Arguments
+            .Where(o => o.Parameter?.Name != null)
+            .ToImmutableDictionary(
+                o => o.Parameter!.Name,
+                o => o.Value.ConstantValue.Value as string)
+            ?? ImmutableDictionary<string, string?>.Empty;
     }
 }

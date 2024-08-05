@@ -12,8 +12,11 @@ namespace Cabazure.Client;
     Inherited = false,
     AllowMultiple = false)]
 public sealed class HeaderAttribute(
-    string name)
+    string name,
+    string? formatString = null)
     : Attribute
 {
     public string Name { get; } = name;
+
+    public string? FormatString { get; } = formatString;
 }

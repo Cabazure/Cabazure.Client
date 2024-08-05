@@ -273,4 +273,18 @@ public class ClientEndpointGeneratorTests
                 }
             }
             """);
+
+    [Fact]
+    public Task CanGenerate_QueryParameter_DateTimeOffset()
+       => TestHelper.VerifyEndpoint("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items")]
+                public Task<EndpointResponse<string[]>> ExecuteAsync(
+                    [Query(formatString: "O", name: "time")] DateTimeOffset time,        
+                    ClientRequestOptions options,
+                    CancellationToken cancellationToken);
+            }
+            """);
 }
