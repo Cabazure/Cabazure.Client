@@ -15,7 +15,8 @@ internal static partial class ClientInitialization
         this IServiceCollection services,
         string clientName,
         Action<JsonSerializerOptions>? jsonOptions,
-        Action<TOptions>? clientOptions)
+        Action<TOptions>? clientOptions,
+        Action<IHttpClientBuilder>? builder = default)
         where TOptions : class, ICabazureClientOptions
     {
         if (clientOptions != null)
@@ -51,12 +52,17 @@ internal static partial class ClientInitialization
             }
         }
 
+        void BuildHttpClient(IHttpClientBuilder b)
+        {
+            b.ConfigureHttpClient(ConfigureHttpClient);
+            b.ConfigureAdditionalHttpMessageHandlers(ConfigureAuthHandler);
+            builder?.Invoke(b);
+        }
+
         return services.AddCabazureClient(
             clientName,
             jsonOptions,
-            builder => builder
-                .ConfigureHttpClient(ConfigureHttpClient)
-                .ConfigureAdditionalHttpMessageHandlers(ConfigureAuthHandler));
+            BuildHttpClient);
     }
 
     internal static partial IServiceCollection AddCabazureClient(
