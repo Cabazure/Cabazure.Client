@@ -66,6 +66,7 @@ public record EndpointMethodDescriptor(
         foreach (var parameter in method.ParameterList.Parameters)
         {
             var parameterType = semanticModel.GetTypeName(parameter.Type!)!;
+            var isNullable = parameter.Type!.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.NullableType);
             var parameterName = parameter.Identifier.ValueText;
 
             if (parameterType
@@ -112,21 +113,21 @@ public record EndpointMethodDescriptor(
                                 name));
                     }
                     isValid = true;
-                    pathParameters.Add(new(name, parameterName, parameterType, formatString));
+                    pathParameters.Add(new(name, parameterName, parameterType, isNullable, formatString));
                     continue;
                 }
 
                 if (attributeTypeName == TypeConstants.QueryAttribute)
                 {
                     isValid = true;
-                    queryParameters.Add(new(name, parameterName, parameterType, formatString));
+                    queryParameters.Add(new(name, parameterName, parameterType, isNullable, formatString));
                     continue;
                 }
 
                 if (attributeTypeName == TypeConstants.HeaderAttribute)
                 {
                     isValid = true;
-                    headerParameters.Add(new(name, parameterName, parameterType, formatString));
+                    headerParameters.Add(new(name, parameterName, parameterType, isNullable, formatString));
                     continue;
                 }
             }

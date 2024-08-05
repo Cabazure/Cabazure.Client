@@ -282,7 +282,7 @@ public class ClientEndpointGeneratorTests
             {
                 [Get("/items")]
                 public Task<EndpointResponse<string[]>> ExecuteAsync(
-                    [Query(formatString: "O", name: "time")] DateTimeOffset time,        
+                    [Query(formatString: "O", name: "time")] DateTimeOffset? time,        
                     ClientRequestOptions options,
                     CancellationToken cancellationToken);
             }
