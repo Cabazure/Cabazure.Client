@@ -15,8 +15,8 @@ internal class MessageResponseBuilder : IMessageResponseBuilder
         null,
         new Dictionary<string, IEnumerable<string>>());
 
-    private readonly Dictionary<HttpStatusCode, ContentSerializerDelegate> responseSerializers = [];
-    private readonly Dictionary<HttpStatusCode, bool> responseCodes = [];
+    private readonly Dictionary<HttpStatusCode, ContentSerializerDelegate> responseSerializers = new();
+    private readonly Dictionary<HttpStatusCode, bool> responseCodes = new();
     private readonly HttpResponseMessage? response;
     private readonly IClientSerializer serializer;
     private readonly string clientName;

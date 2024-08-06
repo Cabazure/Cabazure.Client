@@ -18,7 +18,7 @@ internal static class HttpClientBuilderExtensions
         TokenCredential credential)
         => AddAuthentication(
             builder,
-            new TokenRequestContext([scope]),
+            new TokenRequestContext(new[] { scope }),
             credential);
 
     public static IHttpClientBuilder AddAuthentication(

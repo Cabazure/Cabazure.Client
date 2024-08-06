@@ -15,9 +15,9 @@ internal class MessageRequestBuilder : IMessageRequestBuilder
     private const string HeaderMaxItemCount = "x-max-item-count";
     private const string HeaderContinuation = "x-continuation";
 
-    private readonly Dictionary<string, string> pathMapper = [];
-    private readonly Dictionary<string, string> queryMapper = [];
-    private readonly Dictionary<string, StringValues> headerMapper = [];
+    private readonly Dictionary<string, string> pathMapper = new();
+    private readonly Dictionary<string, string> queryMapper = new();
+    private readonly Dictionary<string, StringValues> headerMapper = new();
     private readonly string template;
     private readonly IClientSerializer serializer;
     private readonly string clientName;
