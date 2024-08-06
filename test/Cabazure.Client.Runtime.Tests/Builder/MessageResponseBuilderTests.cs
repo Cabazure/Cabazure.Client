@@ -1,5 +1,4 @@
 using System.Net;
-using AutoFixture.Xunit2;
 using Cabazure.Client.Builder;
 
 namespace Cabazure.Client.Runtime.Tests.Builder;
@@ -7,7 +6,7 @@ namespace Cabazure.Client.Runtime.Tests.Builder;
 public class MessageResponseBuilderTests
 {
     [Theory, AutoNSubstituteData]
-    public async Task IsSuccess_Should_Respect_Configured_ErrorResponse(
+    internal async Task IsSuccess_Should_Respect_Configured_ErrorResponse(
         [Frozen] HttpResponseMessage response,
         MessageResponseBuilder sut,
         CancellationToken cancellationToken)
@@ -24,7 +23,7 @@ public class MessageResponseBuilderTests
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task IsSuccess_Should_Respect_Configured_SuccessResponse(
+    internal async Task IsSuccess_Should_Respect_Configured_SuccessResponse(
         [Frozen] HttpResponseMessage response,
         MessageResponseBuilder sut,
         CancellationToken cancellationToken)
@@ -41,7 +40,7 @@ public class MessageResponseBuilderTests
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Deserialize_Configured_SuccessResponseCode(
+    internal async Task Should_Deserialize_Configured_SuccessResponseCode(
         [Frozen] HttpResponseMessage response,
         [Frozen] IClientSerializer serializer,
         MessageResponseBuilder sut,
@@ -63,7 +62,7 @@ public class MessageResponseBuilderTests
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Deserialize_Configured_ErrorResponseCode(
+    internal async Task Should_Deserialize_Configured_ErrorResponseCode(
         [Frozen] HttpResponseMessage response,
         [Frozen] IClientSerializer serializer,
         MessageResponseBuilder sut,
@@ -85,7 +84,7 @@ public class MessageResponseBuilderTests
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Return_Response_Headers(
+    internal async Task Should_Return_Response_Headers(
         [Frozen] HttpResponseMessage response,
         MessageResponseBuilder sut,
         CancellationToken cancellationToken)

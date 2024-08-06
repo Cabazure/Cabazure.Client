@@ -7,7 +7,7 @@ using Cabazure.Client.Builder;
 
 namespace Test;
 
-public partial class TestEndpoint : ITestEndpoint
+internal partial class TestEndpoint : ITestEndpoint
 {
     private readonly IHttpClientFactory factory;
     private readonly IMessageRequestFactory requestFactory;

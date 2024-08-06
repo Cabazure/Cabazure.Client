@@ -1,19 +1,15 @@
 ﻿using System.Net;
+using System.Text.Json;
 using Cabazure.Client.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute.ReceivedExtensions;
 
 namespace Cabazure.Client.IntegrationTests;
 
-public class PostEndpointTests()
-    : EndpointTests<PostEndpoint, PostEndpointTests.IPostEndpoint>(
-        ClientName,
-        RouteTemplate)
+public class PostEndpointTests
 {
     public const string ClientName = "TestClient";
     public const string RouteTemplate = "/items";
-
-    protected override Task ExecuteAsync(PostEndpoint endpoint)
-        => endpoint.ExecuteAsync(default, default, default);
 
     [ClientEndpoint(ClientName)]
     public interface IPostEndpoint
@@ -26,7 +22,105 @@ public class PostEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Add_Body(
+    internal void Should_Implement_Interface(
+       PostEndpoint sut,
+       string id,
+       ClientRequestOptions options,
+       CancellationToken cancellationToken)
+       => sut.Should().BeAssignableTo<IPostEndpoint>();
+
+    [Theory, AutoNSubstituteData]
+    public void Should_Get_Registered_By_AddCabazureClient(
+        ServiceCollection services,
+        [Substitute] Action<JsonSerializerOptions> jsonOptions,
+        [Substitute] Action<IHttpClientBuilder> builder)
+    {
+        services.AddCabazureClient(ClientName, jsonOptions, builder);
+
+        services
+            .Should()
+            .Contain(s
+                => s.Lifetime == ServiceLifetime.Singleton
+                && s.ServiceType == typeof(IPostEndpoint)
+                && s.ImplementationType == typeof(PostEndpoint));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Create_HttpClient(
+        [Frozen] IHttpClientFactory factory,
+        PostEndpoint sut,
+        string id,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            id,
+            options,
+            cancellationToken);
+
+        factory
+            .Received(1)
+            .CreateClient(ClientName);
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Create_Request(
+        [Frozen] IMessageRequestFactory requestFactory,
+        PostEndpoint sut,
+        string id,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            id,
+            options,
+            cancellationToken);
+
+        requestFactory
+            .Received(1)
+            .FromTemplate(ClientName, RouteTemplate);
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Send_Request(
+        [Frozen] HttpClient client,
+        [Frozen] HttpRequestMessage request,
+        PostEndpoint sut,
+        string id,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            id,
+            options,
+            cancellationToken);
+
+        _ = client
+            .Received(1)
+            .SendAsync(request, Arg.Any<CancellationToken>());
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Create_Builder_From_Response(
+        [Frozen] IMessageRequestFactory requestFactory,
+        [Frozen] HttpResponseMessage response,
+        PostEndpoint sut,
+        string id,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            id,
+            options,
+            cancellationToken);
+
+        requestFactory
+            .Received(1)
+            .FromResponse(ClientName, response);
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Add_Body(
         [Frozen] IMessageRequestBuilder builder,
         PostEndpoint sut,
         string item,
@@ -44,7 +138,7 @@ public class PostEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Add_ClientRequestOptions_To_Builder(
+    internal async Task Should_Add_ClientRequestOptions_To_Builder(
         [Frozen] IMessageRequestBuilder builder,
         PostEndpoint sut,
         string item,
@@ -62,7 +156,7 @@ public class PostEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Use_Correct_HttpMethod(
+    internal async Task Should_Use_Correct_HttpMethod(
         [Frozen] IMessageRequestBuilder builder,
         PostEndpoint sut,
         string id,
@@ -80,7 +174,7 @@ public class PostEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Set_Timeout_On_HttpClient(
+    internal async Task Should_Set_Timeout_On_HttpClient(
         [Frozen] IHttpClientFactory factory,
         [Frozen, Substitute] HttpClient client,
         PostEndpoint sut,
@@ -103,7 +197,7 @@ public class PostEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Configure_SuccessResponse(
+    internal async Task Should_Configure_SuccessResponse(
         [Frozen] IMessageResponseBuilder builder,
         PostEndpoint sut,
         string item,
@@ -121,7 +215,7 @@ public class PostEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Create_Result(
+    internal async Task Should_Create_Result(
         [Frozen] IMessageResponseBuilder builder,
         PostEndpoint sut,
         string item,
@@ -141,7 +235,7 @@ public class PostEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Return_Result(
+    internal async Task Should_Return_Result(
         [Frozen] IMessageResponseBuilder builder,
         PostEndpoint sut,
         EndpointResponse<string> response,

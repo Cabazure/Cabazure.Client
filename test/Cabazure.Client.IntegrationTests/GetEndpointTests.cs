@@ -1,18 +1,14 @@
 ﻿using System.Net;
+using System.Text.Json;
 using Cabazure.Client.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Cabazure.Client.IntegrationTests;
 
-public class GetEndpointTests()
-    : EndpointTests<GetEndpoint, GetEndpointTests.IGetEndpoint>(
-        ClientName,
-        RouteTemplate)
+public class GetEndpointTests
 {
     public const string ClientName = "TestClient";
     public const string RouteTemplate = "/items/{id}";
-
-    protected override Task ExecuteAsync(GetEndpoint endpoint)
-        => endpoint.ExecuteAsync(default, default, default);
 
     [ClientEndpoint(ClientName)]
     public interface IGetEndpoint
@@ -25,7 +21,105 @@ public class GetEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Add_PathParameter(
+    internal void Should_Implement_Interface(
+        GetEndpoint sut,
+        string id,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+        => sut.Should().BeAssignableTo<IGetEndpoint>();
+
+    [Theory, AutoNSubstituteData]
+    public void Should_Get_Registered_By_AddCabazureClient(
+        ServiceCollection services,
+        [Substitute] Action<JsonSerializerOptions> jsonOptions,
+        [Substitute] Action<IHttpClientBuilder> builder)
+    {
+        services.AddCabazureClient(ClientName, jsonOptions, builder);
+
+        services
+            .Should()
+            .Contain(s
+                => s.Lifetime == ServiceLifetime.Singleton
+                && s.ServiceType == typeof(IGetEndpoint)
+                && s.ImplementationType == typeof(GetEndpoint));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Create_HttpClient(
+        [Frozen] IHttpClientFactory factory,
+        GetEndpoint sut,
+        string id,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            id,
+            options,
+            cancellationToken);
+
+        factory
+            .Received(1)
+            .CreateClient(ClientName);
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Create_Request(
+        [Frozen] IMessageRequestFactory requestFactory,
+        GetEndpoint sut,
+        string id,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            id,
+            options,
+            cancellationToken);
+
+        requestFactory
+            .Received(1)
+            .FromTemplate(ClientName, RouteTemplate);
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Send_Request(
+        [Frozen] HttpClient client,
+        [Frozen] HttpRequestMessage request,
+        GetEndpoint sut,
+        string id,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            id,
+            options,
+            cancellationToken);
+
+        _ = client
+            .Received(1)
+            .SendAsync(request, Arg.Any<CancellationToken>());
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Create_Builder_From_Response(
+        [Frozen] IMessageRequestFactory requestFactory,
+        [Frozen] HttpResponseMessage response,
+        GetEndpoint sut,
+        string id,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+    {
+        await sut.ExecuteAsync(
+            id,
+            options,
+            cancellationToken);
+
+        requestFactory
+            .Received(1)
+            .FromResponse(ClientName, response);
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Add_PathParameter(
         [Frozen] IMessageRequestBuilder builder,
         GetEndpoint sut,
         string id,
@@ -43,7 +137,7 @@ public class GetEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Add_ClientRequestOptions_To_Builder(
+    internal async Task Should_Add_ClientRequestOptions_To_Builder(
         [Frozen] IMessageRequestBuilder builder,
         GetEndpoint sut,
         string id,
@@ -61,7 +155,7 @@ public class GetEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Use_Correct_HttpMethod(
+    internal async Task Should_Use_Correct_HttpMethod(
         [Frozen] IMessageRequestBuilder builder,
         GetEndpoint sut,
         string id,
@@ -79,7 +173,7 @@ public class GetEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Set_Timeout_On_HttpClient(
+    internal async Task Should_Set_Timeout_On_HttpClient(
         [Frozen, Substitute] HttpClient client,
         GetEndpoint sut,
         string item,
@@ -98,7 +192,7 @@ public class GetEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Configure_SuccessResponse(
+    internal async Task Should_Configure_SuccessResponse(
         [Frozen] IMessageResponseBuilder builder,
         GetEndpoint sut,
         string item,
@@ -116,7 +210,7 @@ public class GetEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Create_Result(
+    internal async Task Should_Create_Result(
         [Frozen] IMessageResponseBuilder builder,
         GetEndpoint sut,
         string item,
@@ -136,7 +230,7 @@ public class GetEndpointTests()
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Return_Result(
+    internal async Task Should_Return_Result(
         [Frozen] IMessageResponseBuilder builder,
         GetEndpoint sut,
         EndpointResponse<string> response,

@@ -61,7 +61,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         }
 
         source.AppendLine($$"""
-            public partial class {{endpoint.ClassName}} : {{endpoint.InterfaceName}}
+            internal partial class {{endpoint.ClassName}} : {{endpoint.InterfaceName}}
             {
                 private readonly IHttpClientFactory factory;
                 private readonly IMessageRequestFactory requestFactory;

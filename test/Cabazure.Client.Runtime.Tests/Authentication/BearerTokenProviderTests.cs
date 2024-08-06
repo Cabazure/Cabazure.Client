@@ -6,7 +6,7 @@ namespace Cabazure.Client.Runtime.Tests.Authentication;
 public class BearerTokenProviderTests
 {
     [Theory, AutoNSubstituteData]
-    public async Task Should_Return_Token_From_TokenCredential(
+    internal async Task Should_Return_Token_From_TokenCredential(
         [Frozen] TokenCredential credential,
         [Frozen] IDateTimeProvider dateTimeProvider,
         [Frozen] TokenRequestContext context,
@@ -32,7 +32,7 @@ public class BearerTokenProviderTests
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Use_Cached_Token_From_TokenCredential(
+    internal async Task Should_Use_Cached_Token_From_TokenCredential(
         [Frozen] TokenCredential credential,
         [Frozen] IDateTimeProvider dateTimeProvider,
         [Frozen] TokenRequestContext context,
@@ -67,7 +67,7 @@ public class BearerTokenProviderTests
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Renew_Expired_Token(
+    internal async Task Should_Renew_Expired_Token(
         [Frozen] TokenCredential credential,
         [Frozen] IDateTimeProvider dateTimeProvider,
         [Frozen] TokenRequestContext context,
@@ -99,7 +99,7 @@ public class BearerTokenProviderTests
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Use_Bearer_AuthorizationToken(
+    internal async Task Should_Use_Bearer_AuthorizationToken(
         [Frozen] TokenCredential credential,
         [Frozen] IDateTimeProvider dateTimeProvider,
         [Frozen] TokenRequestContext context,

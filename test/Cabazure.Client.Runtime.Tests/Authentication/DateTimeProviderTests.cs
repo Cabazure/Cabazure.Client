@@ -5,7 +5,7 @@ namespace Cabazure.Client.Runtime.Tests.Authentication;
 public class DateTimeProviderTests
 {
     [Theory, AutoNSubstituteData]
-    public void GetDateTime_Returns_DateTimeOffset_UtcNow(
+    internal void GetDateTime_Returns_DateTimeOffset_UtcNow(
         DateTimeProvider sut)
         => sut
             .GetDateTime()
