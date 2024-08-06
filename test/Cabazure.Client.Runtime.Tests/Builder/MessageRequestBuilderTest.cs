@@ -165,7 +165,7 @@ public class MessageRequestBuilderTest
     [Theory, AutoNSubstituteData]
     internal void Should_Include_MacItemCount_Header(
         MessageRequestBuilder sut,
-        ClientPaginationOptions options)
+        PagedRequestOptions options)
     {
         sut.WithRequestOptions(options);
 
@@ -183,7 +183,7 @@ public class MessageRequestBuilderTest
     [Theory, AutoNSubstituteData]
     internal void Should_Include_Continuation_Header(
         MessageRequestBuilder sut,
-        ClientPaginationOptions options)
+        PagedRequestOptions options)
     {
         sut.WithRequestOptions(options);
 

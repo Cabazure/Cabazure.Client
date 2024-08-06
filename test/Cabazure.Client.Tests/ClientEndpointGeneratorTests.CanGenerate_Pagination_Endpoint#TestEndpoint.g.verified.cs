@@ -21,7 +21,7 @@ internal partial class TestEndpoint : ITestEndpoint
     }
 
     public async Task<PagedResponse<string[]>> ExecuteAsync(
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         var client = factory.CreateClient("ClientName");

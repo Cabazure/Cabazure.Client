@@ -59,7 +59,7 @@ Apart from the data parameters, the following parameter types are supported:
 | Parameter Type            | Description                                                             |
 | ------------------------- | ---------------------------------------------------------------------- |
 | `ClientRequestOptions`    | Allowing the caller to specify further request options.                |
-| `ClientPaginationOptions` | Allowing the caller to specify further request and pagination options. |
+| `PagedRequestOptions` | Allowing the caller to specify further request and pagination options. |
 | `CancellationToken`       | Allowing the caller to cancel the async call to the endpoint.          |
 
 ### 2. Adding a bootstrap

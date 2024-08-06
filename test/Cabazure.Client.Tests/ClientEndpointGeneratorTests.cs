@@ -38,14 +38,14 @@ public class ClientEndpointGeneratorTests
             """);
 
     [Fact]
-    public Task CanGenerate_ClientPaginationOptions_Parameter()
+    public Task CanGenerate_PagedRequestOptions_Parameter()
         => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
             {
                 [Get("/items")]
                 public Task<EndpointResponse<string[]>> ExecuteAsync(
-                    ClientPaginationOptions options);
+                    PagedRequestOptions options);
             }
             """);
 
@@ -224,7 +224,7 @@ public class ClientEndpointGeneratorTests
             {
                 [Get("/routes")]
                 public Task<PagedResponse<string[]>> ExecuteAsync(
-                    ClientPaginationOptions options,
+                    PagedRequestOptions options,
                     CancellationToken cancellationToken);
             }
             """);

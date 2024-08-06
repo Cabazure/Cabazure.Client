@@ -71,7 +71,7 @@ public record EndpointMethodDescriptor(
 
             if (parameterType
                 is TypeConstants.ClientRequestOptions
-                or TypeConstants.ClientPaginationOptions)
+                or TypeConstants.PagedRequestOptions)
             {
                 optionsParameter = parameterName;
                 continue;

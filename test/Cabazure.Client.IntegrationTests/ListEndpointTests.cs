@@ -16,7 +16,7 @@ public class ListEndpointTests
         [Get(RouteTemplate)]
         Task<PagedResponse<string[]>> ExecuteAsync(
             [Query("s")] string search,
-            ClientPaginationOptions options,
+            PagedRequestOptions options,
             CancellationToken cancellationToken);
     }
 
@@ -49,7 +49,7 @@ public class ListEndpointTests
         [Frozen] IHttpClientFactory factory,
         ListEndpoint sut,
         string id,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -67,7 +67,7 @@ public class ListEndpointTests
         [Frozen] IMessageRequestFactory requestFactory,
         ListEndpoint sut,
         string id,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -86,7 +86,7 @@ public class ListEndpointTests
         [Frozen] HttpRequestMessage request,
         ListEndpoint sut,
         string id,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -105,7 +105,7 @@ public class ListEndpointTests
         [Frozen] HttpResponseMessage response,
         ListEndpoint sut,
         string id,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -123,7 +123,7 @@ public class ListEndpointTests
         [Frozen] IMessageRequestBuilder builder,
         ListEndpoint sut,
         string search,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -137,11 +137,11 @@ public class ListEndpointTests
     }
 
     [Theory, AutoNSubstituteData]
-    internal async Task Should_Add_ClientPaginationOptions_To_Builder(
+    internal async Task Should_Add_PagedRequestOptions_To_Builder(
         [Frozen] IMessageRequestBuilder builder,
         ListEndpoint sut,
         string search,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -160,7 +160,7 @@ public class ListEndpointTests
         [Frozen, Substitute] HttpClient client,
         ListEndpoint sut,
         string item,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         TimeSpan timeout,
         CancellationToken cancellationToken)
     {
@@ -182,7 +182,7 @@ public class ListEndpointTests
         [Frozen] IMessageResponseBuilder builder,
         ListEndpoint sut,
         string item,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -200,7 +200,7 @@ public class ListEndpointTests
         [Frozen] IMessageResponseBuilder builder,
         ListEndpoint sut,
         string item,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         await sut.ExecuteAsync(
@@ -221,7 +221,7 @@ public class ListEndpointTests
         ListEndpoint sut,
         PagedResponse<string[]> response,
         string item,
-        ClientPaginationOptions options,
+        PagedRequestOptions options,
         CancellationToken cancellationToken)
     {
         builder
