@@ -28,6 +28,8 @@
     <Compile Remove="EmbeddedSource\DeleteAttribute.g.cs" />
     <Compile Remove="EmbeddedSource\GetAttribute.g.cs" />
     <Compile Remove="EmbeddedSource\HeaderAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\ICabazureAuthClientOptions.g.cs" />
+    <Compile Remove="EmbeddedSource\ICabazureClientOptions.g.cs" />
     <Compile Remove="EmbeddedSource\PathAttribute.g.cs" />
     <Compile Remove="EmbeddedSource\PostAttribute.g.cs" />
     <Compile Remove="EmbeddedSource\PutAttribute.g.cs" />
@@ -40,6 +42,8 @@
     <EmbeddedResource Include="EmbeddedSource\DeleteAttribute.g.cs" />
     <EmbeddedResource Include="EmbeddedSource\GetAttribute.g.cs" />
     <EmbeddedResource Include="EmbeddedSource\HeaderAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\ICabazureAuthClientOptions.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\ICabazureClientOptions.g.cs" />
     <EmbeddedResource Include="EmbeddedSource\PathAttribute.g.cs" />
     <EmbeddedResource Include="EmbeddedSource\PostAttribute.g.cs" />
     <EmbeddedResource Include="EmbeddedSource\PutAttribute.g.cs" />
