@@ -1,11 +1,11 @@
-<a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Cabazure/Cabazure.Client/.github%2Fworkflows%2Fci.yml" /></a>
-<a href="https://github.com/Cabazure/Cabazure.Client/releases"><img alt="GitHub Release Date" src="https://img.shields.io/github/release-date/Cabazure/Cabazure.Client" /></a>
-<a href="https://www.nuget.org/packages/Cabazure.Client"><img alt="NuGet Version" src="https://img.shields.io/nuget/v/Cabazure.Client?color=blue" /></a>
-<a href="https://www.nuget.org/stats/packages/Cabazure.Client?groupby=Version"><img alt="NuGet Downloads" src="https://img.shields.io/nuget/dt/Cabazure.Client?color=blue" /></a>
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Cabazure/Cabazure.Client/.github%2Fworkflows%2Fci.yml)](https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml)
+[![GitHub Release Date](https://img.shields.io/github/release-date/Cabazure/Cabazure.Client)](https://github.com/Cabazure/Cabazure.Client/releases)
+[![NuGet Version](https://img.shields.io/nuget/v/Cabazure.Client?color=blue)](https://www.nuget.org/packages/Cabazure.Client)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Cabazure.Client?color=blue)](https://www.nuget.org/stats/packages/Cabazure.Client?groupby=Version)
 
-<a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="Branch Coverage" src="https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_branchcoverage.svg?raw=true" /></a>
-<a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="Line Coverage" src="https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_linecoverage.svg?raw=true" /></a>
-<a href="https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml"><img alt="Method Coverage" src="https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_methodcoverage.svg?raw=true" /></a>
+[![Branch Coverage](https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_branchcoverage.svg?raw=true)](https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml)
+[![Line Coverage](https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_linecoverage.svg?raw=true)](https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml)
+[![Method Coverage](https://raw.githubusercontent.com/Cabazure/Cabazure.Client/main/.github/coveragereport/badge_methodcoverage.svg?raw=true)](https://github.com/Cabazure/Cabazure.Client/actions/workflows/ci.yml)
 
 # Cabazure.Client
 
