@@ -7,11 +7,7 @@ namespace Cabazure.Client.Builder;
 
 internal delegate object? ContentSerializerDelegate(string content);
 
-internal class MessageResponseBuilder(
-    HttpResponseMessage? response,
-    IClientSerializer serializer,
-    string clientName)
-    : IMessageResponseBuilder
+internal class MessageResponseBuilder : IMessageResponseBuilder
 {
     private static readonly EndpointResponse EmptyResponse = new(
         false,
@@ -22,6 +18,19 @@ internal class MessageResponseBuilder(
 
     private readonly Dictionary<HttpStatusCode, ContentSerializerDelegate> responseSerializers = [];
     private readonly Dictionary<HttpStatusCode, bool> responseCodes = [];
+    private readonly HttpResponseMessage? response;
+    private readonly IClientSerializer serializer;
+    private readonly string clientName;
+
+    public MessageResponseBuilder(
+        HttpResponseMessage? response,
+        IClientSerializer serializer,
+        string clientName)
+    {
+        this.response = response;
+        this.serializer = serializer;
+        this.clientName = clientName;
+    }
 
     public IMessageResponseBuilder AddErrorResponse(HttpStatusCode statusCode)
         => AddEmptyResponse(statusCode, false);

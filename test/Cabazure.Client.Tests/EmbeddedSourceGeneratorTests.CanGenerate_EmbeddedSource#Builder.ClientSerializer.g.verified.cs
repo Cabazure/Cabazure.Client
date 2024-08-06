@@ -6,10 +6,16 @@ using Microsoft.Extensions.Options;
 
 namespace Cabazure.Client.Builder;
 
-internal class ClientSerializer(
-    IOptionsMonitor<JsonSerializerOptions> options)
-    : IClientSerializer
+internal class ClientSerializer : IClientSerializer
 {
+    private readonly IOptionsMonitor<JsonSerializerOptions> options;
+
+    public ClientSerializer(
+        IOptionsMonitor<JsonSerializerOptions> options)
+    {
+        this.options = options;
+    }
+
     public string Serialize(string clientName, object value)
         => JsonSerializer.Serialize(value, options.Get(clientName));
 

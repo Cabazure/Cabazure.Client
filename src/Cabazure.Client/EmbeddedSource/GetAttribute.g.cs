@@ -7,16 +7,20 @@ namespace Cabazure.Client;
 /// <summary>
 /// Identifies a HTTP GET request call.
 /// </summary>
-/// <param name="routeTemplate">The relative request path which might include placeholders, like: <c>/users/{id}</c>.</param>
 [ExcludeFromCodeCoverage]
 [AttributeUsage(
     AttributeTargets.Method, 
     Inherited = false, 
     AllowMultiple = false)]
-internal sealed class GetAttribute(
-    string routeTemplate)
-    : Attribute
+internal sealed class GetAttribute : Attribute
 {
-    public string RouteTemplate { get; } = routeTemplate;
+    public string RouteTemplate { get; }
+
+    /// <param name="routeTemplate">The relative request path which might include placeholders, like: <c>/users/{id}</c>.</param>
+    public GetAttribute(
+        string routeTemplate)
+    {
+        RouteTemplate = routeTemplate;
+    }
 }
 #nullable disable

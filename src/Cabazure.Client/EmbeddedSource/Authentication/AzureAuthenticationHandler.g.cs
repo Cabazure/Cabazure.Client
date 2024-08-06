@@ -2,10 +2,17 @@
 #nullable enable
 namespace Cabazure.Client.Authentication;
 
-internal class AzureAuthenticationHandler(
-    IBearerTokenProvider tokenProvider)
+internal class AzureAuthenticationHandler
     : DelegatingHandler
 {
+    private readonly IBearerTokenProvider tokenProvider;
+
+    public AzureAuthenticationHandler(
+        IBearerTokenProvider tokenProvider)
+    {
+        this.tokenProvider = tokenProvider;     
+    }
+
     protected async override Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
