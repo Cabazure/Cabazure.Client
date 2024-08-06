@@ -7,11 +7,11 @@ namespace Cabazure.Client.Runtime.Tests.Builder;
 public class HttpClientBuilderExtensionsTests
 {
     [Theory, AutoNSubstituteData]
-    public void SetBaseAddress_Should_Set_BaseAddress_On_HttpClient(
-    ServiceCollection services,
-    IHttpClientBuilder builder,
-    string name,
-    Uri baseAddress)
+    internal void SetBaseAddress_Should_Set_BaseAddress_On_HttpClient(
+        ServiceCollection services,
+        IHttpClientBuilder builder,
+        string name,
+        Uri baseAddress)
     {
         builder.Name.Returns(name);
         builder.Services.Returns(services);
@@ -29,7 +29,7 @@ public class HttpClientBuilderExtensionsTests
     }
 
     [Theory, AutoNSubstituteData]
-    public void AddAuthentication_With_TokenContext_Should_Configure_AzureAuthenticationHandler(
+    internal void AddAuthentication_With_TokenContext_Should_Configure_AzureAuthenticationHandler(
         ServiceCollection services,
         IHttpClientBuilder builder,
         string name,
@@ -55,7 +55,7 @@ public class HttpClientBuilderExtensionsTests
     }
 
     [Theory, AutoNSubstituteData]
-    public void AddAuthentication_With_Scope_Should_Configure_AzureAuthenticationHandler(
+    internal void AddAuthentication_With_Scope_Should_Configure_AzureAuthenticationHandler(
         ServiceCollection services,
         IHttpClientBuilder builder,
         string name,

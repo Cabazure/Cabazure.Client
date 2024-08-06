@@ -9,7 +9,7 @@ public class ClientSerializerTests
     public record TestObject(string Name, int Age);
 
     [Theory, AutoNSubstituteData]
-    public void Serialize_Gets_Named_SerializerOptions(
+    internal void Serialize_Gets_Named_SerializerOptions(
         [Frozen] IOptionsMonitor<JsonSerializerOptions> optionsMonitor,
         ClientSerializer sut,
         string clientName,
@@ -20,7 +20,7 @@ public class ClientSerializerTests
     }
 
     [Theory, AutoNSubstituteData]
-    public void Serialize_Returns_Serialized_Value(
+    internal void Serialize_Returns_Serialized_Value(
         [Frozen] IOptionsMonitor<JsonSerializerOptions> optionsMonitor,
         ClientSerializer sut,
         string clientName,
@@ -39,7 +39,7 @@ public class ClientSerializerTests
     }
 
     [Theory, AutoNSubstituteData]
-    public void Deserialize_Gets_Named_SerializerOptions(
+    internal void Deserialize_Gets_Named_SerializerOptions(
         [Frozen] IOptionsMonitor<JsonSerializerOptions> optionsMonitor,
         ClientSerializer sut,
         string clientName,
@@ -53,7 +53,7 @@ public class ClientSerializerTests
     }
 
     [Theory, AutoNSubstituteData]
-    public void Deserialize_Returns_Deserialized_Value(
+    internal void Deserialize_Returns_Deserialized_Value(
         [Frozen] IOptionsMonitor<JsonSerializerOptions> optionsMonitor,
         ClientSerializer sut,
         string clientName,

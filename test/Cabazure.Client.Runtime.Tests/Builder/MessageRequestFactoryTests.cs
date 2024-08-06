@@ -5,7 +5,7 @@ namespace Cabazure.Client.Runtime.Tests.Builder;
 public class MessageRequestFactoryTests
 {
     [Theory, AutoNSubstituteData]
-    public void Should_Provide_MessageResponseBuilder_FromResponse(
+    internal void Should_Provide_MessageResponseBuilder_FromResponse(
         HttpResponseMessage response,
         string clientName,
         MessageRequestFactory sut)
@@ -14,7 +14,7 @@ public class MessageRequestFactoryTests
             .NotBeNull();
 
     [Theory, AutoNSubstituteData]
-    public void Should_Provide_MessageResponseBuilder_From_Null_Response(
+    internal void Should_Provide_MessageResponseBuilder_From_Null_Response(
         string clientName,
         MessageRequestFactory sut)
         => sut.FromResponse(clientName, null)
@@ -22,7 +22,7 @@ public class MessageRequestFactoryTests
             .NotBeNull();
 
     [Theory, AutoNSubstituteData]
-    public void Should_Provide_MessageRequestBuilder_FromTemplate(
+    internal void Should_Provide_MessageRequestBuilder_FromTemplate(
         string template,
         string clientName,
         MessageRequestFactory sut)

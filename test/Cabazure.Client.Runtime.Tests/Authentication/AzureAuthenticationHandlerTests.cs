@@ -7,7 +7,7 @@ namespace Cabazure.Client.Runtime.Tests.Authentication;
 public class AzureAuthenticationHandlerTests
 {
     [Theory, AutoNSubstituteData]
-    public async Task Should_Get_Token_On_Send(
+    internal async Task Should_Get_Token_On_Send(
         [Frozen] IBearerTokenProvider tokenProvider,
         AzureAuthenticationHandler sut,
         [Substitute] HttpMessageHandler handler,

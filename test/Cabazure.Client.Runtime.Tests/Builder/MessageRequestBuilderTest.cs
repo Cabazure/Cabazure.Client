@@ -8,7 +8,7 @@ namespace Cabazure.Client.Runtime.Tests.Builder;
 public class MessageRequestBuilderTest
 {
     [Theory, AutoNSubstituteData]
-    public void Should_Use_HttpMethod(
+    internal void Should_Use_HttpMethod(
         HttpMethod method,
         MessageRequestBuilder sut)
         => sut.Build(method)
@@ -17,7 +17,7 @@ public class MessageRequestBuilderTest
             .Be(method);
 
     [Theory, AutoNSubstituteData]
-    public void Should_Use_HttpVersion_20(
+    internal void Should_Use_HttpVersion_20(
         HttpMethod method,
         MessageRequestBuilder sut)
         => sut.Build(method)
@@ -26,7 +26,7 @@ public class MessageRequestBuilderTest
             .Be(HttpVersion.Version20);
 
     [Theory, AutoNSubstituteData]
-    public void Should_Use_ApplicationJson_As_MediaType(
+    internal void Should_Use_ApplicationJson_As_MediaType(
         MessageRequestBuilder sut)
     {
         var message = sut.Build(HttpMethod.Post);
@@ -47,7 +47,7 @@ public class MessageRequestBuilderTest
 
     [Theory]
     [InlineAutoNSubstituteData("/api/chargepoints/{chargepointId}/connectors/{connectorId}/startcharging")]
-    public void Should_Replace_Path_Parameters(
+    internal void Should_Replace_Path_Parameters(
         string template,
         string parameterValue,
         IClientSerializer serializer,
@@ -67,7 +67,7 @@ public class MessageRequestBuilderTest
 
     [Theory]
     [InlineAutoNSubstituteData("/api/chargepoints/1232/reset")]
-    public void Should_Replace_Query_Parameters(
+    internal void Should_Replace_Query_Parameters(
         string template,
         string parameterValue,
         IClientSerializer serializer,
@@ -87,7 +87,7 @@ public class MessageRequestBuilderTest
     }
 
     [Theory, AutoNSubstituteData]
-    public async Task Should_Include_BodyAsync(
+    internal async Task Should_Include_BodyAsync(
         string template,
         IClientSerializer serializer,
         string clientName,
@@ -109,7 +109,7 @@ public class MessageRequestBuilderTest
     }
 
     [Theory, AutoNSubstituteData]
-    public void Should_Include_Header(
+    internal void Should_Include_Header(
         MessageRequestBuilder sut,
         string headerName,
         string headerValue)
@@ -128,7 +128,7 @@ public class MessageRequestBuilderTest
     }
 
     [Theory, AutoNSubstituteData]
-    public void Should_Include_OnBehalfOf_Header(
+    internal void Should_Include_OnBehalfOf_Header(
         MessageRequestBuilder sut,
         ClientRequestOptions options)
     {
@@ -145,7 +145,7 @@ public class MessageRequestBuilderTest
     }
 
     [Theory, AutoNSubstituteData]
-    public void Should_Include_CorrelationId_Header(
+    internal void Should_Include_CorrelationId_Header(
         MessageRequestBuilder sut,
         ClientRequestOptions options)
     {
@@ -163,7 +163,7 @@ public class MessageRequestBuilderTest
     }
 
     [Theory, AutoNSubstituteData]
-    public void Should_Include_MacItemCount_Header(
+    internal void Should_Include_MacItemCount_Header(
         MessageRequestBuilder sut,
         ClientPaginationOptions options)
     {
@@ -181,7 +181,7 @@ public class MessageRequestBuilderTest
     }
 
     [Theory, AutoNSubstituteData]
-    public void Should_Include_Continuation_Header(
+    internal void Should_Include_Continuation_Header(
         MessageRequestBuilder sut,
         ClientPaginationOptions options)
     {
@@ -199,7 +199,7 @@ public class MessageRequestBuilderTest
     }
 
     [Theory, AutoNSubstituteData]
-    public void Should_Ignore_Header_When_Null_Or_Empty_Or_Whitespace(
+    internal void Should_Ignore_Header_When_Null_Or_Empty_Or_Whitespace(
         MessageRequestBuilder sut,
         string headerName)
     {

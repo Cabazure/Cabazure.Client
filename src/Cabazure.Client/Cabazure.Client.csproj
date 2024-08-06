@@ -23,7 +23,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Cabazure.Client.Runtime.Tests" />
+    <InternalsVisibleTo Include="Cabazure.Client.IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="EmbeddedSource\Authentication\AzureAuthenticationHandler.g.cs" />
+    <Compile Remove="EmbeddedSource\Authentication\BearerTokenProvider.g.cs" />
+    <Compile Remove="EmbeddedSource\Authentication\DateTimeProvider.g.cs" />
+    <Compile Remove="EmbeddedSource\Authentication\IBearerTokenProvider.g.cs" />
+    <Compile Remove="EmbeddedSource\Authentication\IDateTimeProvider.g.cs" />
     <Compile Remove="EmbeddedSource\BodyAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\ClientSerializer.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\HttpClientBuilderExtensions.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\HttpClientExtensions.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\IClientSerializer.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\IMessageRequestBuilder.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\IMessageRequestFactory.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\IMessageResponseBuilder.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\MessageRequestBuilder.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\MessageRequestFactory.g.cs" />
+    <Compile Remove="EmbeddedSource\Builder\MessageResponseBuilder.g.cs" />
     <Compile Remove="EmbeddedSource\ClientEndpointAttribute.g.cs" />
     <Compile Remove="EmbeddedSource\DeleteAttribute.g.cs" />
     <Compile Remove="EmbeddedSource\GetAttribute.g.cs" />
@@ -37,7 +57,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="EmbeddedSource\Authentication\AzureAuthenticationHandler.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Authentication\BearerTokenProvider.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Authentication\DateTimeProvider.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Authentication\IBearerTokenProvider.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Authentication\IDateTimeProvider.g.cs" />
     <EmbeddedResource Include="EmbeddedSource\BodyAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\ClientSerializer.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\HttpClientBuilderExtensions.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\HttpClientExtensions.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\IClientSerializer.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\IMessageRequestBuilder.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\IMessageRequestFactory.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\IMessageResponseBuilder.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\MessageRequestBuilder.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\MessageRequestFactory.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\Builder\MessageResponseBuilder.g.cs" />
     <EmbeddedResource Include="EmbeddedSource\ClientEndpointAttribute.g.cs" />
     <EmbeddedResource Include="EmbeddedSource\DeleteAttribute.g.cs" />
     <EmbeddedResource Include="EmbeddedSource\GetAttribute.g.cs" />
