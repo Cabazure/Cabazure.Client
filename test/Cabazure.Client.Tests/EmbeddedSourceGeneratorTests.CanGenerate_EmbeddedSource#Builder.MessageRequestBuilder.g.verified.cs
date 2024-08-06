@@ -70,14 +70,14 @@ internal class MessageRequestBuilder(
                 id);
         }
 
-        if (options is ClientPaginationOptions { ContinuationToken: { } token })
+        if (options is PagedRequestOptions { ContinuationToken: { } token })
         {
             WithHeader(
                 HeaderContinuation,
                 token);
         }
 
-        if (options is ClientPaginationOptions { MaxItemCount: { } maxCount })
+        if (options is PagedRequestOptions { MaxItemCount: { } maxCount })
         {
             WithHeader(
                 HeaderMaxItemCount,

@@ -3,7 +3,7 @@
 /// <summary>
 /// Options for a client request, that supports pagination.
 /// </summary>
-public class ClientPaginationOptions : ClientRequestOptions
+public class PagedRequestOptions : ClientRequestOptions
 {
     /// <summary>
     /// The maximum number of items to return, sent via the x-max-item-count header.
