@@ -7,15 +7,20 @@ namespace Cabazure.Client;
 /// <summary>
 /// Identifies a HTTP DELETE request call.
 /// </summary>
-/// <param name="routeTemplate">The relative request path which might include placeholders, like: <c>/users/{id}</c>.</param>
 [ExcludeFromCodeCoverage]
 [AttributeUsage(
     AttributeTargets.Method,
     Inherited = false,
     AllowMultiple = false)]
-internal sealed class DeleteAttribute(
-    string routeTemplate) : Attribute
+internal sealed class DeleteAttribute : Attribute
 {
-    public string RouteTemplate { get; } = routeTemplate;
+    public string RouteTemplate { get; }
+
+    /// <param name="routeTemplate">The relative request path which might include placeholders, like: <c>/users/{id}</c>.</param>
+    public DeleteAttribute(
+        string routeTemplate)
+    {
+        RouteTemplate = routeTemplate;
+    }
 }
 #nullable disable

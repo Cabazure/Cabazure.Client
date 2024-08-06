@@ -8,11 +8,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Cabazure.Client.Builder;
 
-internal class MessageRequestBuilder(
-    string template,
-    IClientSerializer serializer,
-    string clientName)
-    : IMessageRequestBuilder
+internal class MessageRequestBuilder : IMessageRequestBuilder
 {
     private const string HeaderOnBehalfOf = "x-on-behalf-of";
     private const string HeaderCorrelationId = "x-correlation-id";
@@ -22,7 +18,20 @@ internal class MessageRequestBuilder(
     private readonly Dictionary<string, string> pathMapper = [];
     private readonly Dictionary<string, string> queryMapper = [];
     private readonly Dictionary<string, StringValues> headerMapper = [];
+    private readonly string template;
+    private readonly IClientSerializer serializer;
+    private readonly string clientName;
     private string content = string.Empty;
+
+    public MessageRequestBuilder(
+        string template,
+        IClientSerializer serializer,
+        string clientName)
+    {
+        this.template = template;
+        this.serializer = serializer;
+        this.clientName = clientName;
+    }
 
     public HttpRequestMessage Build(HttpMethod method)
     {

@@ -7,19 +7,24 @@ namespace Cabazure.Client;
 /// <summary>
 /// Specifies that a parameter should be bound to a request header.
 /// </summary>
-/// <param name="name">The name of the request header.</param>
 [ExcludeFromCodeCoverage]
 [AttributeUsage(
     AttributeTargets.Parameter | AttributeTargets.Property,
     Inherited = false,
     AllowMultiple = false)]
-internal sealed class HeaderAttribute(
-    string name,
-    string? formatString = null)
-    : Attribute
+internal sealed class HeaderAttribute : Attribute
 {
-    public string Name { get; } = name;
+    public string Name { get; }
 
-    public string? FormatString { get; } = formatString;
+    public string? FormatString { get; }
+
+    /// <param name="name">The name of the request header.</param>
+    public HeaderAttribute(
+        string name,
+        string? formatString = null)
+    {
+        Name = name;
+        FormatString = formatString;
+    }
 }
 #nullable disable

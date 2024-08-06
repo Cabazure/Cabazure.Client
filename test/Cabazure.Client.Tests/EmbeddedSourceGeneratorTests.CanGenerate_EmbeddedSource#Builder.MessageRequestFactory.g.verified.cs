@@ -3,8 +3,15 @@
 #nullable enable
 namespace Cabazure.Client.Builder;
 
-internal class MessageRequestFactory(IClientSerializer serializer) : IMessageRequestFactory
+internal class MessageRequestFactory : IMessageRequestFactory
 {
+    private readonly IClientSerializer serializer;
+
+    public MessageRequestFactory(IClientSerializer serializer)
+    {
+        this.serializer = serializer;
+    }
+
     public IMessageResponseBuilder FromResponse(string clientName, HttpResponseMessage? response)
         => new MessageResponseBuilder(response, serializer, clientName);
 

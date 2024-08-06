@@ -8,18 +8,22 @@ namespace Cabazure.Client;
 /// <summary>
 /// Indicates that the interface is a specification for a client endpoint.
 /// </summary>
-/// <param name="clientName">
-/// The name of the <see cref="HttpClient"/> instance, the endpoint belongs to.
-/// </param>
 [ExcludeFromCodeCoverage]
 [AttributeUsage(
     AttributeTargets.Interface,
     Inherited = false,
     AllowMultiple = false)]
-internal sealed class ClientEndpointAttribute(
-    string clientName)
-    : Attribute
+internal sealed class ClientEndpointAttribute : Attribute
 {
-    public string ClientName { get; } = clientName;
+    public string ClientName { get; }
+
+    /// <param name="clientName">
+    /// The name of the <see cref="HttpClient"/> instance, the endpoint belongs to.
+    /// </param>
+    public ClientEndpointAttribute(
+        string clientName)
+    {
+        ClientName = clientName;
+    }
 }
 #nullable disable
