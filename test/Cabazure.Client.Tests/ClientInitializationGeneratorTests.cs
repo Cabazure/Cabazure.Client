@@ -3,7 +3,7 @@
 public class ClientInitializationGeneratorTests
 {
     [Fact]
-    public Task CanGenerate_GetEndpoint()
+    public Task CanGenerate_Initialization()
         => TestHelper.VerifyInitialization("""
             [ClientEndpoint("ClientName")]
             public interface ITestEndpoint
