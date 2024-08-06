@@ -138,7 +138,7 @@ public static class TestHelper
         var references = AppDomain.CurrentDomain
             .GetAssemblies()
             .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location))
-            .Append(typeof(ClientEndpointAttribute).Assembly)
+            .Append(typeof(ClientRequestOptions).Assembly)
             .Append(typeof(JsonSerializerOptions).Assembly)
             .Append(typeof(IServiceCollection).Assembly)
             .Append(typeof(IHttpClientBuilder).Assembly)

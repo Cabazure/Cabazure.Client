@@ -24,10 +24,26 @@
 
   <ItemGroup>
     <Compile Remove="EmbeddedSource\BodyAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\ClientEndpointAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\DeleteAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\GetAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\HeaderAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\PathAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\PostAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\PutAttribute.g.cs" />
+    <Compile Remove="EmbeddedSource\QueryAttribute.g.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedSource\BodyAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\ClientEndpointAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\DeleteAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\GetAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\HeaderAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\PathAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\PostAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\PutAttribute.g.cs" />
+    <EmbeddedResource Include="EmbeddedSource\QueryAttribute.g.cs" />
   </ItemGroup>
 
   <ItemGroup>
