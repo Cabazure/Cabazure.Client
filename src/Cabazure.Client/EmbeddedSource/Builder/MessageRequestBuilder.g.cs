@@ -59,9 +59,12 @@ internal class MessageRequestBuilder : IMessageRequestBuilder
     public IMessageRequestBuilder WithRequestOptions(
         IRequestOptions? options)
     {
-        foreach (var header in options.GetHeaders())
+        if (options is { } o)
         {
-            WithHeader(header.Key, header.Value);
+            foreach (var header in o.GetHeaders())
+            {
+                WithHeader(header.Key, header.Value);
+            }
         }
 
         return this;
