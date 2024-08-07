@@ -6,7 +6,7 @@ internal static class HttpClientExtensions
 {
     public static HttpClient WithRequestOptions(
         this HttpClient httpClient,
-        ClientRequestOptions? requestOptions)
+        IRequestOptions? requestOptions)
     {
         if (requestOptions is { Timeout: { Ticks: > 0 } timeout })
         {

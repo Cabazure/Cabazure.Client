@@ -9,11 +9,6 @@ namespace Cabazure.Client.Builder;
 
 internal class MessageRequestBuilder : IMessageRequestBuilder
 {
-    private const string HeaderOnBehalfOf = "x-on-behalf-of";
-    private const string HeaderCorrelationId = "x-correlation-id";
-    private const string HeaderMaxItemCount = "x-max-item-count";
-    private const string HeaderContinuation = "x-continuation";
-
     private readonly Dictionary<string, string> pathMapper = new();
     private readonly Dictionary<string, string> queryMapper = new();
     private readonly Dictionary<string, StringValues> headerMapper = new();
@@ -62,34 +57,11 @@ internal class MessageRequestBuilder : IMessageRequestBuilder
     }
 
     public IMessageRequestBuilder WithRequestOptions(
-        ClientRequestOptions? options)
+        IRequestOptions? options)
     {
-        if (options is { OnBehalfOf: { } onBehalfOf })
+        foreach (var header in options.GetHeaders())
         {
-            WithHeader(
-                HeaderOnBehalfOf,
-                onBehalfOf);
-        }
-
-        if (options is { CorrelationId: { } id })
-        {
-            WithHeader(
-                HeaderCorrelationId,
-                id);
-        }
-
-        if (options is PagedRequestOptions { ContinuationToken: { } token })
-        {
-            WithHeader(
-                HeaderContinuation,
-                token);
-        }
-
-        if (options is PagedRequestOptions { MaxItemCount: { } maxCount })
-        {
-            WithHeader(
-                HeaderMaxItemCount,
-                maxCount.ToString(CultureInfo.InvariantCulture));
+            WithHeader(header.Key, header.Value);
         }
 
         return this;
@@ -132,7 +104,7 @@ internal class MessageRequestBuilder : IMessageRequestBuilder
 
         if (queryMapper.Count != 0)
         {
-            urlBuilder.Append('?');
+            urlBuilder.Append(template.Contains('?') ? '&': '?');
             urlBuilder.Append(string.Join("&", queryMapper.Select(q => $"{q.Key}={Uri.EscapeDataString(q.Value)}")));
         }
 

@@ -12,7 +12,7 @@ internal interface IMessageRequestBuilder
 
     IMessageRequestBuilder WithHeader(string name, StringValues value);
 
-    IMessageRequestBuilder WithRequestOptions(ClientRequestOptions? options);
+    IMessageRequestBuilder WithRequestOptions(IRequestOptions? options);
 
     IMessageRequestBuilder WithBody<TBody>(TBody body)
         where TBody : class;

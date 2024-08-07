@@ -128,23 +128,6 @@ public class MessageRequestBuilderTest
     }
 
     [Theory, AutoNSubstituteData]
-    internal void Should_Include_OnBehalfOf_Header(
-        MessageRequestBuilder sut,
-        ClientRequestOptions options)
-    {
-        sut.WithRequestOptions(options);
-
-        var message = sut.Build(HttpMethod.Post);
-        var result = message.Headers.Single(
-                c => c.Key == "x-on-behalf-of")
-            .Value;
-
-        result
-            .Should()
-            .BeEquivalentTo(options.OnBehalfOf);
-    }
-
-    [Theory, AutoNSubstituteData]
     internal void Should_Include_CorrelationId_Header(
         MessageRequestBuilder sut,
         ClientRequestOptions options)
