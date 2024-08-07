@@ -65,19 +65,19 @@ public record EndpointMethodDescriptor(
 
         foreach (var parameter in method.ParameterList.Parameters)
         {
-            var parameterType = semanticModel.GetTypeName(parameter.Type!)!;
+            var parameterType = semanticModel.GetTypeInfo(parameter.Type!).Type!;
+            var parameterTypeName = parameterType.GetName()!;
+                
             var isNullable = parameter.Type!.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.NullableType);
             var parameterName = parameter.Identifier.ValueText;
 
-            if (parameterType
-                is TypeConstants.ClientRequestOptions
-                or TypeConstants.PagedRequestOptions)
+            if (parameterType.AllInterfaces.Any(i => i.GetName() == TypeConstants.RequestOptions))
             {
                 optionsParameter = parameterName;
                 continue;
             }
 
-            if (parameterType == TypeConstants.CancellationToken)
+            if (parameterTypeName == TypeConstants.CancellationToken)
             {
                 cancellationTokenParameter = parameterName;
                 continue;
@@ -113,21 +113,21 @@ public record EndpointMethodDescriptor(
                                 name));
                     }
                     isValid = true;
-                    pathParameters.Add(new(name, parameterName, parameterType, isNullable, formatString));
+                    pathParameters.Add(new(name, parameterName, parameterTypeName, isNullable, formatString));
                     continue;
                 }
 
                 if (attributeTypeName == TypeConstants.QueryAttribute)
                 {
                     isValid = true;
-                    queryParameters.Add(new(name, parameterName, parameterType, isNullable, formatString));
+                    queryParameters.Add(new(name, parameterName, parameterTypeName, isNullable, formatString));
                     continue;
                 }
 
                 if (attributeTypeName == TypeConstants.HeaderAttribute)
                 {
                     isValid = true;
-                    headerParameters.Add(new(name, parameterName, parameterType, isNullable, formatString));
+                    headerParameters.Add(new(name, parameterName, parameterTypeName, isNullable, formatString));
                     continue;
                 }
             }
