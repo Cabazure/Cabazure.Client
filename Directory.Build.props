@@ -15,6 +15,11 @@
     <RepositoryUrl>https://github.com/Cabazure/Cabazure.Client</RepositoryUrl>
   </PropertyGroup>
 
+  <!-- Treat warnings as errors are always on when building in release -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
   <!--
   By default builds are non-deterministic, meaning there is no guarantee that building the same code twice(on the same or different machines)
   will produce exactly the same binary output. Deterministic builds are important as they enable verification that the resulting
