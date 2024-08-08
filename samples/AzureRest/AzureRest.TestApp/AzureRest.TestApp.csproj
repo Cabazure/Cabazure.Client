@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Graph.Client\Microsoft.Graph.Client.csproj" />
+    <ProjectReference Include="..\AzureRest.Client\AzureRest.Client.csproj" />
   </ItemGroup>
-
+  
+  
 </Project>

@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Cabazure.Client.Runtime\Cabazure.Client.Runtime.csproj" />
     <ProjectReference Include="..\..\..\src\Cabazure.Client\Cabazure.Client.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\Microsoft.Graph.Contracts\Microsoft.Graph.Contracts.csproj" />
+    <ProjectReference Include="..\AzureRest.Contracts\AzureRest.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
