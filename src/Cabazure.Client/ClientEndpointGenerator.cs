@@ -39,6 +39,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         var usingStatements = endpoint
             .Usings
             .Append("System.Net")
+            .Append("System.Net.Http")
             .Append("Cabazure.Client")
             .Append("Cabazure.Client.Builder")
             .Where(us => us != endpoint.Namespace)
@@ -57,22 +58,23 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
         if (endpoint.Namespace != null)
         {
-            source.AppendLine($"namespace {endpoint.Namespace};\n");
+            source.AppendLine($"namespace {endpoint.Namespace}");
+            source.AppendLine($"{{");
         }
 
         source.AppendLine($$"""
-            internal partial class {{endpoint.ClassName}} : {{endpoint.InterfaceName}}
-            {
-                private readonly IHttpClientFactory factory;
-                private readonly IMessageRequestFactory requestFactory;
-
-                public {{endpoint.ClassName}}(
-                    IHttpClientFactory factory,
-                    IMessageRequestFactory requestFactory)
+                internal partial class {{endpoint.ClassName}} : {{endpoint.InterfaceName}}
                 {
-                    this.factory = factory;
-                    this.requestFactory = requestFactory;
-                }
+                    private readonly IHttpClientFactory factory;
+                    private readonly IMessageRequestFactory requestFactory;
+
+                    public {{endpoint.ClassName}}(
+                        IHttpClientFactory factory,
+                        IMessageRequestFactory requestFactory)
+                    {
+                        this.factory = factory;
+                        this.requestFactory = requestFactory;
+                    }
             """);
 
         foreach (var method in endpoint.Methods)
@@ -83,7 +85,11 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                 endpoint.ClientName);
         }
 
-        source.AppendLine("}");
+        source.AppendLine("    }");
+        if (endpoint.Namespace != null)
+        {
+            source.AppendLine($"}}");
+        }
         source.AppendLine("#nullable disable");
 
         context.AddSource(
@@ -101,28 +107,28 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
         foreach (var p in method.PathParameters)
         {
-            requestOptions.Append($"\n            .WithPathParameter(\"{p.Name}\", {GetParameterValue(p)})");
+            requestOptions.Append($"\n                .WithPathParameter(\"{p.Name}\", {GetParameterValue(p)})");
         }
 
         foreach (var p in method.QueryParameters)
         {
-            requestOptions.Append($"\n            .WithQueryParameter(\"{p.Name}\", {GetParameterValue(p)})");
+            requestOptions.Append($"\n                .WithQueryParameter(\"{p.Name}\", {GetParameterValue(p)})");
         }
 
         foreach (var p in method.HeaderParameters)
         {
-            requestOptions.Append($"\n            .WithHeader(\"{p.Name}\", {GetParameterValue(p)})");
+            requestOptions.Append($"\n                .WithHeader(\"{p.Name}\", {GetParameterValue(p)})");
         }
 
         if (method.BodyParameter is { } b)
         {
-            requestOptions.Append($"\n            .WithBody({b})");
+            requestOptions.Append($"\n                .WithBody({b})");
         }
 
         if (method.OptionsParameter is { } o)
         {
-            clientOptions.Append($"\n            .WithRequestOptions({o})");
-            requestOptions.Append($"\n            .WithRequestOptions({o})");
+            clientOptions.Append($"\n                .WithRequestOptions({o})");
+            requestOptions.Append($"\n                .WithRequestOptions({o})");
         }
 
         var cancellationToken = method.CancellationTokenParameter
@@ -136,26 +142,26 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
         var resultConversion = method.ResponseType == null
             ? null
-            : $"\n                response => new {method.ResponseType}(response),\n                ";
+            : $"\n                    response => new {method.ResponseType}(response),\n                    ";
 
         source.AppendLine($$"""
 
-            {{method.Signature}}
-            {
-                var client = factory.CreateClient("{{clientName}}");
+                {{method.Signature}}
+                {
+                    var client = factory.CreateClient("{{clientName}}");
 
-                using var requestMessage = requestFactory
-                    .FromTemplate("{{clientName}}", "{{method.RouteTemplate}}"){{requestOptions}}
-                    .Build(HttpMethod.{{method.HttpMethod}});
+                    using var requestMessage = requestFactory
+                        .FromTemplate("{{clientName}}", "{{method.RouteTemplate}}"){{requestOptions}}
+                        .Build(HttpMethod.{{method.HttpMethod}});
 
-                using var response = await client{{clientOptions}}
-                    .SendAsync(requestMessage, {{cancellationToken}});
+                    using var response = await client{{clientOptions}}
+                        .SendAsync(requestMessage, {{cancellationToken}});
 
-                return await requestFactory
-                    .FromResponse("{{clientName}}", response)
-                    .AddSuccessResponse{{resultGeneric}}(HttpStatusCode.OK)
-                    .GetAsync({{resultConversion}}{{cancellationToken}});
-            }
+                    return await requestFactory
+                        .FromResponse("{{clientName}}", response)
+                        .AddSuccessResponse{{resultGeneric}}(HttpStatusCode.OK)
+                        .GetAsync({{resultConversion}}{{cancellationToken}});
+                }
         """);
     }
 
