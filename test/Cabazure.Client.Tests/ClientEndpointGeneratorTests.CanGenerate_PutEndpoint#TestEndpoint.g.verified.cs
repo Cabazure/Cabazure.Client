@@ -6,39 +6,39 @@ using System.Net.Http;
 using Cabazure.Client;
 using Cabazure.Client.Builder;
 
-    internal partial class TestEndpoint : ITestEndpoint
+internal partial class TestEndpoint : ITestEndpoint
+{
+    private readonly IHttpClientFactory factory;
+    private readonly IMessageRequestFactory requestFactory;
+
+    public TestEndpoint(
+        IHttpClientFactory factory,
+        IMessageRequestFactory requestFactory)
     {
-        private readonly IHttpClientFactory factory;
-        private readonly IMessageRequestFactory requestFactory;
-
-        public TestEndpoint(
-            IHttpClientFactory factory,
-            IMessageRequestFactory requestFactory)
-        {
-            this.factory = factory;
-            this.requestFactory = requestFactory;
-        }
-
-        public async Task<EndpointResponse> ExecuteAsync(
-        [Path("id")] string id,
-        [Body] string body,
-        CancellationToken cancellationToken)
-        {
-            var client = factory.CreateClient("ClientName");
-
-            using var requestMessage = requestFactory
-                .FromTemplate("ClientName", "/items/{id}")
-                .WithPathParameter("id", id)
-                .WithBody(body)
-                .Build(HttpMethod.Put);
-
-            using var response = await client
-                .SendAsync(requestMessage, cancellationToken);
-
-            return await requestFactory
-                .FromResponse("ClientName", response)
-                .AddSuccessResponse(HttpStatusCode.OK)
-                .GetAsync(cancellationToken);
-        }
+        this.factory = factory;
+        this.requestFactory = requestFactory;
     }
+
+    public async Task<EndpointResponse> ExecuteAsync(
+        string id,
+        string body,
+        CancellationToken cancellationToken)
+    {
+        var client = factory.CreateClient("ClientName");
+
+        using var requestMessage = requestFactory
+            .FromTemplate("ClientName", "/items/{id}")
+            .WithPathParameter("id", id)
+            .WithBody(body)
+            .Build(HttpMethod.Put);
+
+        using var response = await client
+            .SendAsync(requestMessage, cancellationToken);
+
+        return await requestFactory
+            .FromResponse("ClientName", response)
+            .AddSuccessResponse(HttpStatusCode.OK)
+            .GetAsync(cancellationToken);
+    }
+}
 #nullable disable

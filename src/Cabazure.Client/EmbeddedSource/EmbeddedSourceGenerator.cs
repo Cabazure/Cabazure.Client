@@ -22,7 +22,14 @@ public class EmbeddedSourceGenerator : ISourceGenerator
             {
                 var hintName = sourceFile.Substring(prefix.Length);
                 var stream = assembly.GetManifestResourceStream(sourceFile);
-                context.AddSource(hintName, SourceText.From(stream, canBeEmbedded: true));
+                context.AddSource(
+                    hintName, 
+                    SourceText.From(
+                        stream, 
+                        encoding: System.Text.Encoding.UTF8,
+                        checksumAlgorithm: SourceHashAlgorithm.Sha1,
+                        throwIfBinaryDetected: true,
+                        canBeEmbedded: true));
             }
         }
     }

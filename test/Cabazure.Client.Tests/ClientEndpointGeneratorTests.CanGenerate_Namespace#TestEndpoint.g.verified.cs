@@ -12,7 +12,7 @@ namespace Test
     {
         private readonly IHttpClientFactory factory;
         private readonly IMessageRequestFactory requestFactory;
-
+    
         public TestEndpoint(
             IHttpClientFactory factory,
             IMessageRequestFactory requestFactory)
@@ -26,16 +26,16 @@ namespace Test
             CancellationToken cancellationToken)
         {
             var client = factory.CreateClient("ClientName");
-
+    
             using var requestMessage = requestFactory
                 .FromTemplate("ClientName", "/routes")
                 .WithRequestOptions(options)
                 .Build(HttpMethod.Get);
-
+    
             using var response = await client
                 .WithRequestOptions(options)
                 .SendAsync(requestMessage, cancellationToken);
-
+    
             return await requestFactory
                 .FromResponse("ClientName", response)
                 .AddSuccessResponse<string[]>(HttpStatusCode.OK)

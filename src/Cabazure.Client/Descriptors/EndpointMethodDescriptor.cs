@@ -9,9 +9,10 @@ namespace Cabazure.Client.SourceGenerator.Descriptors;
 
 public record EndpointMethodDescriptor(
     string Name,
-    string Signature,
-    string? ResultType,
+    string[] Parameters,
+    string ReturnType,
     string? ResponseType,
+    string? ResultType,
     string HttpMethod,
     string RouteTemplate,
     string? OptionsParameter,
@@ -164,9 +165,10 @@ public record EndpointMethodDescriptor(
 
         return new EndpointMethodDescriptor(
             method.Identifier.ValueText,
-            $"public async {method.ReturnType} {method.Identifier}{method.ParameterList}",
-            returnType,
+            method.ParameterList.Parameters.Select(p => $"{p.Type} {p.Identifier}").ToArray(),
+            method.ReturnType.ToString(),
             responseType,
+            returnType,
             httpMethod,
             routeTemplate,
             optionsParameter,
