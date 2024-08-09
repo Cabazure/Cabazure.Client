@@ -10,7 +10,7 @@ builder.Services.AddAzureRestClient();
 
 var app = builder.Build();
 
-var endpoint = app.Services.GetRequiredService<IListSubscriptions>();
+var endpoint = app.Services.GetRequiredService<IListSubscriptionsEndpoint>();
 
 var result = await endpoint.ExecuteAsync();
 if (result.OkContent is not { } list)
