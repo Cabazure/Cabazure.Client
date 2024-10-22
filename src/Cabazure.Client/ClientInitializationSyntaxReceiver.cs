@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cabazure.Client.SourceGenerator;
 
-public class ClientInitializationSyntaxReceiver : ISyntaxContextReceiver
+public sealed class ClientInitializationSyntaxReceiver : ISyntaxContextReceiver
 {
     private readonly List<EndpointReferenceDescriptor> endpoints = [];
     private readonly List<Diagnostic> diagnostics = [];

@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Azure.Core;
 using Cabazure.Client.SourceGenerator;
-using Cabazure.Client.SourceGenerator.EmbeddedSource;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,40 +22,15 @@ public static class TestHelper
         global using global::Cabazure.Client;
         """;
 
-    public static async Task VerifyEmbeddedSource()
-    {
-        var initialCompilation = CompileSources();
-
-        var embeddedGenerator = new EmbeddedSourceGenerator();
-        var driver = CSharpGeneratorDriver
-            .Create(embeddedGenerator)
-            .RunGeneratorsAndUpdateCompilation(
-                initialCompilation,
-                out var embeddedCompilation,
-                out _);
-
-        await Verifier.Verify(driver);
-
-        ThrowOnCompilationErrors(embeddedCompilation);
-    }
-
     public static async Task VerifyEndpoint(params string[] sources)
     {
         var initialCompilation = CompileSources(sources);
-
-        var embeddedGenerator = new EmbeddedSourceGenerator();
-        CSharpGeneratorDriver
-            .Create(embeddedGenerator)
-            .RunGeneratorsAndUpdateCompilation(
-                initialCompilation,
-                out var embeddedCompilation,
-                out _);
 
         var endpointGenerator = new ClientEndpointGenerator();
         var driver = CSharpGeneratorDriver
             .Create(endpointGenerator)
             .RunGeneratorsAndUpdateCompilation(
-                embeddedCompilation,
+                initialCompilation,
                 out var finalCompilation,
                 out _);
 
@@ -69,19 +43,11 @@ public static class TestHelper
     {
         var initialCompilation = CompileSources(sources);
 
-        var embeddedGenerator = new EmbeddedSourceGenerator();
-        CSharpGeneratorDriver
-            .Create(embeddedGenerator)
-            .RunGeneratorsAndUpdateCompilation(
-                initialCompilation,
-                out var embeddedCompilation,
-                out _);
-
         var endpointGenerator = new ClientEndpointGenerator();
         CSharpGeneratorDriver
             .Create(endpointGenerator)
             .RunGeneratorsAndUpdateCompilation(
-                embeddedCompilation,
+                initialCompilation,
                 out var endpointCompilation,
                 out _);
 
@@ -103,16 +69,9 @@ public static class TestHelper
         var initialCompilation = CompileSources(sources);
 
         CSharpGeneratorDriver
-            .Create(new EmbeddedSourceGenerator())
-            .RunGeneratorsAndUpdateCompilation(
-                initialCompilation,
-                out var embeddedCompilation,
-                out var embeddedDiagnostics);
-
-        CSharpGeneratorDriver
             .Create(new ClientEndpointGenerator())
             .RunGeneratorsAndUpdateCompilation(
-                embeddedCompilation,
+                initialCompilation,
                 out var endpointCompilation,
                 out var endpointDiagnostics);
 
@@ -123,8 +82,7 @@ public static class TestHelper
                 out _,
                 out var initializationDiagnostics);
 
-        return embeddedDiagnostics
-            .Union(endpointDiagnostics)
+        return endpointDiagnostics
             .Union(initializationDiagnostics)
             .Select(d => d.Descriptor);
     }

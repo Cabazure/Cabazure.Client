@@ -7,7 +7,12 @@
     <Nullable>enable</Nullable>
     <LangVersion>Latest</LangVersion>
     <IsPackable>false</IsPackable>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.43.0" />

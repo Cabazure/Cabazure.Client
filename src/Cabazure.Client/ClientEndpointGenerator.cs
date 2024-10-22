@@ -44,7 +44,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             .Append("Cabazure.Client.Builder")
             .Where(us => us != endpoint.Namespace)
             .Distinct()
-            .OrderByDescending(us => us.StartsWith("System"))
+            .OrderByDescending(us => us.StartsWith("System", StringComparison.Ordinal))
             .ThenBy(us => us)
             .ToArray();
         if (usingStatements.Length > 0)

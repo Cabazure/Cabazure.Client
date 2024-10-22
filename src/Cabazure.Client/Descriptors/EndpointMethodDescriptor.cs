@@ -9,7 +9,7 @@ namespace Cabazure.Client.SourceGenerator.Descriptors;
 
 public record EndpointMethodDescriptor(
     string Name,
-    string[] Parameters,
+    ImmutableArray<string> Parameters,
     string ReturnType,
     string? ResponseType,
     string? ResultType,
@@ -165,7 +165,7 @@ public record EndpointMethodDescriptor(
 
         return new EndpointMethodDescriptor(
             method.Identifier.ValueText,
-            method.ParameterList.Parameters.Select(p => $"{p.Type} {p.Identifier}").ToArray(),
+            method.ParameterList.Parameters.Select(p => $"{p.Type} {p.Identifier}").ToImmutableArray(),
             method.ReturnType.ToString(),
             responseType,
             returnType,
