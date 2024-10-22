@@ -2,7 +2,7 @@ using System.Net;
 
 namespace Cabazure.Client.Builder
 {
-    public delegate object? ContentSerializerDelegate(string content);
+    public delegate object? ContentSerializerFunction(string content);
 
     public class MessageResponseBuilder : IMessageResponseBuilder
     {
@@ -13,7 +13,7 @@ namespace Cabazure.Client.Builder
             null,
             new Dictionary<string, IEnumerable<string>>());
 
-        private readonly Dictionary<HttpStatusCode, ContentSerializerDelegate> responseSerializers = new();
+        private readonly Dictionary<HttpStatusCode, ContentSerializerFunction> responseSerializers = new();
         private readonly Dictionary<HttpStatusCode, bool> responseCodes = new();
         private readonly HttpResponseMessage? response;
         private readonly IClientSerializer serializer;
@@ -73,7 +73,7 @@ namespace Cabazure.Client.Builder
                 ? isSuccess
                 : responseMessage.IsSuccessStatusCode;
 
-        private ContentSerializerDelegate? GetSerializer(HttpStatusCode statusCode)
+        private ContentSerializerFunction? GetSerializer(HttpStatusCode statusCode)
             => responseSerializers.TryGetValue(statusCode, out var @delegate)
              ? @delegate
              : null;

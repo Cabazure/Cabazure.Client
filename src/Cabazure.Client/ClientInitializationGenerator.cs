@@ -74,7 +74,7 @@ public class ClientInitializationGenerator : ISourceGenerator
             .Append("Microsoft.Extensions.DependencyInjection.Extensions")
             .Append("Microsoft.Extensions.Options")
             .Distinct()
-            .OrderByDescending(us => us.StartsWith("System"))
+            .OrderByDescending(us => us.StartsWith("System", StringComparison.Ordinal))
             .ThenBy(us => us)
             .ToArray();
         if (usingStatements.Length > 0)

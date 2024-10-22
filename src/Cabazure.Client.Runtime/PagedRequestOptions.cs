@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using System.Globalization;
+using Microsoft.Extensions.Primitives;
 
 namespace Cabazure.Client;
 
@@ -26,7 +27,7 @@ public class PagedRequestOptions : ClientRequestOptions
         
         if (MaxItemCount is { } maxItemCount)
         {
-            headers[HeaderMaxItemCount] = maxItemCount.ToString();
+            headers[HeaderMaxItemCount] = maxItemCount.ToString(CultureInfo.InvariantCulture);
         }
 
         if (ContinuationToken is { } continuationToken)

@@ -2,7 +2,7 @@
 {
     public interface IMessageRequestFactory
     {
-        IMessageRequestBuilder FromTemplate(string clientName, string template);
+        IMessageRequestBuilder FromTemplate(string clientName, string routeTemplate);
 
         IMessageResponseBuilder FromResponse(string clientName, HttpResponseMessage? response);
     }
