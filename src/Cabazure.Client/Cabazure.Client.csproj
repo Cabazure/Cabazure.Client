@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>Latest</LangVersion>
-    <EnforceExtendedAnalyzerRules>false</EnforceExtendedAnalyzerRules>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <EnablePackageValidation>true</EnablePackageValidation>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>

@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Cabazure.Client.SourceGenerator;
 
-[Generator]
+[Generator(LanguageNames.CSharp)]
 public class ClientEndpointGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)

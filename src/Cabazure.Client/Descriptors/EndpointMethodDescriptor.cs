@@ -68,7 +68,7 @@ public record EndpointMethodDescriptor(
         {
             var parameterType = semanticModel.GetTypeInfo(parameter.Type!).Type!;
             var parameterTypeName = parameterType.GetName()!;
-                
+
             var isNullable = parameter.Type!.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.NullableType);
             var parameterName = parameter.Identifier.ValueText;
 
