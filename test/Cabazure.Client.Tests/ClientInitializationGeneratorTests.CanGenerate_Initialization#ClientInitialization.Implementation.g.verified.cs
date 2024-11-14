@@ -64,7 +64,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder?.Invoke(b);
             }
 
-            return services.AddCabazureClient(
+            return AddCabazureClient(
+                services,
                 clientName,
                 jsonOptions,
                 BuildHttpClient);

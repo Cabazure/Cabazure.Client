@@ -139,7 +139,8 @@ public class ClientInitializationGenerator : ISourceGenerator
                             builder?.Invoke(b);
                         }
             
-                        return services.AddCabazureClient(
+                        return AddCabazureClient(
+                            services,
                             clientName,
                             jsonOptions,
                             BuildHttpClient);
