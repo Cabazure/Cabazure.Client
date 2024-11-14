@@ -9,13 +9,16 @@ public record EndpointReferenceDescriptor(
     string ClassName,
     string? Namespace)
 {
-    public static EndpointReferenceDescriptor? Create(
-        Action<Diagnostic> diagnostics,
-        SemanticModel semanticModel,
-        AttributeSyntax attribute)
+    public static EndpointReferenceDescriptor Create(
+        GeneratorAttributeSyntaxContext context)
     {
-        var clientName = (string)semanticModel.GetConstantValue(attribute.ArgumentList!.Arguments[0].Expression).Value!;
-        var interfaceSyntax = (InterfaceDeclarationSyntax)attribute.Parent!.Parent!;
+        var clientName = context.Attributes
+            .SelectMany(a => a.ConstructorArguments)
+            .Select(a => a.Value)
+            .OfType<string>()
+            .FirstOrDefault();
+
+        var interfaceSyntax = (InterfaceDeclarationSyntax)context.TargetNode;
         var interfaceName = interfaceSyntax.Identifier.ValueText;
         var className = interfaceName.Length > 1 && interfaceName[0] == 'I'
             ? interfaceName.Substring(1)
