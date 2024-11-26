@@ -55,7 +55,7 @@ jobs:
           fail-on-error: true
 
       - name: 📭 Restore coverage history
-        uses: dawidd6/action-download-artifact@v3
+        uses: dawidd6/action-download-artifact@v6
         with:
           name: CoverageHistory
           path: CoverageHistory
