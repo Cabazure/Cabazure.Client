@@ -38,20 +38,21 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
         var usingStatements = endpoint
             .Usings
-            .Append("System.Net")
-            .Append("System.Net.Http")
-            .Append("Cabazure.Client")
-            .Append("Cabazure.Client.Builder")
-            .Where(us => us != endpoint.Namespace)
+            .Append("using System.Net;")
+            .Append("using System.Net.Http;")
+            .Append("using Cabazure.Client;")
+            .Append("using Cabazure.Client.Builder;")
+            .Where(us => us != $"using {endpoint.Namespace};")
             .Distinct()
-            .OrderByDescending(us => us.StartsWith("System", StringComparison.Ordinal))
+            .OrderByDescending(us => us.StartsWith("using System", StringComparison.Ordinal))
+            .ThenBy(us => us.Contains('='))
             .ThenBy(us => us)
             .ToArray();
         if (usingStatements.Length > 0)
         {
             foreach (var us in usingStatements)
             {
-                source.AppendLine($"using {us};");
+                source.AppendLine(us);
             }
             source.AppendLine();
         }
@@ -171,7 +172,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                 """;
 
         var parameters = string.Join(
-            ",", 
+            ",",
             method.Parameters.Select(p => $"\n{indention}        {p}"));
 
         source.AppendLine();

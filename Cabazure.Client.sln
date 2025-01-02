@@ -16,6 +16,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9FD398E9-51D6-4C0E-AD0A-D85A4B9D014F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{115ACFA6-5271-4A7B-844D-FFEA0A4F6BB7}"
+	ProjectSection(SolutionItems) = preProject
+		test\.editorconfig = test\.editorconfig
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{3932F1A3-4272-4E08-83F6-E1EB7DCED0FC}"
 EndProject
@@ -26,6 +29,23 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureRest.Contracts", "samples\AzureRest\AzureRest.Contracts\AzureRest.Contracts.csproj", "{C19CB361-795D-49FF-8821-E4C739EE5020}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureRest.TestApp", "samples\AzureRest\AzureRest.TestApp\AzureRest.TestApp.csproj", "{CF5F841E-FC86-441D-8075-49EA5F280AB8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\release-preview.yml = .github\workflows\release-preview.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +99,7 @@ Global
 		{469837C7-D9B8-4867-A1CD-747DBA16213B} = {D2D03799-0BB4-45C1-9D35-60F364C154EE}
 		{C19CB361-795D-49FF-8821-E4C739EE5020} = {D2D03799-0BB4-45C1-9D35-60F364C154EE}
 		{CF5F841E-FC86-441D-8075-49EA5F280AB8} = {D2D03799-0BB4-45C1-9D35-60F364C154EE}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3DD1DF42-FFAB-4F35-B264-B128D2778D40}
