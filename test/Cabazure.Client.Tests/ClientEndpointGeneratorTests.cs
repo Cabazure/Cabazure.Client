@@ -287,4 +287,20 @@ public class ClientEndpointGeneratorTests
                     CancellationToken cancellationToken);
             }
             """);
+
+    [Fact]
+    public Task CanGenerate_Using_Alias()
+        => TestHelper.VerifyEndpoint("""
+            using TypeAlias = System.Text.Json.Nodes.JsonArray;
+
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items")]
+                public Task<EndpointResponse> ExecuteAsync(
+                    [Body] TypeAlias body,
+                    ClientRequestOptions options,
+                    CancellationToken cancellationToken);
+            }
+            """);
 }

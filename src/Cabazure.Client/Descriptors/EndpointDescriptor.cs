@@ -54,7 +54,8 @@ public record EndpointDescriptor(
 
         var usings = @interface
             .GetUsings()
-            .Select(u => u.Name?.ToString())
+            .ToArray()
+            .Select(u => u.ToString())
             .OfType<string>()
             .ToImmutableArray();
 
