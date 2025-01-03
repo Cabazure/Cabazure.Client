@@ -3,6 +3,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Text.Json;
 using Azure.Core;
@@ -16,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     internal static partial class ClientInitialization
     {
-        internal static partial IServiceCollection AddCabazureClient<TOptions>(
+        internal static partial IServiceCollection AddCabazureClient<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TOptions>(
             this IServiceCollection services,
             string clientName,
             Action<JsonSerializerOptions>? jsonOptions,
