@@ -20,4 +20,5 @@ public static class TypeConstants
     public const string Task = "System.Threading.Tasks.Task";
     public const string EndpointResponse = "Cabazure.Client.EndpointResponse";
     public const string PagedResponse = "Cabazure.Client.PagedResponse";
+    public const string DynamicallyAccessedMembersAttribute = "System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute";
 }

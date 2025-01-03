@@ -9,6 +9,7 @@
     <IsTestProject>true</IsTestProject>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
