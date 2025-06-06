@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
-
-namespace Cabazure.Client;
+﻿namespace Cabazure.Client;
 
 public interface IRequestOptions
 {
@@ -10,8 +8,8 @@ public interface IRequestOptions
     TimeSpan? Timeout { get; set; }
 
     /// <summary>
-    /// Gets the headers to be sent with the request.
+    /// Allows the options implementation to configure the HTTP request message.
     /// </summary>
-    /// <returns>Dictionary of header names and header values.</returns>
-    IDictionary<string, StringValues> GetHeaders();
+    /// <param name="request">The http request being sent.</param>
+    void ConfigureHttpRequest(HttpRequestMessage request);
 }
