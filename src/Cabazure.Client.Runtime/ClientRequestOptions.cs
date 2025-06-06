@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
-
-namespace Cabazure.Client;
+﻿namespace Cabazure.Client;
 
 /// <summary>
 /// Options for a client request.
@@ -19,20 +17,16 @@ public class ClientRequestOptions : IRequestOptions
     /// </summary>
     public TimeSpan? Timeout { get; set; }
 
-    IDictionary<string, StringValues> IRequestOptions.GetHeaders()
+    void IRequestOptions.ConfigureHttpRequest(HttpRequestMessage request)
     {
-        var headers = new Dictionary<string, StringValues>();
-        AppendHeaders(headers);
-
-        return headers;
+        ConfigureHttpRequest(request);
     }
 
-    protected virtual void AppendHeaders(
-        IDictionary<string, StringValues> headers)
-    { 
+    protected virtual void ConfigureHttpRequest(HttpRequestMessage request)
+    {
         if (CorrelationId is { } id)
         {
-            headers[HeaderCorrelationId] = id;
+            request.Headers.TryAddWithoutValidation(HeaderCorrelationId, id);
         }
     }
 }

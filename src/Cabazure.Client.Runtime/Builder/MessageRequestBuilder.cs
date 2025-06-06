@@ -13,6 +13,7 @@ namespace Cabazure.Client.Builder
         private readonly IClientSerializer serializer;
         private readonly string clientName;
         private string content = string.Empty;
+        private IRequestOptions? options;
 
         public MessageRequestBuilder(
             string template,
@@ -40,6 +41,11 @@ namespace Cabazure.Client.Builder
                 message.Headers.Add(header.Key, header.Value.ToArray());
             }
 
+            if (options is not null)
+            {
+                options.ConfigureHttpRequest(message);
+            }
+
             return message;
         }
 
@@ -56,14 +62,7 @@ namespace Cabazure.Client.Builder
         public IMessageRequestBuilder WithRequestOptions(
             IRequestOptions? options)
         {
-            if (options is { } o)
-            {
-                foreach (var header in o.GetHeaders())
-                {
-                    WithHeader(header.Key, header.Value);
-                }
-            }
-
+            this.options = options;
             return this;
         }
 
@@ -104,7 +103,7 @@ namespace Cabazure.Client.Builder
 
             if (queryMapper.Count != 0)
             {
-                urlBuilder.Append(template.Contains('?') ? '&': '?');
+                urlBuilder.Append(template.Contains('?') ? '&' : '?');
                 urlBuilder.Append(string.Join("&", queryMapper.Select(q => $"{q.Key}={Uri.EscapeDataString(q.Value)}")));
             }
 

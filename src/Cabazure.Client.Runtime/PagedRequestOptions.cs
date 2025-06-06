@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using Microsoft.Extensions.Primitives;
 
 namespace Cabazure.Client;
 
@@ -21,18 +20,18 @@ public class PagedRequestOptions : ClientRequestOptions
     /// </summary>
     public string? ContinuationToken { get; set; }
 
-    protected override void AppendHeaders(IDictionary<string, StringValues> headers)
+    protected override void ConfigureHttpRequest(HttpRequestMessage request)
     {
-        base.AppendHeaders(headers);
-        
+        base.ConfigureHttpRequest(request);
+
         if (MaxItemCount is { } maxItemCount)
         {
-            headers[HeaderMaxItemCount] = maxItemCount.ToString(CultureInfo.InvariantCulture);
+            request.Headers.TryAddWithoutValidation(HeaderMaxItemCount, maxItemCount.ToString(CultureInfo.InvariantCulture));
         }
 
         if (ContinuationToken is { } continuationToken)
         {
-            headers[HeaderContinuation] = continuationToken;
+            request.Headers.TryAddWithoutValidation(HeaderContinuation, continuationToken);
         }
     }
 }
