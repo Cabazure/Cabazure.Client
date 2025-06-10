@@ -9,8 +9,8 @@ public class BearerTokenProviderTests
     internal async Task Should_Return_Token_From_TokenCredential(
         [Frozen] TokenCredential credential,
         [Frozen] IDateTimeProvider dateTimeProvider,
-        [Frozen] TokenRequestContext context,
         BearerTokenProvider sut,
+        string[] scopes,
         DateTimeOffset timestamp,
         AccessToken accessToken,
         CancellationToken cancellationToken)
@@ -23,7 +23,7 @@ public class BearerTokenProviderTests
             .GetTokenAsync(default, default)
             .ReturnsForAnyArgs(accessToken);
 
-        var response = await sut.GetTokenAsync(cancellationToken);
+        var response = await sut.GetTokenAsync(scopes, cancellationToken);
 
         response
             .Parameter
@@ -35,8 +35,8 @@ public class BearerTokenProviderTests
     internal async Task Should_Use_Cached_Token_From_TokenCredential(
         [Frozen] TokenCredential credential,
         [Frozen] IDateTimeProvider dateTimeProvider,
-        [Frozen] TokenRequestContext context,
         BearerTokenProvider sut,
+        string[] scopes,
         DateTimeOffset timestamp,
         CancellationToken cancellationToken)
     {
@@ -52,8 +52,8 @@ public class BearerTokenProviderTests
             .GetTokenAsync(default, default)
             .ReturnsForAnyArgs(accessToken);
 
-        var response1 = await sut.GetTokenAsync(cancellationToken);
-        var response2 = await sut.GetTokenAsync(cancellationToken);
+        var response1 = await sut.GetTokenAsync(scopes, cancellationToken);
+        var response2 = await sut.GetTokenAsync(scopes, cancellationToken);
 
         response1
             .Should()
@@ -70,8 +70,8 @@ public class BearerTokenProviderTests
     internal async Task Should_Renew_Expired_Token(
         [Frozen] TokenCredential credential,
         [Frozen] IDateTimeProvider dateTimeProvider,
-        [Frozen] TokenRequestContext context,
         BearerTokenProvider sut,
+        string[] scopes,
         DateTimeOffset timestamp,
         CancellationToken cancellationToken)
     {
@@ -87,9 +87,9 @@ public class BearerTokenProviderTests
             .GetTokenAsync(default, default)
             .ReturnsForAnyArgs(accessToken);
 
-        await sut.GetTokenAsync(cancellationToken);
-        await sut.GetTokenAsync(cancellationToken);
-        await sut.GetTokenAsync(cancellationToken);
+        await sut.GetTokenAsync(scopes, cancellationToken);
+        await sut.GetTokenAsync(scopes, cancellationToken);
+        await sut.GetTokenAsync(scopes, cancellationToken);
 
         _ = credential
             .Received(3)
@@ -102,8 +102,8 @@ public class BearerTokenProviderTests
     internal async Task Should_Use_Bearer_AuthorizationToken(
         [Frozen] TokenCredential credential,
         [Frozen] IDateTimeProvider dateTimeProvider,
-        [Frozen] TokenRequestContext context,
         BearerTokenProvider sut,
+        string[] scopes,
         DateTimeOffset timestamp,
         CancellationToken cancellationToken)
     {
@@ -119,7 +119,7 @@ public class BearerTokenProviderTests
             .GetTokenAsync(default, default)
             .ReturnsForAnyArgs(accessToken);
 
-        var response = await sut.GetTokenAsync(cancellationToken);
+        var response = await sut.GetTokenAsync(scopes, cancellationToken);
 
         response
             .Scheme

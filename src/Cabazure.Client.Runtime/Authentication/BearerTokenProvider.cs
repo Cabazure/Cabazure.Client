@@ -1,31 +1,30 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections.Concurrent;
+using System.Net.Http.Headers;
 using Azure.Core;
 
 namespace Cabazure.Client.Authentication
 {
     public class BearerTokenProvider : IBearerTokenProvider
     {
-        private readonly TokenRequestContext context;
         private readonly TokenCredential credential;
         private readonly IDateTimeProvider dateTimeProvider;
-        private AccessToken accessToken;
+        private readonly ConcurrentDictionary<string[], AccessToken> accessTokenCache = new();
 
         public BearerTokenProvider(
-            TokenRequestContext context,
             TokenCredential credential,
             IDateTimeProvider dateTimeProvider)
         {
-            this.context = context;
             this.credential = credential;
             this.dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<AuthenticationHeaderValue> GetTokenAsync(
+            string[] scopes,
             CancellationToken cancellationToken)
         {
-            if (TokenIsExpired())
+            if (!accessTokenCache.TryGetValue(scopes, out var accessToken) || TokenIsExpired(accessToken))
             {
-                accessToken = await credential.GetTokenAsync(context, cancellationToken);
+                accessTokenCache[scopes] = accessToken = await credential.GetTokenAsync(new TokenRequestContext(scopes), cancellationToken);
             }
 
             return new AuthenticationHeaderValue(
@@ -33,7 +32,7 @@ namespace Cabazure.Client.Authentication
                 accessToken.Token);
         }
 
-        private bool TokenIsExpired()
+        private bool TokenIsExpired(AccessToken accessToken)
             => dateTimeProvider.GetDateTime().AddMinutes(1) > accessToken.ExpiresOn;
     }
 }
