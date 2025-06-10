@@ -8,10 +8,10 @@ namespace Cabazure.Client
     public interface ICabazureAuthClientOptions : ICabazureClientOptions
     {
         /// <summary>
-        /// The scope to use for authorization token.
+        /// The scopes to use for authorization token.
         /// </summary>
-        /// <returns>The authorization scope.</returns>
-        string GetScope();
+        /// <returns>The authorization scopes.</returns>
+        string[] GetScopes();
 
         /// <summary>
         /// The credential to use for authentication.

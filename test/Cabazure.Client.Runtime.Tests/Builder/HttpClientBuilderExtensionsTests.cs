@@ -29,18 +29,18 @@ public class HttpClientBuilderExtensionsTests
     }
 
     [Theory, AutoNSubstituteData]
-    internal void AddAuthentication_With_TokenContext_Should_Configure_AzureAuthenticationHandler(
+    internal void AddAuthentication_With_Scopes_Should_Configure_AzureAuthenticationHandler(
         ServiceCollection services,
         IHttpClientBuilder builder,
         string name,
-        TokenRequestContext context,
+        string[] context,
         TokenCredential credential)
     {
         builder.Name.Returns(name);
         builder.Services.Returns(services);
 
         builder.AddAuthentication(
-            context, 
+            context,
             credential);
 
         services.AddHttpClient(name);

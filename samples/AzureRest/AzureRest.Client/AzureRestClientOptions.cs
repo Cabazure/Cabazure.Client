@@ -13,9 +13,9 @@ namespace AzureRest.Client
             // for the client to work correctly with relative paths.
             => new("https://management.azure.com/");
 
-        string ICabazureAuthClientOptions.GetScope()
+        string[] ICabazureAuthClientOptions.GetScopes()
             // The default scope for Microsoft Graph.
-            => "https://management.azure.com/.default";
+            => new string[] { "https://management.azure.com/.default" };
 
         TokenCredential ICabazureAuthClientOptions.GetCredential()
             => Credential

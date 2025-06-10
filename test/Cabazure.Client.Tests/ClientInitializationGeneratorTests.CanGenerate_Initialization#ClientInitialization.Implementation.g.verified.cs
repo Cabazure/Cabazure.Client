@@ -46,15 +46,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 if (options is ICabazureAuthClientOptions authOptions)
                 {
-                    var scope = authOptions.GetScope();
+                    var scopes = authOptions.GetScopes();
                     var credential = authOptions.GetCredential();
 
                     var tokenProvider = new BearerTokenProvider(
-                        new TokenRequestContext(new [] { scope }),
                         credential,
                         new DateTimeProvider());
 
-                    handlers.Add(new AzureAuthenticationHandler(tokenProvider));
+                    handlers.Add(new AzureAuthenticationHandler(scopes, tokenProvider));
                 }
             }
 

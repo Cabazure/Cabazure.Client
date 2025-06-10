@@ -16,22 +16,21 @@ namespace Microsoft.Extensions.DependencyInjection
             TokenCredential credential)
             => AddAuthentication(
                 builder,
-                new TokenRequestContext(new[] { scope }),
+                new[] { scope },
                 credential);
 
         public static IHttpClientBuilder AddAuthentication(
             this IHttpClientBuilder builder,
-            TokenRequestContext context,
+            string[] scopes,
             TokenCredential credential)
         {
             var tokenProvider = new BearerTokenProvider(
-                context,
                 credential,
                 new DateTimeProvider());
 
             return builder
                 .AddHttpMessageHandler(
-                    () => new AzureAuthenticationHandler(tokenProvider));
+                    () => new AzureAuthenticationHandler(scopes, tokenProvider));
         }
     }
 }

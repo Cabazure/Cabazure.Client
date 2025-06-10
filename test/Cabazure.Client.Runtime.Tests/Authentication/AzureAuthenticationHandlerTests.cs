@@ -17,7 +17,7 @@ public class AzureAuthenticationHandlerTests
         CancellationToken cancellationToken)
     {
         tokenProvider
-            .GetTokenAsync(default)
+            .GetTokenAsync(default, default)
             .ReturnsForAnyArgs(authenticationHeader);
         handler
             .InvokeProtectedMethod<Task<HttpResponseMessage>>("SendAsync", request, cancellationToken)
@@ -29,6 +29,6 @@ public class AzureAuthenticationHandlerTests
 
         _ = tokenProvider
             .Received(1)
-            .GetTokenAsync(Arg.Any<CancellationToken>());
+            .GetTokenAsync(Arg.Any<string[]>(), Arg.Any<CancellationToken>());
     }
 }
