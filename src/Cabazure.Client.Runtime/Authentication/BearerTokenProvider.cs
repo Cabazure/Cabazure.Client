@@ -8,7 +8,7 @@ namespace Cabazure.Client.Authentication
     {
         private readonly TokenCredential credential;
         private readonly IDateTimeProvider dateTimeProvider;
-        private readonly ConcurrentDictionary<string[], AccessToken> accessTokenCache = new();
+        private readonly ConcurrentDictionary<string, AccessToken> accessTokenCache = new();
 
         public BearerTokenProvider(
             TokenCredential credential,
@@ -22,9 +22,10 @@ namespace Cabazure.Client.Authentication
             string[] scopes,
             CancellationToken cancellationToken)
         {
-            if (!accessTokenCache.TryGetValue(scopes, out var accessToken) || TokenIsExpired(accessToken))
+            var key = string.Join(" ", scopes);
+            if (!accessTokenCache.TryGetValue(key, out var accessToken) || TokenIsExpired(accessToken))
             {
-                accessTokenCache[scopes] = accessToken = await credential.GetTokenAsync(new TokenRequestContext(scopes), cancellationToken);
+                accessTokenCache[key] = accessToken = await credential.GetTokenAsync(new TokenRequestContext(scopes), cancellationToken);
             }
 
             return new AuthenticationHeaderValue(
