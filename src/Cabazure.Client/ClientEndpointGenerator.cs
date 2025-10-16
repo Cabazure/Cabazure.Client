@@ -40,6 +40,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             .Usings
             .Append("using System.Net;")
             .Append("using System.Net.Http;")
+            .Append("using System.Runtime.CompilerServices;")
             .Append("using Cabazure.Client;")
             .Append("using Cabazure.Client.Builder;")
             .Where(us => us != $"using {endpoint.Namespace};")
@@ -66,6 +67,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         }
 
         source.AppendLine($$"""
+            {{indention}}[CompilerGenerated]
             {{indention}}internal partial class {{endpoint.ClassName}} : {{endpoint.InterfaceName}}
             {{indention}}{
             {{indention}}    private readonly IHttpClientFactory factory;

@@ -74,10 +74,11 @@ public class ClientInitializationGenerator : IIncrementalGenerator
             .Select(e => e.Namespace)
             .OfType<string>()
             .Append("System")
+            .Append("System.Collections.Generic")
             .Append("System.Diagnostics.CodeAnalysis")
             .Append("System.Net.Http")
+            .Append("System.Runtime.CompilerServices")
             .Append("System.Text.Json")
-            .Append("System.Collections.Generic")
             .Append("Azure.Core")
             .Append("Cabazure.Client")
             .Append("Cabazure.Client.Authentication")
@@ -104,6 +105,7 @@ public class ClientInitializationGenerator : IIncrementalGenerator
         source.AppendLine($$"""
             namespace Microsoft.Extensions.DependencyInjection
             {
+                [CompilerGenerated]
                 internal static partial class ClientInitialization
                 {
                     internal static partial IServiceCollection AddCabazureClient<{{aotAttribute}}TOptions>(
