@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 using Azure.Core;
 using Cabazure.Client.SourceGenerator;
 using Microsoft.CodeAnalysis;
@@ -101,6 +102,8 @@ public static class TestHelper
             .Append(typeof(IServiceCollection).Assembly)
             .Append(typeof(IHttpClientBuilder).Assembly)
             .Append(typeof(HttpMethod).Assembly)
+            .Append(typeof(HttpStatusCode).Assembly)
+            .Append(typeof(IServiceProvider).Assembly)
             .Append(typeof(StringValues).Assembly)
             .Append(typeof(OptionsServiceCollectionExtensions).Assembly)
             .Append(typeof(TokenCredential).Assembly)
