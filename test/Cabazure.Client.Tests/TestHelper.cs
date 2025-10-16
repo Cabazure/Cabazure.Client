@@ -100,6 +100,7 @@ public static class TestHelper
             .Append(typeof(JsonSerializerOptions).Assembly)
             .Append(typeof(IServiceCollection).Assembly)
             .Append(typeof(IHttpClientBuilder).Assembly)
+            .Append(typeof(HttpMethod).Assembly)
             .Append(typeof(StringValues).Assembly)
             .Append(typeof(OptionsServiceCollectionExtensions).Assembly)
             .Append(typeof(TokenCredential).Assembly)
