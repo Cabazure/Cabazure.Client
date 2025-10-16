@@ -3,10 +3,12 @@
 #nullable enable
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using Cabazure.Client;
 using Cabazure.Client.Builder;
 using TypeAlias = System.Text.Json.Nodes.JsonArray;
 
+[CompilerGenerated]
 internal partial class TestEndpoint : ITestEndpoint
 {
     private readonly IHttpClientFactory factory;
