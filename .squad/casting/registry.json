@@ -1,0 +1,53 @@
+{
+  "registry_version": "1.0",
+  "agents": [
+    {
+      "persistent_name": "Ripley",
+      "universe": "Alien",
+      "role": "Lead",
+      "created_at": "2026-03-10T13:55:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Dallas",
+      "universe": "Alien",
+      "role": ".NET Dev",
+      "created_at": "2026-03-10T13:55:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Hudson",
+      "universe": "Alien",
+      "role": "Tester",
+      "created_at": "2026-03-10T13:55:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Bishop",
+      "universe": "Alien",
+      "role": "DevRel",
+      "created_at": "2026-03-10T13:55:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Scribe",
+      "universe": null,
+      "role": "Session Logger",
+      "created_at": "2026-03-10T13:55:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Ralph",
+      "universe": null,
+      "role": "Work Monitor",
+      "created_at": "2026-03-10T13:55:00Z",
+      "legacy_named": false,
+      "status": "active"
+    }
+  ]
+}

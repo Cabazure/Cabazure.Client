@@ -486,3 +486,6 @@ $RECYCLE.BIN/
 
 # verify received files
 *.received.*
+# Squad: ignore generated logs
+.squad/orchestration-log/
+.squad/log/

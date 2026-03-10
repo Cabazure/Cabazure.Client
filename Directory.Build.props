@@ -13,6 +13,7 @@
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Cabazure/Cabazure.Client</RepositoryUrl>
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
 
   <!-- Treat warnings as errors are always on when building in release -->

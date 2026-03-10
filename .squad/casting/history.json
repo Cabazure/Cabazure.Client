@@ -1,0 +1,18 @@
+{
+  "history_version": "1.0",
+  "assignments": [
+    {
+      "assignment_id": "cabazure-client-2026-03-10",
+      "universe": "Alien",
+      "created_at": "2026-03-10T13:55:00Z",
+      "requested_by": "Ricky Kaare Engelharth",
+      "team_size": 4,
+      "agents": [
+        { "name": "Ripley", "role": "Lead" },
+        { "name": "Dallas", "role": ".NET Dev" },
+        { "name": "Hudson", "role": "Tester" },
+        { "name": "Bishop", "role": "DevRel" }
+      ]
+    }
+  ]
+}
