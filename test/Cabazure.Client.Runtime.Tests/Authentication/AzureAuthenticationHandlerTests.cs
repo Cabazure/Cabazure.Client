@@ -20,7 +20,7 @@ public class AzureAuthenticationHandlerTests
             .GetTokenAsync(default, default)
             .ReturnsForAnyArgs(authenticationHeader);
         handler
-            .InvokeProtectedMethod<Task<HttpResponseMessage>>("SendAsync", request, cancellationToken)
+            .InvokeProtectedAsync<HttpResponseMessage>("SendAsync", request, cancellationToken)
             .ReturnsForAnyArgs(response);
         sut.InnerHandler = handler;
 

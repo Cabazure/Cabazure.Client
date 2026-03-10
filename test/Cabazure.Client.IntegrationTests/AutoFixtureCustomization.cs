@@ -1,10 +1,8 @@
-﻿using Atc.Test.Customizations;
-using AutoFixture;
+﻿using AutoFixture;
 using Cabazure.Client.Builder;
 
 namespace Cabazure.Client.IntegrationTests;
 
-[AutoRegister]
 public class AutoFixtureCustomization : ICustomization
 {
     public void Customize(IFixture fixture)
