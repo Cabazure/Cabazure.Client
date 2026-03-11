@@ -45,6 +45,9 @@ jobs:
       - name: 🧪 Run tests
         run: dotnet test --no-build -c:Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" || true
 
+      - name: 🔬 AOT compatibility check
+        run: dotnet build test/Cabazure.Client.IntegrationTests -c Release /p:TreatWarningsAsErrors=true
+
       - name: 📋 Test Report
         uses: dorny/test-reporter@v1
         if: always()
