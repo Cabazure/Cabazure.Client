@@ -38,7 +38,7 @@ public record EndpointDescriptor(
             return null;
         }
 
-        var (interfaceName, className) = EndpointNaming.GetNames(@interface);
+        var (interfaceName, className) = @interface.GetEndpointNames();
 
         var ns = @interface.GetNamespace();
 

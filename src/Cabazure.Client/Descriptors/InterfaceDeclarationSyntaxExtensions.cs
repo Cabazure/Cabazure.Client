@@ -2,9 +2,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cabazure.Client.SourceGenerator.Descriptors;
 
-internal static class EndpointNaming
+internal static class InterfaceDeclarationSyntaxExtensions
 {
-    public static (string InterfaceName, string ClassName) GetNames(InterfaceDeclarationSyntax syntax)
+    public static (string InterfaceName, string ClassName) GetEndpointNames(this InterfaceDeclarationSyntax syntax)
     {
         var interfaceName = syntax.Identifier.ValueText;
         var className = interfaceName.Length > 1 && interfaceName[0] == 'I'

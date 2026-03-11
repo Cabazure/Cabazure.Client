@@ -19,7 +19,7 @@ public record EndpointReferenceDescriptor(
             .FirstOrDefault();
 
         var interfaceSyntax = (InterfaceDeclarationSyntax)context.TargetNode;
-        var (interfaceName, className) = EndpointNaming.GetNames(interfaceSyntax);
+        var (interfaceName, className) = interfaceSyntax.GetEndpointNames();
 
         var ns = interfaceSyntax.GetNamespace();
 
