@@ -17,33 +17,49 @@ public class MessageRequestBuilderTest
             .Be(method);
 
     [Theory, AutoNSubstituteData]
-    internal void Should_Use_HttpVersion_20(
+    internal void Should_Not_Force_Http_Version(
         HttpMethod method,
         MessageRequestBuilder sut)
         => sut.Build(method)
             .Version
             .Should()
-            .Be(HttpVersion.Version20);
+            .NotBe(HttpVersion.Version20);
 
     [Theory, AutoNSubstituteData]
-    internal void Should_Use_ApplicationJson_As_MediaType(
+    internal void Should_Use_ApplicationJson_As_Accept(
+        HttpMethod method,
         MessageRequestBuilder sut)
-    {
-        var message = sut.Build(HttpMethod.Post);
-
-        message
+        => sut.Build(method)
             .Headers
             .Accept
             .Should()
             .BeEquivalentTo(new[] { MediaTypeWithQualityHeaderValue.Parse("application/json") });
 
-        message
-            .Content
+    [Theory, AutoNSubstituteData]
+    internal void Should_Use_ApplicationJson_As_ContentType_When_Body_Is_Set(
+        [Frozen] IClientSerializer serializer,
+        string body,
+        MessageRequestBuilder sut)
+    {
+        serializer.Serialize(Arg.Any<string>(), Arg.Any<object>()).Returns(body);
+        sut.WithBody(body);
+
+        sut.Build(HttpMethod.Post)
+            .Content!
             .Headers
             .ContentType
             .Should()
             .Be(MediaTypeHeaderValue.Parse("application/json"));
     }
+
+    [Theory, AutoNSubstituteData]
+    internal void Should_Not_Set_Content_When_No_Body(
+        HttpMethod method,
+        MessageRequestBuilder sut)
+        => sut.Build(method)
+            .Content
+            .Should()
+            .BeNull();
 
     [Theory]
     [InlineAutoNSubstituteData("/api/chargepoints/{chargepointId}/connectors/{connectorId}/startcharging")]
