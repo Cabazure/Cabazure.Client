@@ -30,7 +30,7 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor MissingEndpointRoute = new(
         "ECL003",
         "ClientEndpoint does not specify route",
-        "{0}.{1} does not have a route defined. Please add one of the [Get], [Post], [Put] or [Delete] attributes.",
+        "{0}.{1} does not have a route defined. Please add one of the [Get], [Post], [Put], [Patch] or [Delete] attributes.",
         DiagnosticCategories.EndpointGenerator,
         DiagnosticSeverity.Error,
         true
@@ -67,6 +67,15 @@ public static class DiagnosticDescriptors
         "ECL007",
         "ClientEndpoint is missing a path parameter for the specified route template",
         "{0}.{1} has no path parameter specified for the \"{{{2}}}\" placeholder in the route template \"{3}\"",
+        DiagnosticCategories.EndpointGenerator,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor BodyParameterCannotBeNullable = new(
+        "ECL008",
+        "Body parameter cannot be nullable",
+        "Parameter '{0}' in {1}.{2} is marked with [Body] but is nullable. Body parameters must be non-nullable reference types.",
         DiagnosticCategories.EndpointGenerator,
         DiagnosticSeverity.Error,
         true

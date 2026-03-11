@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Cabazure.Client.SourceGenerator.Descriptors;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cabazure.Client.SourceGenerator;
 
@@ -12,7 +13,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         var endpointsToGenerate = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 TypeConstants.ClientEndpointAttribute,
-                static (_, _) => true,
+                static (node, _) => node is InterfaceDeclarationSyntax,
                 static (ctx, _) => ctx);
 
         context.RegisterSourceOutput(
@@ -159,6 +160,11 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         var cancellationToken = method.CancellationTokenParameter
             ?? "CancellationToken.None";
 
+        // HttpMethod.Patch doesn't exist in netstandard2.0, need to create it manually
+        var httpMethod = method.HttpMethod == "Patch"
+            ? "new HttpMethod(\"PATCH\")"
+            : $"HttpMethod.{method.HttpMethod}";
+
         string? resultGeneric = null;
         if (method.ResultType is { } rt)
         {
@@ -185,7 +191,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             {{indention}}
             {{indention}}        using var requestMessage = requestFactory
             {{indention}}            .FromTemplate("{{clientName}}", "{{method.RouteTemplate}}"){{requestOptions}}
-            {{indention}}            .Build(HttpMethod.{{method.HttpMethod}});
+            {{indention}}            .Build({{httpMethod}});
             {{indention}}
             {{indention}}        using var response = await client{{clientOptions}}
             {{indention}}            .SendAsync(requestMessage, {{cancellationToken}});

@@ -8,6 +8,7 @@ public static class TypeConstants
     public const string GetAttribute = "Cabazure.Client.GetAttribute";
     public const string PostAttribute = "Cabazure.Client.PostAttribute";
     public const string PutAttribute = "Cabazure.Client.PutAttribute";
+    public const string PatchAttribute = "Cabazure.Client.PatchAttribute";
     public const string DeleteAttribute = "Cabazure.Client.DeleteAttribute";
     public const string QueryAttribute = "Cabazure.Client.QueryAttribute";
     public const string PathAttribute = "Cabazure.Client.PathAttribute";

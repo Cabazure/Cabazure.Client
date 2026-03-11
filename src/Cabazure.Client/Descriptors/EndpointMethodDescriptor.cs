@@ -90,6 +90,20 @@ public record EndpointMethodDescriptor(
                 var attributeTypeName = semanticModel.GetTypeName(attribute);
                 if (attributeTypeName == TypeConstants.BodyAttribute)
                 {
+                    // Check if body parameter is nullable
+                    if (isNullable || parameterType.NullableAnnotation == NullableAnnotation.Annotated)
+                    {
+                        diagnostics.Invoke(
+                            Diagnostic.Create(
+                                DiagnosticDescriptors.BodyParameterCannotBeNullable,
+                                parameter.GetLocation(),
+                                parameterName,
+                                method.Parent?.GetIdentifier(),
+                                method.Identifier));
+
+                        return null;
+                    }
+
                     isValid = true;
                     bodyParameter = parameterName;
                     continue;
@@ -204,6 +218,11 @@ public record EndpointMethodDescriptor(
 
                 case TypeConstants.PutAttribute:
                     httpMethod = nameof(System.Net.Http.HttpMethod.Put);
+                    routeTemplate = semanticModel.GetAttributeValue(attribute)!;
+                    return true;
+
+                case TypeConstants.PatchAttribute:
+                    httpMethod = "Patch";
                     routeTemplate = semanticModel.GetAttributeValue(attribute)!;
                     return true;
 

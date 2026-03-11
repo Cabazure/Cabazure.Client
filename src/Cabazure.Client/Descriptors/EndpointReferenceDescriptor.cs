@@ -19,17 +19,7 @@ public record EndpointReferenceDescriptor(
             .FirstOrDefault();
 
         var interfaceSyntax = (InterfaceDeclarationSyntax)context.TargetNode;
-        var interfaceName = interfaceSyntax.Identifier.ValueText;
-        var className = interfaceName.Length > 1 && interfaceName[0] == 'I'
-            ? interfaceName.Substring(1)
-            : interfaceName + "_Implementation";
-
-        var interfaceParent = interfaceSyntax.Parent;
-        while (interfaceParent is ClassDeclarationSyntax c)
-        {
-            interfaceName = string.Concat(c.Identifier.ValueText, ".", interfaceName);
-            interfaceParent = c.Parent;
-        }
+        var (interfaceName, className) = EndpointNaming.GetNames(interfaceSyntax);
 
         var ns = interfaceSyntax.GetNamespace();
 
