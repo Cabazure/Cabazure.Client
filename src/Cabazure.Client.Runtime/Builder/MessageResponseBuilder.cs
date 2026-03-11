@@ -53,10 +53,12 @@ namespace Cabazure.Client.Builder
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0 || NETCOREAPP3_1
             var content = await response.Content
-                .ReadAsStringAsync();
+                .ReadAsStringAsync()
+                .ConfigureAwait(false);
 #else
             var content = await response.Content
-                .ReadAsStringAsync(cancellationToken);
+                .ReadAsStringAsync(cancellationToken)
+                .ConfigureAwait(false);
 #endif
 
             return factory(

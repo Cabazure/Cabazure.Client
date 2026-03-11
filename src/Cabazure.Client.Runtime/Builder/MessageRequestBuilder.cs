@@ -31,10 +31,15 @@ namespace Cabazure.Client.Builder
 
             message.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
             message.RequestUri = BuildRequestUri();
-            message.Content = new StringContent(content);
-            message.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            
+            // Only set content if body is non-empty
+            if (!string.IsNullOrEmpty(content))
+            {
+                message.Content = new StringContent(content);
+                message.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            }
+            
             message.Method = method;
-            message.Version = new Version(2, 0);
 
             foreach (var header in headerMapper)
             {
