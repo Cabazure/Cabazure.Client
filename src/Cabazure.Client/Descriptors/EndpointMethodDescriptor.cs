@@ -112,6 +112,20 @@ public record EndpointMethodDescriptor(
                         return null;
                     }
 
+                    // Check if body parameter is a non-reference type (IMessageRequestBuilder.WithBody<T> requires class)
+                    if (parameterType.IsValueType)
+                    {
+                        diagnostics.Invoke(
+                            Diagnostic.Create(
+                                DiagnosticDescriptors.UnsupportedEndpointParameter,
+                                parameter.GetLocation(),
+                                method.Parent?.GetIdentifier(),
+                                method.Identifier,
+                                parameter.Identifier));
+
+                        return null;
+                    }
+
                     isValid = true;
                     bodyParameter = parameterName;
                     continue;

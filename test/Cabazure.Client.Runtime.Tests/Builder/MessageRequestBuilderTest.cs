@@ -282,13 +282,13 @@ public class MessageRequestBuilderTest
     }
 
     [Theory]
-    [InlineAutoNSubstituteData("/api/search")]
+    [InlineAutoNSubstituteData("/api/users/{userId}/profile")]
     internal void Should_URL_Encode_Special_Characters_In_Path_Parameters(
         string template,
         IClientSerializer serializer,
         string clientName)
     {
-        var sut = new MessageRequestBuilder("/api/users/{userId}/profile", serializer, clientName);
+        var sut = new MessageRequestBuilder(template, serializer, clientName);
         sut.WithPathParameter("userId", "user@test.com");
 
         var message = sut.Build(HttpMethod.Get);

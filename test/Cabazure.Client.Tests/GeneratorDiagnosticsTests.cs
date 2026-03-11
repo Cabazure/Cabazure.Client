@@ -124,4 +124,36 @@ public class GeneratorDiagnosticsTests
                 """)
             .Should()
             .Contain(DiagnosticDescriptors.RouteTemplateHasUnmappedPathParameter);
+
+    [Fact]
+    public void ReportDiagnostics_When_BodyParameterIsNullable()
+        => TestHelper
+            .GetDiagnostics("""
+                [ClientEndpoint("ClientName")]
+                public interface ITestEndpoint
+                {
+                    [Post("/items")]
+                    public Task<EndpointResponse> ExecuteAsync(
+                        [Body] string? body,
+                        CancellationToken cancellationToken);
+                }
+                """)
+            .Should()
+            .Contain(DiagnosticDescriptors.BodyParameterCannotBeNullable);
+
+    [Fact]
+    public void ReportDiagnostics_When_BodyParameterIsValueType()
+        => TestHelper
+            .GetDiagnostics("""
+                [ClientEndpoint("ClientName")]
+                public interface ITestEndpoint
+                {
+                    [Post("/items")]
+                    public Task<EndpointResponse> ExecuteAsync(
+                        [Body] int body,
+                        CancellationToken cancellationToken);
+                }
+                """)
+            .Should()
+            .Contain(DiagnosticDescriptors.UnsupportedEndpointParameter);
 }

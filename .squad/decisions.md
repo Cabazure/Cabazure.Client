@@ -68,7 +68,7 @@
 - Hardcoded HTTP/2 prevents fallback to 1.1 and prevents 3.0 upgrade
 - HttpClient is shared; mutating Timeout is thread-unsafe for concurrent requests
 
-**How:** New HttpClientWithOptions wrapper; timeout via CancellationTokenSource.CancelAfter().  
+**How:** New `SendAsync` extension on `HttpClient` taking `IRequestOptions?`; timeout via `CancellationTokenSource.CancelAfter()`.  
 **Impact:** Better HTTP semantics, thread-safe per-request timeout, no breaking changes.
 
 #### 3. Generator Enhancements (255dbf6)
@@ -90,7 +90,7 @@
 **What:** Generator emits multiple `.AddSuccessResponse` calls per HTTP method:
 - GET: 200
 - POST: 200, 201
-- PUT: 200, 204
+- PUT: 200
 - DELETE: 200, 204
 - PATCH: 200, 204
 
