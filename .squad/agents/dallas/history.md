@@ -52,3 +52,126 @@
   - AzureRest.Client and AzureRest.Contracts remain on netstandard2.0 (cross-platform demo)
 - **Outcome:** ✅ Build successful, all 115 tests passed, no snapshot updates required
 - **Commit:** `6fa7b90` — "build: upgrade test and sample projects to net10.0"
+
+### 2025-01-24: Cabazure.Client Implementation Analysis
+- **Branch:** (analysis only, no changes)
+- **Task:** Deep-dive implementation analysis: performance, maintainability, correctness, netstandard2.0 compat
+- **Scope:** All files in `src/Cabazure.Client/` and `src/Cabazure.Client.Runtime/`
+- **Key Findings:**
+  - **Performance Issues:**
+    - MessageRequestBuilder.Build() allocates StringContent for GET/DELETE (unnecessary)
+    - Missing ConfigureAwait(false) throughout async paths (context capture overhead)
+    - BearerTokenProvider cache key allocates string on every request (even cache hits)
+    - StringBuilder.Replace in BuildRequestUri is O(N×M) for path parameters
+    - Generator incremental pipeline predicate always returns true (no early filtering)
+  - **Maintainability Issues:**
+    - ClientEndpointGenerator.ProcessEndpoint has deeply nested raw string literals (hard to read)
+    - Descriptor Create() methods mix parsing with diagnostic emission (hard to test)
+    - TypeConstants.cs mixes attribute names, framework types, and DI types without grouping
+    - EndpointReferenceDescriptor duplicates naming logic from EndpointDescriptor
+  - **Correctness Issues:**
+    - No validation that path parameter names are valid C# identifiers (will silently fail on `{user.id}`)
+    - BearerTokenProvider doesn't handle concurrent token refresh (race condition under load)
+    - No validation of nullable body parameters (will compile but fail at runtime)
+    - Query string builder can silently exceed URI length limits
+  - **netstandard2.0 Compat:**
+    - HttpRequestMessage.Properties is obsolete in .NET 5+ (need conditional compilation)
+    - MessageResponseBuilder correctly uses #if for ReadAsStringAsync overloads
+    - IsExternalInit.cs is duplicated in both projects (should use shared link)
+- **Patterns Observed:**
+  - Generator uses snapshot-based testing (Verify library) — changes require .received → .verified rename
+  - Descriptors are immutable records with static Create() factories
+  - Generated code uses dependency injection: IHttpClientFactory + IMessageRequestFactory
+  - BearerTokenProvider uses ConcurrentDictionary for token cache with 1-minute expiry buffer
+  - All diagnostics go through DiagnosticDescriptors (no thrown exceptions in generator)
+- **Top Priority Recommendations:**
+  1. Fix StringContent allocation in GET/DELETE requests
+  2. Add ConfigureAwait(false) throughout
+  3. Fix BearerTokenProvider race condition
+  4. Validate path parameter names
+  5. Add conditional compilation for HttpRequestMessage.Properties
+- **Output:** `.squad/decisions/inbox/dallas-optimization-analysis.md` (full report)
+- **Log References:** orchestration-log/2025-01-24_*.md
+
+## Learnings
+### 2025-01-30 - Authentication Thread-Safety and Obsolete API Fixes
+
+**Changed Files:**
+- `src/Cabazure.Client.Runtime/Authentication/BearerTokenProvider.cs`
+- `src/Cabazure.Client.Runtime/Authentication/AzureAuthenticationHandler.cs`
+- `src/Cabazure.Client.Runtime/HttpRequestMessageExtensions.cs`
+
+**Changes:**
+1. **BearerTokenProvider race condition fix**: Added SemaphoreSlim(1,1) with double-check locking pattern to prevent multiple concurrent threads from calling Azure credential.GetTokenAsync() simultaneously when a token expires. Fast path checks cache without locking, slow path acquires semaphore, double-checks cache, then refreshes. Implemented IDisposable with GC.SuppressFinalize to properly dispose the semaphore.
+
+2. **ConfigureAwait(false)**: Added to all await calls in BearerTokenProvider.GetTokenAsync, AzureAuthenticationHandler.SendAsync to avoid capturing sync context and prevent potential deadlocks in library code.
+
+3. **HttpRequestMessage.Properties obsolete fix**: Used conditional compilation (#if NET5_0_OR_GREATER) to use HttpRequestMessage.Options with HttpRequestOptionsKey<string[]> on .NET 5+ and fall back to Properties on older frameworks. Suppresses obsolete warnings.
+
+4. **TokenIsExpired logic correction**: Changed from now.AddMinutes(1) > expiresOn to now >= expiresOn.AddMinutes(-1) for clearer semantics (refresh 1 minute before expiry).
+
+**Patterns Noted:**
+- Always implement IDisposable + GC.SuppressFinalize when holding SemaphoreSlim or other IDisposable fields (CA1001, CA1816)
+- Double-check locking: check cache → acquire lock → check cache again → do work → release lock
+- ConfigureAwait(false) is mandatory in library code to avoid sync context capture
+- Conditional compilation for framework-specific APIs prevents obsolete warnings while maintaining backward compatibility
+- netstandard2.0 requires using System.Threading for SemaphoreSlim, using System for IDisposable/GC
+
+### 2025-01-30 - Builder and Extension Fixes (HTTP Semantics & Thread Safety)
+
+**Changed Files:**
+- `src/Cabazure.Client.Runtime/Builder/MessageRequestBuilder.cs`
+- `src/Cabazure.Client.Runtime/Builder/MessageResponseBuilder.cs`
+- `src/Cabazure.Client.Runtime/Builder/HttpClientExtensions.cs`
+
+**Changes:**
+1. **Conditional StringContent allocation**: Modified MessageRequestBuilder.Build() to only create StringContent and set Content-Type header when body is non-null/non-empty. Previously allocated StringContent even for GET/DELETE requests with no body, causing unnecessary Content-Type: application/json headers.
+
+2. **Removed HTTP/2 hardcode**: Removed `message.Version = new Version(2, 0)` from Build() method. Let HttpClient negotiate HTTP version automatically (allows HTTP/1.1, HTTP/2, HTTP/3 based on server support).
+
+3. **Thread-safe timeout handling**: Replaced HttpClient.Timeout mutation with wrapper pattern. HttpClientExtensions.WithRequestOptions() now returns HttpClientWithOptions wrapper class that implements SendAsync with CancellationTokenSource-based timeout. Prevents thread-unsafe mutation of shared HttpClient.Timeout property when handling concurrent requests with different timeout values.
+
+4. **ConfigureAwait(false)**: Added to MessageResponseBuilder.GetAsync() async paths for both netstandard2.0 and net5.0+ ReadAsStringAsync calls.
+
+**Patterns Noted:**
+- Wrapper pattern for maintaining fluent API while fixing thread-safety: `client.WithRequestOptions(options).SendAsync(...)` now returns wrapper, wrapper's SendAsync applies timeout via CancellationTokenSource
+- CancellationTokenSource.CreateLinkedTokenSource() + CancelAfter() pattern for per-request timeouts without mutating shared HttpClient
+- Always dispose CancellationTokenSource in finally block
+- ConfigureAwait(false) on ALL library async paths, even in conditional compilation blocks
+- Conditional StringContent allocation: check string.IsNullOrEmpty before creating HttpContent
+
+### 2026-03-11 - Generator Improvements: PATCH Verb, Incremental Optimization, and Nullable Body Validation
+
+**Branch:** feat/optimization-backlog  
+**Commit:** 255dbf6
+
+**Changed Files:**
+- `src/Cabazure.Client.Runtime/PatchAttribute.cs` (new)
+- `src/Cabazure.Client/TypeConstants.cs`
+- `src/Cabazure.Client/ClientEndpointGenerator.cs`
+- `src/Cabazure.Client/Descriptors/EndpointMethodDescriptor.cs`
+- `src/Cabazure.Client/Descriptors/EndpointDescriptor.cs`
+- `src/Cabazure.Client/Descriptors/EndpointReferenceDescriptor.cs`
+- `src/Cabazure.Client/Descriptors/EndpointNaming.cs` (new)
+- `src/Cabazure.Client/Diagnostics/DiagnosticDescriptors.cs`
+
+**Changes:**
+
+1. **[Patch] attribute support**: Added PatchAttribute runtime attribute following same pattern as Get/Post/Put/Delete. Updated TypeConstants with PatchAttribute constant. Modified EndpointMethodDescriptor.TryGetEndpointRoute() to handle PatchAttribute case. Generator emits `new HttpMethod("PATCH")` instead of `HttpMethod.Patch` since HttpMethod.Patch doesn't exist in netstandard2.0. Updated ECL003 diagnostic message to include Patch in the list of valid HTTP verb attributes.
+
+2. **Incremental generator optimization**: Changed ClientEndpointGenerator.Initialize() predicate from `static (_, _) => true` to `static (node, _) => node is InterfaceDeclarationSyntax`. This filters out all non-interface syntax nodes during ForAttributeWithMetadataName processing, avoiding unnecessary semantic analysis and improving generator performance. Required adding `using Microsoft.CodeAnalysis.CSharp.Syntax`.
+
+3. **Extract duplicate naming logic**: Created EndpointNaming static helper class with GetNames(InterfaceDeclarationSyntax) method. This method centralizes the logic for computing interface/class names and handling nested class parents that was previously duplicated in both EndpointDescriptor and EndpointReferenceDescriptor. Both descriptors now call EndpointNaming.GetNames(syntax) instead of duplicating the logic.
+
+4. **Nullable body parameter diagnostic**: Added ECL008 diagnostic descriptor "Body parameter cannot be nullable" to DiagnosticDescriptors.cs. Modified EndpointMethodDescriptor body parameter handling to check `isNullable || parameterType.NullableAnnotation == NullableAnnotation.Annotated` and emit ECL008 diagnostic if true. This prevents nullable body parameters which would compile but fail at runtime.
+
+**Patterns Noted:**
+- HTTP verb attributes follow consistent pattern: sealed class, ExcludeFromCodeCoverage, AttributeUsage(Method, Inherited=false, AllowMultiple=false), single RouteTemplate property, constructor with routeTemplate parameter
+- TypeConstants.cs is single source of truth for all attribute fully-qualified names used by generator
+- netstandard2.0 doesn't have HttpMethod.Patch — need to generate `new HttpMethod("PATCH")` instead of `HttpMethod.Patch`
+- Incremental generator predicates should filter to relevant syntax node types early (e.g., InterfaceDeclarationSyntax for [ClientEndpoint])
+- Extract shared logic to static helper classes in Descriptors namespace when multiple descriptors duplicate the same code
+- Nullable checking requires both syntax-level check (IsKind(NullableType)) and semantic-level check (NullableAnnotation.Annotated)
+- Diagnostic emission pattern: `diagnostics.Invoke(Diagnostic.Create(DiagnosticDescriptors.XXX, location, ...args))`
+- Diagnostic IDs follow ECL001-ECL0XX pattern in sequential order
+
