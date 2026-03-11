@@ -38,6 +38,7 @@ internal partial class TestEndpoint : ITestEndpoint
         return await requestFactory
             .FromResponse("ClientName", response)
             .AddSuccessResponse(HttpStatusCode.OK)
+            .AddSuccessResponse(HttpStatusCode.NoContent)
             .GetAsync(cancellationToken);
     }
 }

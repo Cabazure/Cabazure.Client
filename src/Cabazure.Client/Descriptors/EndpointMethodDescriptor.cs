@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Cabazure.Client.SourceGenerator.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Cabazure.Client.SourceGenerator.Descriptors;
 
@@ -15,6 +16,7 @@ public record EndpointMethodDescriptor(
     string? ResultType,
     string HttpMethod,
     string RouteTemplate,
+    ImmutableArray<int> SuccessStatusCodes,
     string? OptionsParameter,
     string? CancellationTokenParameter,
     ImmutableArray<EndpointParameter> HeaderParameters,
@@ -27,12 +29,18 @@ public record EndpointMethodDescriptor(
         RegexOptions.Compiled,
         TimeSpan.FromMilliseconds(100));
 
+    private static readonly int[] GetDefaultStatusCodes = new[] { 200 };
+    private static readonly int[] PostDefaultStatusCodes = new[] { 200, 201 };
+    private static readonly int[] PutDefaultStatusCodes = new[] { 200 };
+    private static readonly int[] PatchDefaultStatusCodes = new[] { 200, 204 };
+    private static readonly int[] DeleteDefaultStatusCodes = new[] { 200, 204 };
+
     public static EndpointMethodDescriptor? Create(
         Action<Diagnostic> diagnostics,
         SemanticModel semanticModel,
         MethodDeclarationSyntax method)
     {
-        TryGetEndpointRoute(semanticModel, method, out var httpMethod, out var routeTemplate);
+        TryGetEndpointRoute(semanticModel, method, out var httpMethod, out var routeTemplate, out var successStatusCodes);
 
         if (httpMethod == null || routeTemplate == null)
         {
@@ -185,6 +193,7 @@ public record EndpointMethodDescriptor(
             returnType,
             httpMethod,
             routeTemplate,
+            successStatusCodes,
             optionsParameter,
             cancellationTokenParameter,
             headerParameters.ToImmutableArray(),
@@ -197,10 +206,12 @@ public record EndpointMethodDescriptor(
         SemanticModel semanticModel,
         MethodDeclarationSyntax method,
         [NotNullWhen(true)] out string? httpMethod,
-        [NotNullWhen(true)] out string? routeTemplate)
+        [NotNullWhen(true)] out string? routeTemplate,
+        out ImmutableArray<int> successStatusCodes)
     {
         httpMethod = null;
         routeTemplate = null;
+        successStatusCodes = ImmutableArray<int>.Empty;
         foreach (var attribute in method.AttributeLists.SelectMany(a => a.Attributes))
         {
             var attributeTypeName = semanticModel.GetTypeName(attribute);
@@ -209,32 +220,65 @@ public record EndpointMethodDescriptor(
                 case TypeConstants.GetAttribute:
                     httpMethod = nameof(System.Net.Http.HttpMethod.Get);
                     routeTemplate = semanticModel.GetAttributeValue(attribute)!;
+                    successStatusCodes = GetSuccessStatusCodes(semanticModel, attribute, GetDefaultStatusCodes);
                     return true;
 
                 case TypeConstants.PostAttribute:
                     httpMethod = nameof(System.Net.Http.HttpMethod.Post);
                     routeTemplate = semanticModel.GetAttributeValue(attribute)!;
+                    successStatusCodes = GetSuccessStatusCodes(semanticModel, attribute, PostDefaultStatusCodes);
                     return true;
 
                 case TypeConstants.PutAttribute:
                     httpMethod = nameof(System.Net.Http.HttpMethod.Put);
                     routeTemplate = semanticModel.GetAttributeValue(attribute)!;
+                    successStatusCodes = GetSuccessStatusCodes(semanticModel, attribute, PutDefaultStatusCodes);
                     return true;
 
                 case TypeConstants.PatchAttribute:
                     httpMethod = "Patch";
                     routeTemplate = semanticModel.GetAttributeValue(attribute)!;
+                    successStatusCodes = GetSuccessStatusCodes(semanticModel, attribute, PatchDefaultStatusCodes);
                     return true;
 
                 case TypeConstants.DeleteAttribute:
                     httpMethod = nameof(System.Net.Http.HttpMethod.Delete);
                     routeTemplate = semanticModel.GetAttributeValue(attribute)!;
+                    successStatusCodes = GetSuccessStatusCodes(semanticModel, attribute, DeleteDefaultStatusCodes);
                     return true;
 
             }
         }
 
         return false;
+    }
+
+    private static ImmutableArray<int> GetSuccessStatusCodes(
+        SemanticModel semanticModel,
+        AttributeSyntax attribute,
+        int[] defaults)
+    {
+        var op = semanticModel.GetOperation(attribute) as IAttributeOperation;
+        var oco = op?.Operation as IObjectCreationOperation;
+
+        var statusCodesArg = oco?
+            .Arguments
+            .FirstOrDefault(a => a.Parameter?.Name == "successStatusCodes");
+
+        if (statusCodesArg?.Value is IArrayCreationOperation arrayCreation)
+        {
+            var codes = arrayCreation.Initializer?.ElementValues
+                .Select(e => e.ConstantValue.Value)
+                .OfType<int>()
+                .ToArray();
+
+            if (codes?.Length > 0)
+            {
+                return codes.ToImmutableArray();
+            }
+        }
+
+        return defaults.ToImmutableArray();
     }
 
     private static bool IsValidEndpointReturnType(

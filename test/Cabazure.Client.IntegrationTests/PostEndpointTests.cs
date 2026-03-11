@@ -213,6 +213,10 @@ public class PostEndpointTests
         builder
             .Received(1)
             .AddSuccessResponse<string>(HttpStatusCode.OK);
+
+        builder
+            .Received(1)
+            .AddSuccessResponse<string>(HttpStatusCode.Created);
     }
 
     [Theory, AutoNSubstituteData]

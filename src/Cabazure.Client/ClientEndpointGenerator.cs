@@ -171,6 +171,16 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             resultGeneric = $"<{rt}>";
         }
 
+        var successResponseCalls = new StringBuilder();
+        foreach (var statusCode in method.SuccessStatusCodes)
+        {
+            var httpStatusCodeName = GetHttpStatusCodeName(statusCode);
+            successResponseCalls.Append($"""
+
+                {indention}            .AddSuccessResponse{resultGeneric}(HttpStatusCode.{httpStatusCodeName})
+                """);
+        }
+
         var resultConversion = method.ResponseType == null
             ? null
             : $"""
@@ -197,12 +207,21 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             {{indention}}            .SendAsync(requestMessage, {{cancellationToken}});
             {{indention}}
             {{indention}}        return await requestFactory
-            {{indention}}            .FromResponse("{{clientName}}", response)
-            {{indention}}            .AddSuccessResponse{{resultGeneric}}(HttpStatusCode.OK)
+            {{indention}}            .FromResponse("{{clientName}}", response){{successResponseCalls}}
             {{indention}}            .GetAsync({{resultConversion}}{{cancellationToken}});
             {{indention}}    }
             """);
     }
+
+    private static string GetHttpStatusCodeName(int statusCode)
+        => statusCode switch
+        {
+            200 => "OK",
+            201 => "Created",
+            202 => "Accepted",
+            204 => "NoContent",
+            _ => statusCode.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        };
 
     private static string GetParameterValue(EndpointParameter parameter)
         => parameter switch

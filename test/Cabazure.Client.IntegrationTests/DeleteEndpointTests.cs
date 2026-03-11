@@ -155,6 +155,10 @@ public class DeleteEndpointTests
         builder
             .Received(1)
             .AddSuccessResponse(HttpStatusCode.OK);
+
+        builder
+            .Received(1)
+            .AddSuccessResponse(HttpStatusCode.NoContent);
     }
 
     [Theory, AutoNSubstituteData]
