@@ -35,8 +35,7 @@ namespace Test
                 .Build(HttpMethod.Get);
     
             using var response = await client
-                .WithRequestOptions(options)
-                .SendAsync(requestMessage, cancellationToken);
+                .SendAsync(requestMessage, options, cancellationToken);
     
             return await requestFactory
                 .FromResponse("ConstantName", response)

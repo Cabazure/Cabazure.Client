@@ -35,7 +35,7 @@ internal partial class TestEndpoint : ITestEndpoint
             .Build(HttpMethod.Put);
 
         using var response = await client
-            .SendAsync(requestMessage, cancellationToken);
+            .SendAsync(requestMessage, null, cancellationToken);
 
         return await requestFactory
             .FromResponse("ClientName", response)

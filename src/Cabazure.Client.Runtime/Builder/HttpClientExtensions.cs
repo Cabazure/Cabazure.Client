@@ -6,33 +6,23 @@ namespace Cabazure.Client.Builder
 {
     public static class HttpClientExtensions
     {
-        public static HttpClientWithOptions WithRequestOptions(
+        public static HttpClient WithRequestOptions(
             this HttpClient httpClient,
             IRequestOptions? requestOptions)
         {
-            return new HttpClientWithOptions(httpClient, requestOptions);
-        }
-    }
-
-    public class HttpClientWithOptions
-    {
-        private readonly HttpClient client;
-        private readonly IRequestOptions? options;
-
-        public HttpClientWithOptions(HttpClient client, IRequestOptions? options)
-        {
-            this.client = client;
-            this.options = options;
+            return httpClient;
         }
 
-        public async Task<HttpResponseMessage> SendAsync(
+        public static async Task<HttpResponseMessage> SendAsync(
+            this HttpClient httpClient,
             HttpRequestMessage request,
+            IRequestOptions? requestOptions,
             CancellationToken cancellationToken)
         {
             CancellationTokenSource? timeoutCts = null;
             CancellationToken effectiveCt = cancellationToken;
 
-            if (options is { Timeout: { Ticks: > 0 } timeout })
+            if (requestOptions is { Timeout: { Ticks: > 0 } timeout })
             {
                 timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 timeoutCts.CancelAfter(timeout);
@@ -41,7 +31,7 @@ namespace Cabazure.Client.Builder
 
             try
             {
-                return await client.SendAsync(request, effectiveCt).ConfigureAwait(false);
+                return await httpClient.SendAsync(request, effectiveCt).ConfigureAwait(false);
             }
             finally
             {

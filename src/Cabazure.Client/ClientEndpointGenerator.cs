@@ -110,7 +110,6 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         string clientName,
         string indention)
     {
-        var clientOptions = new StringBuilder();
         var requestOptions = new StringBuilder();
 
         foreach (var p in method.PathParameters)
@@ -147,10 +146,6 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
         if (method.OptionsParameter is { } o)
         {
-            clientOptions.Append($"""
-
-                {indention}            .WithRequestOptions({o})
-                """);
             requestOptions.Append($"""
 
                 {indention}            .WithRequestOptions({o})
@@ -174,10 +169,10 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         var successResponseCalls = new StringBuilder();
         foreach (var statusCode in method.SuccessStatusCodes)
         {
-            var httpStatusCodeName = GetHttpStatusCodeName(statusCode);
+            var httpStatusCodeExpression = GetHttpStatusCodeExpression(statusCode);
             successResponseCalls.Append($"""
 
-                {indention}            .AddSuccessResponse{resultGeneric}(HttpStatusCode.{httpStatusCodeName})
+                {indention}            .AddSuccessResponse{resultGeneric}({httpStatusCodeExpression})
                 """);
         }
 
@@ -203,8 +198,8 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             {{indention}}            .FromTemplate("{{clientName}}", "{{method.RouteTemplate}}"){{requestOptions}}
             {{indention}}            .Build({{httpMethod}});
             {{indention}}
-            {{indention}}        using var response = await client{{clientOptions}}
-            {{indention}}            .SendAsync(requestMessage, {{cancellationToken}});
+            {{indention}}        using var response = await client
+            {{indention}}            .SendAsync(requestMessage, {{method.OptionsParameter ?? "null"}}, {{cancellationToken}});
             {{indention}}
             {{indention}}        return await requestFactory
             {{indention}}            .FromResponse("{{clientName}}", response){{successResponseCalls}}
@@ -213,14 +208,14 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             """);
     }
 
-    private static string GetHttpStatusCodeName(int statusCode)
+    private static string GetHttpStatusCodeExpression(int statusCode)
         => statusCode switch
         {
-            200 => "OK",
-            201 => "Created",
-            202 => "Accepted",
-            204 => "NoContent",
-            _ => statusCode.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            200 => "HttpStatusCode.OK",
+            201 => "HttpStatusCode.Created",
+            202 => "HttpStatusCode.Accepted",
+            204 => "HttpStatusCode.NoContent",
+            _ => $"(HttpStatusCode){statusCode.ToString(System.Globalization.CultureInfo.InvariantCulture)}",
         };
 
     private static string GetParameterValue(EndpointParameter parameter)
