@@ -13,8 +13,8 @@ namespace Cabazure.Client.Builder
             null,
             new Dictionary<string, IEnumerable<string>>());
 
-        private readonly Dictionary<HttpStatusCode, ContentSerializerFunction> responseSerializers = new();
-        private readonly Dictionary<HttpStatusCode, bool> responseCodes = new();
+        private readonly Dictionary<HttpStatusCode, ContentSerializerFunction> responseSerializers = [];
+        private readonly Dictionary<HttpStatusCode, bool> responseCodes = [];
         private readonly HttpResponseMessage? response;
         private readonly IClientSerializer serializer;
         private readonly string clientName;

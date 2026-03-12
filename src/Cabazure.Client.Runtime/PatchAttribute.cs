@@ -24,7 +24,7 @@ namespace Cabazure.Client
             RouteTemplate = routeTemplate;
             SuccessStatusCodes = successStatusCodes.Length > 0
                 ? successStatusCodes
-                : new[] { 200, 204 };
+                : [200, 204];
         }
     }
 }

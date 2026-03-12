@@ -1,8 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Cabazure.Client.Builder
+﻿namespace Cabazure.Client.Builder
 {
     public static class HttpClientExtensions
     {

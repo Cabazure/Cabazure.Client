@@ -7,8 +7,8 @@ namespace Cabazure.Client
     /// </summary>
     [ExcludeFromCodeCoverage]
     [AttributeUsage(
-        AttributeTargets.Method, 
-        Inherited = false, 
+        AttributeTargets.Method,
+        Inherited = false,
         AllowMultiple = false)]
     public sealed class PutAttribute : Attribute
     {
@@ -24,7 +24,7 @@ namespace Cabazure.Client
             RouteTemplate = routeTemplate;
             SuccessStatusCodes = successStatusCodes.Length > 0
                 ? successStatusCodes
-                : new[] { 200 };
+                : [200];
         }
     }
 }

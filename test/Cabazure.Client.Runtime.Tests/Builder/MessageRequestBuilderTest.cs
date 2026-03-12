@@ -33,7 +33,7 @@ public class MessageRequestBuilderTest
             .Headers
             .Accept
             .Should()
-            .BeEquivalentTo(new[] { MediaTypeWithQualityHeaderValue.Parse("application/json") });
+            .BeEquivalentTo([MediaTypeWithQualityHeaderValue.Parse("application/json")]);
 
     [Theory, AutoNSubstituteData]
     internal void Should_Use_ApplicationJson_As_ContentType_When_Body_Is_Set(

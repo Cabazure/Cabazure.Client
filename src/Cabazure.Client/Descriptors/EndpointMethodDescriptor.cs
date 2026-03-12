@@ -29,11 +29,11 @@ public record EndpointMethodDescriptor(
         RegexOptions.Compiled,
         TimeSpan.FromMilliseconds(100));
 
-    private static readonly int[] GetDefaultStatusCodes = new[] { 200 };
-    private static readonly int[] PostDefaultStatusCodes = new[] { 200, 201 };
-    private static readonly int[] PutDefaultStatusCodes = new[] { 200 };
-    private static readonly int[] PatchDefaultStatusCodes = new[] { 200, 204 };
-    private static readonly int[] DeleteDefaultStatusCodes = new[] { 200, 204 };
+    private static readonly int[] GetDefaultStatusCodes = [200];
+    private static readonly int[] PostDefaultStatusCodes = [200, 201];
+    private static readonly int[] PutDefaultStatusCodes = [200];
+    private static readonly int[] PatchDefaultStatusCodes = [200, 204];
+    private static readonly int[] DeleteDefaultStatusCodes = [200, 204];
 
     public static EndpointMethodDescriptor? Create(
         Action<Diagnostic> diagnostics,

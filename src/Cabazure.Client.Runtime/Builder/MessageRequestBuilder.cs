@@ -6,9 +6,9 @@ namespace Cabazure.Client.Builder
 {
     public class MessageRequestBuilder : IMessageRequestBuilder
     {
-        private readonly Dictionary<string, string> pathMapper = new();
-        private readonly Dictionary<string, string> queryMapper = new();
-        private readonly Dictionary<string, StringValues> headerMapper = new();
+        private readonly Dictionary<string, string> pathMapper = [];
+        private readonly Dictionary<string, string> queryMapper = [];
+        private readonly Dictionary<string, StringValues> headerMapper = [];
         private readonly string template;
         private readonly IClientSerializer serializer;
         private readonly string clientName;
@@ -31,14 +31,14 @@ namespace Cabazure.Client.Builder
 
             message.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
             message.RequestUri = BuildRequestUri();
-            
+
             // Only set content if body is non-empty
             if (!string.IsNullOrEmpty(content))
             {
                 message.Content = new StringContent(content);
                 message.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
             }
-            
+
             message.Method = method;
 
             foreach (var header in headerMapper)
