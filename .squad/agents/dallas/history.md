@@ -202,3 +202,43 @@
 - Diagnostic emission pattern: `diagnostics.Invoke(Diagnostic.Create(DiagnosticDescriptors.XXX, location, ...args))`
 - Diagnostic IDs follow ECL001-ECL0XX pattern in sequential order
 
+### 2026-03-11 - BC-03: Default HTTP/2 in Generated DI Setup
+
+**Branch:** feat/optimization-backlog
+**Commit:** a8bdd2e
+
+**Changed Files:**
+- `src/Cabazure.Client/ClientInitializationGenerator.cs`
+- `test/Cabazure.Client.Tests/ClientInitializationGeneratorTests.CanGenerate_Initialization#ClientInitialization.Implementation.g.verified.cs`
+
+**Changes:**
+
+Changed `ConfigureHttpClient` local function in the generated `AddCabazureClient<TOptions>` overload from an expression-body lambda to a block body. Added `client.DefaultRequestVersion = new Version(2, 0)` guarded by `#if NET5_0_OR_GREATER`. This makes HTTP/2 the library default (with `RequestVersionOrLower` policy — falls back to HTTP/1.1 gracefully). Users can override via the `builder` parameter.
+
+**Patterns Noted:**
+- C# raw string literals (triple-quote) strip the indentation of the closing `"""` from every content line. In this generator, the closing `"""` has 12 spaces — so `#if`/`#endif` directives that must appear at column 0 in the output need exactly 12 spaces in the raw string source.
+- `HttpClient.DefaultRequestVersion` is .NET 5+ only — always guard with `#if NET5_0_OR_GREATER` since the library targets netstandard2.0.
+- Snapshot (Verify) workflow: edit generator → run test (expect failure) → inspect `.received.cs` → copy to `.verified.cs` to approve.
+
+⚠️ **REVERTED** — `HttpClient.DefaultRequestVersion` only affects the convenience methods (`GetAsync`, `PostAsync` etc.). It has no effect when `SendAsync` is called with a manually constructed `HttpRequestMessage`. The generator change was reverted (commit 332578e).
+
+### 2026-03-11 - BC-03 (correct fix): HTTP/2 default in MessageRequestBuilder
+
+**Branch:** feat/optimization-backlog
+**Commit:** 45ef2a0
+
+**Changed Files:**
+- `src/Cabazure.Client.Runtime/Builder/MessageRequestBuilder.cs`
+- `test/Cabazure.Client.Runtime.Tests/Builder/MessageRequestBuilderTest.cs`
+
+**Changes:**
+
+Added `message.Version = new Version(2, 0)` unconditionally after `new HttpRequestMessage()` in `Build()`. `HttpRequestMessage.Version` exists in netstandard2.0 — no `#if NET5_0_OR_GREATER` guard needed. Updated the test `Should_Not_Force_Http_Version` → `Should_Use_Http2_As_Default_Version` to assert `Be(HttpVersion.Version20)`.
+
+**Patterns Noted:**
+- `HttpClient.DefaultRequestVersion` applies only to convenience methods (`GetAsync` etc.). For `SendAsync(HttpRequestMessage)`, the version lives on `HttpRequestMessage.Version`.
+- `HttpRequestMessage.Version` is netstandard2.0-compatible — no platform guard required.
+- `HttpVersionPolicy.RequestVersionOrLower` (the .NET 5+ default) gives graceful HTTP/1.1 fallback; on older runtimes, servers that don't support HTTP/2 will negotiate down.
+- When restoring previously-removed behaviour, always check for existing tests that now assert the wrong thing and update them.
+
+
