@@ -35,3 +35,10 @@
 - **Breaking-change risk:** Adding new attributes is low-risk. Changing existing attribute constructors is high-risk (overload resolution). Generated class names (`internal partial class TestEndpoint`) could collide if user defines same class. Internal interfaces (`IMessageRequestFactory`, `IClientSerializer`) are part of generator contract — renaming is breaking.
 - **Ship-blockers:** None. High-priority improvements: PATCH support, timeout fix, empty body handling. Defer to v2: streaming, base path configuration, custom continuation tokens.
 - **Verdict:** Production-ready library with solid architecture. Address HIGH/MED findings before 1.0 release.
+
+### PR #26 Description Rewrite (2026-03-11)
+- Rewrote the PR #26 description (`feat/optimization-backlog` → `main`) to document the **net diff vs main**, not the commit history.
+- Structure: Summary, Changes (grouped by theme), Backward Compatibility, Test Results.
+- Key principle applied: a reviewer should understand what changed and why from a single read, without tracing individual commits.
+- `gh pr edit --body-file` returns exit code 1 with GraphQL deprecation warnings (Projects classic). Use `gh api repos/{owner}/{repo}/pulls/{number} --method PATCH --input -` with a JSON payload piped in as the reliable path for bulk PR body updates.
+- Final test count on `feat/optimization-backlog`: 170 passing (84 runtime, 53 integration, 33 generator snapshots).
