@@ -17,13 +17,13 @@ public class MessageRequestBuilderTest
             .Be(method);
 
     [Theory, AutoNSubstituteData]
-    internal void Should_Not_Force_Http_Version(
+    internal void Should_Use_Http2_As_Default_Version(
         HttpMethod method,
         MessageRequestBuilder sut)
         => sut.Build(method)
             .Version
             .Should()
-            .NotBe(HttpVersion.Version20);
+            .Be(HttpVersion.Version20);
 
     [Theory, AutoNSubstituteData]
     internal void Should_Use_ApplicationJson_As_Accept(

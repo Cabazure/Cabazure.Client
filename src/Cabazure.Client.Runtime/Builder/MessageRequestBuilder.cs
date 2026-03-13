@@ -40,6 +40,7 @@ namespace Cabazure.Client.Builder
             }
 
             message.Method = method;
+            message.Version = new Version(2, 0);
 
             foreach (var header in headerMapper)
             {
