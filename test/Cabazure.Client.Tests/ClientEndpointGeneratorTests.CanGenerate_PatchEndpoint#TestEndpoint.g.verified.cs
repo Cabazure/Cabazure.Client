@@ -23,6 +23,7 @@ internal partial class TestEndpoint : ITestEndpoint
 
     public async Task<EndpointResponse> ExecuteAsync(
         string id,
+        string body,
         CancellationToken cancellationToken)
     {
         var client = factory.CreateClient("ClientName");
@@ -30,7 +31,8 @@ internal partial class TestEndpoint : ITestEndpoint
         using var requestMessage = requestFactory
             .FromTemplate("ClientName", "/items/{id}")
             .WithPathParameter("id", id)
-            .Build(HttpMethod.Delete);
+            .WithBody(body)
+            .Build(new HttpMethod("PATCH"));
 
         using var response = await client
             .SendAsync(requestMessage, null, cancellationToken);

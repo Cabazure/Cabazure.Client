@@ -5,7 +5,7 @@ namespace Cabazure.Client
     /// <summary>
     /// Specifies that a parameter should be added to a placeholder in the request path.
     /// </summary>
-    [ExcludeFromCodeCoverage]   
+    [ExcludeFromCodeCoverage]
     [AttributeUsage(
         AttributeTargets.Parameter | AttributeTargets.Property,
         Inherited = false,

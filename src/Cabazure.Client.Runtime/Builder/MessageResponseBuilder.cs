@@ -13,8 +13,8 @@ namespace Cabazure.Client.Builder
             null,
             new Dictionary<string, IEnumerable<string>>());
 
-        private readonly Dictionary<HttpStatusCode, ContentSerializerFunction> responseSerializers = new();
-        private readonly Dictionary<HttpStatusCode, bool> responseCodes = new();
+        private readonly Dictionary<HttpStatusCode, ContentSerializerFunction> responseSerializers = [];
+        private readonly Dictionary<HttpStatusCode, bool> responseCodes = [];
         private readonly HttpResponseMessage? response;
         private readonly IClientSerializer serializer;
         private readonly string clientName;
@@ -53,10 +53,12 @@ namespace Cabazure.Client.Builder
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0 || NETCOREAPP3_1
             var content = await response.Content
-                .ReadAsStringAsync();
+                .ReadAsStringAsync()
+                .ConfigureAwait(false);
 #else
             var content = await response.Content
-                .ReadAsStringAsync(cancellationToken);
+                .ReadAsStringAsync(cancellationToken)
+                .ConfigureAwait(false);
 #endif
 
             return factory(

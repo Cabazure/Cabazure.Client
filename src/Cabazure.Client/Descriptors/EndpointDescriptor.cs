@@ -38,17 +38,7 @@ public record EndpointDescriptor(
             return null;
         }
 
-        var interfaceName = @interface.Identifier.ValueText;
-        var className = interfaceName.Length > 1 && interfaceName[0] == 'I'
-           ? interfaceName.Substring(1)
-           : interfaceName + "_Implementation";
-
-        var interfaceParent = @interface.Parent;
-        while (interfaceParent is ClassDeclarationSyntax c)
-        {
-            interfaceName = string.Concat(c.Identifier.ValueText, ".", interfaceName);
-            interfaceParent = c.Parent;
-        }
+        var (interfaceName, className) = @interface.GetEndpointNames();
 
         var ns = @interface.GetNamespace();
 

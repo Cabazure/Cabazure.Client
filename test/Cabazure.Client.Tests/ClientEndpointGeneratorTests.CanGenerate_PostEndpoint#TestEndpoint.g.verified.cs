@@ -35,12 +35,12 @@ internal partial class TestEndpoint : ITestEndpoint
             .Build(HttpMethod.Post);
 
         using var response = await client
-            .WithRequestOptions(options)
-            .SendAsync(requestMessage, cancellationToken);
+            .SendAsync(requestMessage, options, cancellationToken);
 
         return await requestFactory
             .FromResponse("ClientName", response)
             .AddSuccessResponse(HttpStatusCode.OK)
+            .AddSuccessResponse(HttpStatusCode.Created)
             .GetAsync(cancellationToken);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Cabazure.Client.SourceGenerator.Descriptors;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cabazure.Client.SourceGenerator;
 
@@ -12,7 +13,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         var endpointsToGenerate = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 TypeConstants.ClientEndpointAttribute,
-                static (_, _) => true,
+                static (node, _) => node is InterfaceDeclarationSyntax,
                 static (ctx, _) => ctx);
 
         context.RegisterSourceOutput(
@@ -109,7 +110,6 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         string clientName,
         string indention)
     {
-        var clientOptions = new StringBuilder();
         var requestOptions = new StringBuilder();
 
         foreach (var p in method.PathParameters)
@@ -146,10 +146,6 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
         if (method.OptionsParameter is { } o)
         {
-            clientOptions.Append($"""
-
-                {indention}            .WithRequestOptions({o})
-                """);
             requestOptions.Append($"""
 
                 {indention}            .WithRequestOptions({o})
@@ -159,10 +155,25 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         var cancellationToken = method.CancellationTokenParameter
             ?? "CancellationToken.None";
 
+        // HttpMethod.Patch doesn't exist in netstandard2.0, need to create it manually
+        var httpMethod = method.HttpMethod == "Patch"
+            ? "new HttpMethod(\"PATCH\")"
+            : $"HttpMethod.{method.HttpMethod}";
+
         string? resultGeneric = null;
         if (method.ResultType is { } rt)
         {
             resultGeneric = $"<{rt}>";
+        }
+
+        var successResponseCalls = new StringBuilder();
+        foreach (var statusCode in method.SuccessStatusCodes)
+        {
+            var httpStatusCodeExpression = GetHttpStatusCodeExpression(statusCode);
+            successResponseCalls.Append($"""
+
+                {indention}            .AddSuccessResponse{resultGeneric}({httpStatusCodeExpression})
+                """);
         }
 
         var resultConversion = method.ResponseType == null
@@ -185,18 +196,27 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             {{indention}}
             {{indention}}        using var requestMessage = requestFactory
             {{indention}}            .FromTemplate("{{clientName}}", "{{method.RouteTemplate}}"){{requestOptions}}
-            {{indention}}            .Build(HttpMethod.{{method.HttpMethod}});
+            {{indention}}            .Build({{httpMethod}});
             {{indention}}
-            {{indention}}        using var response = await client{{clientOptions}}
-            {{indention}}            .SendAsync(requestMessage, {{cancellationToken}});
+            {{indention}}        using var response = await client
+            {{indention}}            .SendAsync(requestMessage, {{method.OptionsParameter ?? "null"}}, {{cancellationToken}});
             {{indention}}
             {{indention}}        return await requestFactory
-            {{indention}}            .FromResponse("{{clientName}}", response)
-            {{indention}}            .AddSuccessResponse{{resultGeneric}}(HttpStatusCode.OK)
+            {{indention}}            .FromResponse("{{clientName}}", response){{successResponseCalls}}
             {{indention}}            .GetAsync({{resultConversion}}{{cancellationToken}});
             {{indention}}    }
             """);
     }
+
+    private static string GetHttpStatusCodeExpression(int statusCode)
+        => statusCode switch
+        {
+            200 => "HttpStatusCode.OK",
+            201 => "HttpStatusCode.Created",
+            202 => "HttpStatusCode.Accepted",
+            204 => "HttpStatusCode.NoContent",
+            _ => $"(HttpStatusCode){statusCode.ToString(System.Globalization.CultureInfo.InvariantCulture)}",
+        };
 
     private static string GetParameterValue(EndpointParameter parameter)
         => parameter switch

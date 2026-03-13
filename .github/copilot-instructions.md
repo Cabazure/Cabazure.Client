@@ -72,6 +72,7 @@ When adding a new attribute (e.g., a new parameter binding):
 - Nullable reference types enabled (`#nullable enable` everywhere, including generated output)
 - `LangVersion` set to `Latest`
 - 4-space indentation, CRLF line endings
+- Prefer **extension methods** over static helper classes for utility logic
 
 ### Diagnostic errors
 Validation errors in generator input are reported via Roslyn diagnostics (not thrown exceptions). `GeneratorDiagnosticsTests.cs` covers expected diagnostic scenarios. New validation rules should emit a diagnostic and have a corresponding test.

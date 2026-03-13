@@ -174,7 +174,7 @@ public class PostEndpointTests
     }
 
     [Theory, AutoNSubstituteData]
-    internal async Task Should_Set_Timeout_On_HttpClient(
+    internal async Task Should_Not_Mutate_HttpClient_Timeout(
         [Frozen] IHttpClientFactory factory,
         [Frozen, Substitute] HttpClient client,
         PostEndpoint sut,
@@ -193,7 +193,8 @@ public class PostEndpointTests
             options,
             cancellationToken);
 
-        client.Timeout.Should().Be(timeout);
+        // Timeout is applied via CancellationTokenSource, not HttpClient.Timeout mutation
+        client.Timeout.Should().NotBe(timeout);
     }
 
     [Theory, AutoNSubstituteData]
@@ -212,6 +213,10 @@ public class PostEndpointTests
         builder
             .Received(1)
             .AddSuccessResponse<string>(HttpStatusCode.OK);
+
+        builder
+            .Received(1)
+            .AddSuccessResponse<string>(HttpStatusCode.Created);
     }
 
     [Theory, AutoNSubstituteData]

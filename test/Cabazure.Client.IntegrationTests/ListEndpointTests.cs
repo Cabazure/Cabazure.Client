@@ -155,7 +155,7 @@ public class ListEndpointTests
     }
 
     [Theory, AutoNSubstituteData]
-    internal async Task Should_Set_Timeout_On_HttpClient(
+    internal async Task Should_Not_Mutate_HttpClient_Timeout(
         [Frozen] IHttpClientFactory factory,
         [Frozen, Substitute] HttpClient client,
         ListEndpoint sut,
@@ -174,7 +174,8 @@ public class ListEndpointTests
             options,
             cancellationToken);
 
-        client.Timeout.Should().Be(timeout);
+        // Timeout is applied via CancellationTokenSource, not HttpClient.Timeout mutation
+        client.Timeout.Should().NotBe(timeout);
     }
 
     [Theory, AutoNSubstituteData]

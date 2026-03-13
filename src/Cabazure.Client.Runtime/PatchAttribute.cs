@@ -1,27 +1,27 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cabazure.Client
 {
     /// <summary>
-    /// Identifies a HTTP DELETE request call.
+    /// Identifies a HTTP PATCH request call.
     /// </summary>
     [ExcludeFromCodeCoverage]
     [AttributeUsage(
         AttributeTargets.Method,
         Inherited = false,
         AllowMultiple = false)]
-    public sealed class DeleteAttribute : Attribute
+    public sealed class PatchAttribute : Attribute
     {
         public string RouteTemplate { get; }
         public int[] SuccessStatusCodes { get; }
 
         /// <param name="routeTemplate">The relative request path which might include placeholders, like: <c>/users/{id}</c>.</param>
-        public DeleteAttribute(string routeTemplate)
+        public PatchAttribute(string routeTemplate)
             : this(routeTemplate, Array.Empty<int>()) { }
 
         /// <param name="routeTemplate">The relative request path which might include placeholders, like: <c>/users/{id}</c>.</param>
         /// <param name="successStatusCodes">HTTP status codes considered successful for this endpoint. Defaults to 200 (OK) and 204 (No Content).</param>
-        public DeleteAttribute(
+        public PatchAttribute(
             string routeTemplate,
             params int[] successStatusCodes)
         {

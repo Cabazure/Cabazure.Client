@@ -6,12 +6,33 @@
             this HttpClient httpClient,
             IRequestOptions? requestOptions)
         {
+            return httpClient;
+        }
+
+        public static async Task<HttpResponseMessage> SendAsync(
+            this HttpClient httpClient,
+            HttpRequestMessage request,
+            IRequestOptions? requestOptions,
+            CancellationToken cancellationToken)
+        {
+            CancellationTokenSource? timeoutCts = null;
+            CancellationToken effectiveCt = cancellationToken;
+
             if (requestOptions is { Timeout: { Ticks: > 0 } timeout })
             {
-                httpClient.Timeout = timeout;
+                timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                timeoutCts.CancelAfter(timeout);
+                effectiveCt = timeoutCts.Token;
             }
 
-            return httpClient;
+            try
+            {
+                return await httpClient.SendAsync(request, effectiveCt).ConfigureAwait(false);
+            }
+            finally
+            {
+                timeoutCts?.Dispose();
+            }
         }
     }
 }

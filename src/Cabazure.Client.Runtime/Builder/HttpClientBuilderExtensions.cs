@@ -16,7 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
             TokenCredential credential)
             => AddAuthentication(
                 builder,
-                new[] { scope },
+                [scope],
                 credential);
 
         public static IHttpClientBuilder AddAuthentication(

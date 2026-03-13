@@ -303,4 +303,18 @@ public class ClientEndpointGeneratorTests
                     CancellationToken cancellationToken);
             }
             """);
+
+    [Fact]
+    public Task CanGenerate_PatchEndpoint()
+        => TestHelper.VerifyEndpoint("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Patch("/items/{id}")]
+                public Task<EndpointResponse> ExecuteAsync(
+                    [Path] string id,
+                    [Body] string body,
+                    CancellationToken cancellationToken);
+            }
+            """);
 }

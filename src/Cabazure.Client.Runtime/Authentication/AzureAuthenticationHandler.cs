@@ -20,9 +20,11 @@
         {
             var scopes = request.GetScopes() ?? defaultScopes;
 
-            request.Headers.Authorization = await tokenProvider.GetTokenAsync(scopes, cancellationToken);
+            request.Headers.Authorization = await tokenProvider
+                .GetTokenAsync(scopes, cancellationToken)
+                .ConfigureAwait(false);
 
-            return await base.SendAsync(request, cancellationToken);
+            return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
     }
 }
