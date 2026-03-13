@@ -140,6 +140,33 @@
 - ConfigureAwait(false) on ALL library async paths, even in conditional compilation blocks
 - Conditional StringContent allocation: check string.IsNullOrEmpty before creating HttpContent
 
+### 2026-03-11 - BC-01 & BC-03 Runtime Fixes
+
+**Branch:** feat/optimization-backlog  
+**Commits:** 2d2c762 (BC-01), b2428ac (BC-03)
+
+**Changed Files:**
+- `src/Cabazure.Client.Runtime/GetAttribute.cs`
+- `src/Cabazure.Client.Runtime/PostAttribute.cs`
+- `src/Cabazure.Client.Runtime/PutAttribute.cs`
+- `src/Cabazure.Client.Runtime/DeleteAttribute.cs`
+- `src/Cabazure.Client.Runtime/PatchAttribute.cs`
+- `src/Cabazure.Client.Runtime/ClientRequestOptions.cs`
+
+**Changes:**
+
+1. **BC-01 — Binary-compat constructors on verb attributes**: Added a single-argument `(string routeTemplate)` constructor to all five HTTP verb attributes (Get, Post, Put, Delete, Patch) chaining to the existing `params int[] successStatusCodes` constructor via `: this(routeTemplate, Array.Empty<int>())`. This preserves the original IL constructor signature that binary consumers depend on. Also repaired `DeleteAttribute` which had its params constructor and `SuccessStatusCodes` assignment commented out, leaving the property uninitialized (null reference hazard).
+
+2. **BC-03 — Opt-in HttpVersion on ClientRequestOptions**: Added `public Version? HttpVersion { get; set; }` to `ClientRequestOptions`. Applied it in `ConfigureHttpRequest()` (the existing IRequestOptions hook) so the version is stamped onto `HttpRequestMessage` when set. `PagedRequestOptions` inherits the property automatically. No changes to `MessageRequestBuilder` were needed — the existing `options.ConfigureHttpRequest(message)` call already propagates it.
+
+**Patterns Noted:**
+- Backward-compat constructor chain pattern: `public VerbAttribute(string routeTemplate) : this(routeTemplate, Array.Empty<int>()) { }` — preserves the original IL signature without duplicating logic
+- `Array.Empty<int>()` is the right choice for `params` backward-compat shim (zero allocation, netstandard2.0 compatible)
+- Per-request HTTP version belongs in `ConfigureHttpRequest()`, not in the builder — the builder only knows about `IRequestOptions`, not the concrete `ClientRequestOptions` subtype
+- `PagedRequestOptions` inherits `HttpVersion` for free since it extends `ClientRequestOptions` — no changes needed there
+
+---
+
 ### 2026-03-11 - Generator Improvements: PATCH Verb, Incremental Optimization, and Nullable Body Validation
 
 **Branch:** feat/optimization-backlog  
