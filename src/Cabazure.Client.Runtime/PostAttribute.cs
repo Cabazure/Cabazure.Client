@@ -16,6 +16,10 @@ namespace Cabazure.Client
         public int[] SuccessStatusCodes { get; }
 
         /// <param name="routeTemplate">The relative request path which might include placeholders, like: <c>/users/{id}</c>.</param>
+        public PostAttribute(string routeTemplate)
+            : this(routeTemplate, Array.Empty<int>()) { }
+
+        /// <param name="routeTemplate">The relative request path which might include placeholders, like: <c>/users/{id}</c>.</param>
         /// <param name="successStatusCodes">HTTP status codes considered successful for this endpoint. Defaults to 200 (OK) and 201 (Created).</param>
         public PostAttribute(
             string routeTemplate,
