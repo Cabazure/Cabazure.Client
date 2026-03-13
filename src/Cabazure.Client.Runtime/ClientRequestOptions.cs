@@ -17,6 +17,12 @@ public class ClientRequestOptions : IRequestOptions
     /// </summary>
     public TimeSpan? Timeout { get; set; }
 
+    /// <summary>
+    /// The HTTP version to use for the request (e.g. <c>new Version(2, 0)</c> for HTTP/2).
+    /// When not set, the HttpClient version negotiation is used.
+    /// </summary>
+    public Version? HttpVersion { get; set; }
+
     void IRequestOptions.ConfigureHttpRequest(HttpRequestMessage request)
     {
         ConfigureHttpRequest(request);
@@ -27,6 +33,11 @@ public class ClientRequestOptions : IRequestOptions
         if (CorrelationId is { } id)
         {
             request.Headers.TryAddWithoutValidation(HeaderCorrelationId, id);
+        }
+
+        if (HttpVersion is { } version)
+        {
+            request.Version = version;
         }
     }
 }
