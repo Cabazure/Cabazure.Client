@@ -1,5 +1,4 @@
 ﻿using Cabazure.Client.SourceGenerator.Diagnostics;
-using FluentAssertions;
 
 namespace Cabazure.Client.Tests;
 

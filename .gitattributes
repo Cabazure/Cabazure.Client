@@ -61,8 +61,6 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
-# Squad: union merge for append-only team state files
-.squad/decisions.md merge=union
-.squad/agents/*/history.md merge=union
-.squad/log/** merge=union
-.squad/orchestration-log/** merge=union
+
+# Verify snapshots must stay LF for Verify.XUnitV3
+*.verified.cs text eol=lf working-tree-encoding=UTF-8

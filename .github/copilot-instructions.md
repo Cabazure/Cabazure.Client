@@ -53,6 +53,9 @@ Generator tests use `Verify.XUnitV3` + `Verify.SourceGenerators`. Each test call
 2. Inspect the `*.g.received.cs` output.
 3. Rename it to `*.g.verified.cs` to accept it.
 
+### Test runner
+Test projects run on Microsoft Testing Platform (MTP) via `global.json` and `xunit.v3.mtp-v2`. Use `dotnet test` normally; for CI-style artifacts prefer MTP switches like `--report-trx`, `--results-directory`, and `--coverage --coverage-output-format cobertura` instead of VSTest `--logger` or `--collect` arguments.
+
 ### Adding new attributes
 When adding a new attribute (e.g., a new parameter binding):
 1. Add the attribute class to `Cabazure.Client.Runtime`.
