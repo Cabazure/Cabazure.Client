@@ -50,7 +50,7 @@ jobs:
         run: dotnet build --no-restore -c:Release -p:SourceRevisionId=${VERSION} -p:Version=${VERSION}
 
       - name: 🧪 Run tests
-        run: dotnet test --no-build -c:Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" || true
+        run: dotnet test --no-build -c:Release --report-trx --results-directory TestResults --coverage --coverage-output-format cobertura || true
 
       - name: 📋 Test Report
         uses: dorny/test-reporter@v1
