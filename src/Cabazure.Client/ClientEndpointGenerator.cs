@@ -218,12 +218,26 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             _ => $"(HttpStatusCode){statusCode.ToString(System.Globalization.CultureInfo.InvariantCulture)}",
         };
 
+    // Types whose default (culture-dependent) ToString() representation is not safe to
+    // round-trip through a URL (e.g. DateOnly.ToString() can produce "08/09/2026" which
+    // becomes "08%2F09%2F2026" and fails ASP.NET Core's parameter binding). For these types,
+    // fall back to the invariant, round-trippable "O" format when no FormatString is specified.
+    private static readonly HashSet<string> RoundTrippableFormatTypes = new(StringComparer.Ordinal)
+    {
+        "System.DateOnly",
+        "System.TimeOnly",
+        "System.DateTime",
+        "System.DateTimeOffset",
+    };
+
     private static string GetParameterValue(EndpointParameter parameter)
         => parameter switch
         {
             { ParameterType: "System.String" or "string" } => parameter.ParameterName,
             { FormatString: { } f, IsNullable: true } => $"{parameter.ParameterName}?.ToString(\"{f}\")",
             { FormatString: { } f } => $"{parameter.ParameterName}.ToString(\"{f}\")",
+            { IsNullable: true } when RoundTrippableFormatTypes.Contains(parameter.ParameterType) => $"{parameter.ParameterName}?.ToString(\"O\")",
+            { } p when RoundTrippableFormatTypes.Contains(p.ParameterType) => $"{parameter.ParameterName}.ToString(\"O\")",
             { IsNullable: true } => $"{parameter.ParameterName}?.ToString()",
             _ => $"{parameter.ParameterName}.ToString()",
         };

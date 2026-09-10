@@ -74,10 +74,19 @@ public record EndpointMethodDescriptor(
 
         foreach (var parameter in method.ParameterList.Parameters)
         {
-            var parameterType = semanticModel.GetTypeInfo(parameter.Type!).Type!;
+            // Resolve the declared type symbol first (covers both `T?` and
+            // `Nullable<T>`/`System.Nullable<T>` syntax, which are equivalent for
+            // value types) and unwrap it if it's a Nullable<T>, rather than
+            // sniffing the syntax kind, so both spellings are handled uniformly.
+            var declaredType = semanticModel.GetTypeInfo(parameter.Type!).Type!;
+            var isNullableValueType = declaredType is INamedTypeSymbol { ConstructedFrom.SpecialType: SpecialType.System_Nullable_T };
+            var isNullable = isNullableValueType
+                || parameter.Type!.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.NullableType);
+            var parameterType = isNullableValueType
+                ? ((INamedTypeSymbol)declaredType).TypeArguments[0]
+                : declaredType;
             var parameterTypeName = parameterType.GetName()!;
 
-            var isNullable = parameter.Type!.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.NullableType);
             var parameterName = parameter.Identifier.ValueText;
 
             if (parameterType.AllInterfaces.Any(i => i.GetName() == TypeConstants.RequestOptions))
