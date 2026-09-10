@@ -304,6 +304,51 @@ public class ClientEndpointGeneratorTests
             """);
 
     [Fact]
+    public Task CanGenerate_PathParameter_TimeOnly()
+        => TestHelper.VerifyEndpoint("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items/{time}/{optionalTime}")]
+                public Task<EndpointResponse<string[]>> ExecuteAsync(
+                    [Path] TimeOnly time,
+                    [Path] TimeOnly? optionalTime,
+                    ClientRequestOptions options,
+                    CancellationToken cancellationToken);
+            }
+            """);
+
+    [Fact]
+    public Task CanGenerate_PathParameter_DateTime()
+        => TestHelper.VerifyEndpoint("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items/{date}/{optionalDate}")]
+                public Task<EndpointResponse<string[]>> ExecuteAsync(
+                    [Path] DateTime date,
+                    [Path] DateTime? optionalDate,
+                    ClientRequestOptions options,
+                    CancellationToken cancellationToken);
+            }
+            """);
+
+    [Fact]
+    public Task CanGenerate_PathParameter_DateTimeOffset()
+        => TestHelper.VerifyEndpoint("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items/{date}/{optionalDate}")]
+                public Task<EndpointResponse<string[]>> ExecuteAsync(
+                    [Path] DateTimeOffset date,
+                    [Path] DateTimeOffset? optionalDate,
+                    ClientRequestOptions options,
+                    CancellationToken cancellationToken);
+            }
+            """);
+
+    [Fact]
     public Task CanGenerate_Using_Alias()
         => TestHelper.VerifyEndpoint("""
             using TypeAlias = System.Text.Json.Nodes.JsonArray;
