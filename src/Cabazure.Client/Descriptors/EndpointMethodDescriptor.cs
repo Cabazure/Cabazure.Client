@@ -74,10 +74,13 @@ public record EndpointMethodDescriptor(
 
         foreach (var parameter in method.ParameterList.Parameters)
         {
-            var parameterType = semanticModel.GetTypeInfo(parameter.Type!).Type!;
+            var isNullable = parameter.Type!.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.NullableType);
+            var typeSyntaxForName = isNullable && parameter.Type is NullableTypeSyntax nullableTypeSyntax
+                ? nullableTypeSyntax.ElementType
+                : parameter.Type!;
+            var parameterType = semanticModel.GetTypeInfo(typeSyntaxForName).Type!;
             var parameterTypeName = parameterType.GetName()!;
 
-            var isNullable = parameter.Type!.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.NullableType);
             var parameterName = parameter.Identifier.ValueText;
 
             if (parameterType.AllInterfaces.Any(i => i.GetName() == TypeConstants.RequestOptions))

@@ -289,6 +289,21 @@ public class ClientEndpointGeneratorTests
             """);
 
     [Fact]
+    public Task CanGenerate_PathParameter_DateOnly()
+        => TestHelper.VerifyEndpoint("""
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items/{date}/{optionalDate}")]
+                public Task<EndpointResponse<string[]>> ExecuteAsync(
+                    [Path] DateOnly date,
+                    [Path] DateOnly? optionalDate,
+                    ClientRequestOptions options,
+                    CancellationToken cancellationToken);
+            }
+            """);
+
+    [Fact]
     public Task CanGenerate_Using_Alias()
         => TestHelper.VerifyEndpoint("""
             using TypeAlias = System.Text.Json.Nodes.JsonArray;
