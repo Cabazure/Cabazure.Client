@@ -87,49 +87,60 @@ namespace Cabazure.Client.Builder
                 return EmptyStreamResponse;
             }
 
-            var isSuccess = IsSuccessStatus(response);
-            if (isSuccess)
+            try
             {
+                var isSuccess = IsSuccessStatus(response);
+                if (isSuccess)
+                {
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0 || NETCOREAPP3_1
-                var stream = await response.Content
-                    .ReadAsStreamAsync()
+                    var stream = await response.Content
+                        .ReadAsStreamAsync()
+                        .ConfigureAwait(false);
+#else
+                    var stream = await response.Content
+                        .ReadAsStreamAsync(cancellationToken)
+                        .ConfigureAwait(false);
+#endif
+
+                    return new StreamResponse(
+                        response,
+                        true,
+                        response.StatusCode,
+                        null,
+                        null,
+                        stream,
+                        response.Content.Headers.ContentType?.ToString(),
+                        GetHeaders(response));
+                }
+
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0 || NETCOREAPP3_1
+                var content = await response.Content
+                    .ReadAsStringAsync()
                     .ConfigureAwait(false);
 #else
-                var stream = await response.Content
-                    .ReadAsStreamAsync(cancellationToken)
+                var content = await response.Content
+                    .ReadAsStringAsync(cancellationToken)
                     .ConfigureAwait(false);
 #endif
 
                 return new StreamResponse(
                     response,
-                    true,
+                    false,
                     response.StatusCode,
+                    content,
+                    GetSerializer(response.StatusCode)?.Invoke(content),
                     null,
-                    null,
-                    stream,
                     response.Content.Headers.ContentType?.ToString(),
                     GetHeaders(response));
             }
-
-#if NETSTANDARD2_0 || NETSTANDARD2_1 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0 || NETCOREAPP3_1
-            var content = await response.Content
-                .ReadAsStringAsync()
-                .ConfigureAwait(false);
-#else
-            var content = await response.Content
-                .ReadAsStringAsync(cancellationToken)
-                .ConfigureAwait(false);
-#endif
-
-            return new StreamResponse(
-                response,
-                false,
-                response.StatusCode,
-                content,
-                GetSerializer(response.StatusCode)?.Invoke(content),
-                null,
-                null,
-                GetHeaders(response));
+            catch
+            {
+                // GetStreamAsync transfers ownership of the HttpResponseMessage to the
+                // returned StreamResponse for disposal by the caller. If reading the
+                // content fails before that handoff happens, dispose it here instead.
+                response.Dispose();
+                throw;
+            }
         }
 
         private bool IsSuccessStatus(HttpResponseMessage responseMessage)

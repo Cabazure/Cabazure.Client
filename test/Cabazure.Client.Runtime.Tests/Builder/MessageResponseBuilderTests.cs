@@ -139,6 +139,7 @@ public class MessageResponseBuilderTests
     {
         response.StatusCode = HttpStatusCode.BadRequest;
         response.Content = new StringContent("error-content");
+        response.Content.Headers.ContentType = new("text/plain");
         serializer
             .Deserialize<DateTimeOffset>(Arg.Any<string>(), Arg.Any<string>())
             .Returns(expected);
@@ -148,7 +149,7 @@ public class MessageResponseBuilderTests
 
         result.IsSuccess.Should().BeFalse();
         result.OkContent.Should().BeNull();
-        result.ContentType.Should().BeNull();
+        result.ContentType.Should().Be("text/plain");
         result.Content.Should().Be("error-content");
         result.ContentObject.Should().BeEquivalentTo(expected);
     }
@@ -166,5 +167,50 @@ public class MessageResponseBuilderTests
         result.IsSuccess.Should().BeFalse();
         result.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         result.OkContent.Should().BeNull();
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task GetStreamAsync_Should_Dispose_Response_On_Read_Failure(
+        [Frozen] HttpResponseMessage response,
+        MessageResponseBuilder sut,
+        CancellationToken cancellationToken)
+    {
+        response.StatusCode = HttpStatusCode.OK;
+        var content = new ThrowingContent();
+        response.Content = content;
+
+        var act = async () => await sut
+            .AddSuccessResponse(response.StatusCode)
+            .GetStreamAsync(cancellationToken);
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
+
+        content.Disposed.Should().BeTrue();
+    }
+
+    private sealed class ThrowingContent : HttpContent
+    {
+        public bool Disposed { get; private set; }
+
+        protected override Task<Stream> CreateContentReadStreamAsync()
+            => throw new InvalidOperationException("Read failed.");
+
+        protected override Task<Stream> CreateContentReadStreamAsync(CancellationToken cancellationToken)
+            => throw new InvalidOperationException("Read failed.");
+
+        protected override Task SerializeToStreamAsync(Stream stream, TransportContext? context)
+            => throw new InvalidOperationException("Read failed.");
+
+        protected override bool TryComputeLength(out long length)
+        {
+            length = 0;
+            return false;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            Disposed = true;
+            base.Dispose(disposing);
+        }
     }
 }

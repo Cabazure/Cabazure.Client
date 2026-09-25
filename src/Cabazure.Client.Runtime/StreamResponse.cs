@@ -11,7 +11,7 @@ namespace Cabazure.Client;
 /// <param name="Content">The raw content, in case the response was not successful.</param>
 /// <param name="ContentObject">The deserialized response, in case the response was not successful.</param>
 /// <param name="OkContent">The response stream. This is only set in case the response was successful.</param>
-/// <param name="ContentType">The content type of the response, read from the Content-Type header. This is only set in case the response was successful.</param>
+/// <param name="ContentType">The content type of the response, read from the Content-Type header.</param>
 /// <param name="Headers">The response headers.</param>
 public record StreamResponse(
     bool IsSuccess,
