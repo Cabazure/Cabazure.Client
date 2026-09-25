@@ -191,6 +191,9 @@ public class ClientEndpointGenerator : IIncrementalGenerator
         var terminalCall = isStreamResponse
             ? $"            .GetStreamAsync({cancellationToken});"
             : $"            .GetAsync({resultConversion}{cancellationToken});";
+        var sendAsyncArgs = isStreamResponse
+            ? $"requestMessage, {method.OptionsParameter ?? "null"}, HttpCompletionOption.ResponseHeadersRead, {cancellationToken}"
+            : $"requestMessage, {method.OptionsParameter ?? "null"}, {cancellationToken}";
 
         var parameters = string.Join(
             ",",
@@ -207,7 +210,7 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             {{indention}}            .Build({{httpMethod}});
             {{indention}}
             {{indention}}        {{responseDeclaration}} = await client
-            {{indention}}            .SendAsync(requestMessage, {{method.OptionsParameter ?? "null"}}, {{cancellationToken}});
+            {{indention}}            .SendAsync({{sendAsyncArgs}});
             {{indention}}
             {{indention}}        return await requestFactory
             {{indention}}            .FromResponse("{{clientName}}", response){{successResponseCalls}}

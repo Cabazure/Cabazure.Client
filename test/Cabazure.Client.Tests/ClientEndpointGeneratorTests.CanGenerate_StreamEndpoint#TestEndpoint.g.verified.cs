@@ -35,7 +35,7 @@ namespace Test
                 .Build(HttpMethod.Get);
     
             var response = await client
-                .SendAsync(requestMessage, null, cancellationToken);
+                .SendAsync(requestMessage, null, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
     
             return await requestFactory
                 .FromResponse("ClientName", response)

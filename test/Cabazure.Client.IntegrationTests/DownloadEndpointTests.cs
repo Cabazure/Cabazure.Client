@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cabazure.Client.IntegrationTests;
 
+[CustomizeWith(typeof(DownloadHttpClientCustomization))]
 public class DownloadEndpointTests
 {
     public const string ClientName = "TestClient";
@@ -82,7 +83,7 @@ public class DownloadEndpointTests
 
     [Theory, AutoNSubstituteData]
     internal async Task Should_Send_Request(
-        [Frozen] HttpClient client,
+        [Frozen] HttpMessageHandler handler,
         [Frozen] HttpRequestMessage request,
         DownloadEndpoint sut,
         string id,
@@ -94,9 +95,12 @@ public class DownloadEndpointTests
             options,
             cancellationToken);
 
-        _ = client
+        _ = handler
             .Received(1)
-            .SendAsync(request, Arg.Any<CancellationToken>());
+            .InvokeProtectedAsync<HttpResponseMessage>(
+                "SendAsync",
+                request,
+                Arg.Any<CancellationToken>());
     }
 
     [Theory, AutoNSubstituteData]
