@@ -238,3 +238,12 @@ if (response is { OkContent: { } stream })
     await stream.CopyToAsync(destination, cancellationToken);
 }
 ```
+
+If `ClientRequestOptions.Timeout` is set, it is applied as a **sliding (idle) timeout** while
+reading `OkContent`, rather than a fixed total-duration timeout: the deadline resets every time
+a chunk of data is successfully read, instead of being a single timer covering the whole
+download. This means a large-but-actively-flowing download is never penalized just for taking
+longer than `Timeout` in total, while a connection that stalls at any point - waiting for
+headers, waiting for the first byte, or mid-transfer - still gets cancelled once no data has
+arrived within a `Timeout` window.
+

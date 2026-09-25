@@ -28,6 +28,8 @@ namespace Cabazure.Client.Builder
         private readonly HttpResponseMessage? response;
         private readonly IClientSerializer serializer;
         private readonly string clientName;
+        private CancellationTokenSource? streamTimeoutCts;
+        private TimeSpan? streamTimeout;
 
         public MessageResponseBuilder(
             HttpResponseMessage? response,
@@ -50,6 +52,14 @@ namespace Cabazure.Client.Builder
 
         public IMessageResponseBuilder AddSuccessResponse<TResponseContent>(HttpStatusCode statusCode)
             => AddTypedResponse<TResponseContent>(statusCode, true);
+
+        public IMessageResponseBuilder WithStreamTimeout(CancellationTokenSource? timeoutCts, TimeSpan? timeout)
+        {
+            streamTimeoutCts = timeoutCts;
+            streamTimeout = timeout;
+
+            return this;
+        }
 
         public Task<EndpointResponse> GetAsync(CancellationToken cancellationToken)
             => GetAsync(r => r, cancellationToken);
@@ -84,6 +94,9 @@ namespace Cabazure.Client.Builder
         {
             if (response is null)
             {
+                // Defensive: shouldn't normally happen (a null response means the send
+                // never produced a stream to time out), but avoid leaking the CTS if it does.
+                streamTimeoutCts?.Dispose();
                 return EmptyStreamResponse;
             }
 
@@ -102,6 +115,11 @@ namespace Cabazure.Client.Builder
                         .ConfigureAwait(false);
 #endif
 
+                    if (streamTimeoutCts is not null && streamTimeout is not null)
+                    {
+                        stream = new SlidingTimeoutStream(stream, streamTimeoutCts, streamTimeout.Value);
+                    }
+
                     return new StreamResponse(
                         response,
                         true,
@@ -110,7 +128,8 @@ namespace Cabazure.Client.Builder
                         null,
                         stream,
                         response.Content.Headers.ContentType?.ToString(),
-                        GetHeaders(response));
+                        GetHeaders(response),
+                        streamTimeoutCts);
                 }
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0 || NETCOREAPP3_1
@@ -122,6 +141,10 @@ namespace Cabazure.Client.Builder
                     .ReadAsStringAsync(cancellationToken)
                     .ConfigureAwait(false);
 #endif
+
+                // No live stream is returned on this path, so the timeout CTS is no longer
+                // needed once the (already fully read) error content has been captured.
+                streamTimeoutCts?.Dispose();
 
                 return new StreamResponse(
                     response,
@@ -139,6 +162,7 @@ namespace Cabazure.Client.Builder
                 // returned StreamResponse for disposal by the caller. If reading the
                 // content fails before that handoff happens, dispose it here instead.
                 response.Dispose();
+                streamTimeoutCts?.Dispose();
                 throw;
             }
         }

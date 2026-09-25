@@ -188,6 +188,102 @@ public class MessageResponseBuilderTests
         content.Disposed.Should().BeTrue();
     }
 
+    [Theory, AutoNSubstituteData]
+    internal async Task GetStreamAsync_Should_Return_Raw_Stream_When_No_Timeout_Configured(
+        [Frozen] HttpResponseMessage response,
+        MessageResponseBuilder sut,
+        CancellationToken cancellationToken)
+    {
+        response.StatusCode = HttpStatusCode.OK;
+        response.Content = new StringContent("stream-content");
+
+        var result = await sut.AddSuccessResponse(response.StatusCode)
+            .GetStreamAsync(cancellationToken);
+
+        result.OkContent.Should().NotBeOfType<SlidingTimeoutStream>();
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task GetStreamAsync_Should_Wrap_Stream_When_Timeout_Configured(
+        [Frozen] HttpResponseMessage response,
+        MessageResponseBuilder sut,
+        CancellationToken cancellationToken)
+    {
+        response.StatusCode = HttpStatusCode.OK;
+        response.Content = new StringContent("stream-content");
+        using var timeoutCts = new CancellationTokenSource();
+
+        var result = await sut
+            .AddSuccessResponse(response.StatusCode)
+            .WithStreamTimeout(timeoutCts, TimeSpan.FromSeconds(30))
+            .GetStreamAsync(cancellationToken);
+
+        result.OkContent.Should().BeOfType<SlidingTimeoutStream>();
+
+        // Ownership of the CTS is transferred to the returned StreamResponse; disposing it
+        // should dispose the CTS too (verified via ObjectDisposedException on further use).
+        result.Dispose();
+        var act = () => timeoutCts.CancelAfter(TimeSpan.FromSeconds(1));
+        act.Should().Throw<ObjectDisposedException>();
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task GetStreamAsync_Should_Dispose_TimeoutCts_On_Error_Response(
+        [Frozen] HttpResponseMessage response,
+        MessageResponseBuilder sut,
+        CancellationToken cancellationToken)
+    {
+        response.StatusCode = HttpStatusCode.BadRequest;
+        response.Content = new StringContent("error-content");
+        using var timeoutCts = new CancellationTokenSource();
+
+        await sut
+            .AddErrorResponse(response.StatusCode)
+            .WithStreamTimeout(timeoutCts, TimeSpan.FromSeconds(30))
+            .GetStreamAsync(cancellationToken);
+
+        var act = () => timeoutCts.CancelAfter(TimeSpan.FromSeconds(1));
+        act.Should().Throw<ObjectDisposedException>();
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task GetStreamAsync_Should_Dispose_TimeoutCts_On_Read_Failure(
+        [Frozen] HttpResponseMessage response,
+        MessageResponseBuilder sut,
+        CancellationToken cancellationToken)
+    {
+        response.StatusCode = HttpStatusCode.OK;
+        response.Content = new ThrowingContent();
+        using var timeoutCts = new CancellationTokenSource();
+
+        var act = async () => await sut
+            .AddSuccessResponse(response.StatusCode)
+            .WithStreamTimeout(timeoutCts, TimeSpan.FromSeconds(30))
+            .GetStreamAsync(cancellationToken);
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
+
+        var disposedCheck = () => timeoutCts.CancelAfter(TimeSpan.FromSeconds(1));
+        disposedCheck.Should().Throw<ObjectDisposedException>();
+    }
+
+    [Fact]
+    public async Task GetStreamAsync_Should_Dispose_TimeoutCts_When_No_HttpResponseMessage()
+    {
+        var sut = new MessageResponseBuilder(
+            null,
+            Substitute.For<IClientSerializer>(),
+            "ClientName");
+        var timeoutCts = new CancellationTokenSource();
+
+        await sut
+            .WithStreamTimeout(timeoutCts, TimeSpan.FromSeconds(30))
+            .GetStreamAsync(CancellationToken.None);
+
+        var act = () => timeoutCts.CancelAfter(TimeSpan.FromSeconds(1));
+        act.Should().Throw<ObjectDisposedException>();
+    }
+
     private sealed class ThrowingContent : HttpContent
     {
         public bool Disposed { get; private set; }
