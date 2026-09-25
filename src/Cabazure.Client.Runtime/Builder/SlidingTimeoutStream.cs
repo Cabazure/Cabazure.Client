@@ -40,17 +40,15 @@
         public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
 
         public override int Read(byte[] buffer, int offset, int count)
-        {
-            var read = inner.Read(buffer, offset, count);
-            OnReadCompleted(read);
-            return read;
-        }
+            => ReadAsync(buffer, offset, count, CancellationToken.None)
+                .GetAwaiter()
+                .GetResult();
 
         public override int ReadByte()
         {
-            var value = inner.ReadByte();
-            OnReadCompleted(value >= 0 ? 1 : 0);
-            return value;
+            var buffer = new byte[1];
+            var read = Read(buffer, 0, 1);
+            return read > 0 ? buffer[0] : -1;
         }
 
 #if NETSTANDARD2_0 || NETSTANDARD2_1 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0 || NETCOREAPP3_1

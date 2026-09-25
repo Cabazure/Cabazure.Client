@@ -73,6 +73,85 @@ public class SlidingTimeoutStreamTests
     }
 
     [Fact]
+    public void Read_Should_Reset_Deadline_On_Each_Successful_Read()
+    {
+        // Mirrors ReadAsync_Should_Reset_Deadline_On_Each_Successful_Read, but for the
+        // synchronous Read(byte[], int, int) overload.
+        var timeout = TimeSpan.FromMilliseconds(200);
+        using var timeoutCts = new CancellationTokenSource();
+        timeoutCts.CancelAfter(timeout);
+        using var inner = new SlowChunkedStream(
+            chunkCount: 4,
+            delayBetweenChunks: TimeSpan.FromMilliseconds(120));
+        using var sut = new SlidingTimeoutStream(inner, timeoutCts, timeout);
+
+        var buffer = new byte[16];
+        var totalRead = 0;
+        int read;
+        while ((read = sut.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            totalRead += read;
+        }
+
+        totalRead.Should().Be(4);
+        timeoutCts.IsCancellationRequested.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Read_Should_Throw_When_Read_Stalls_Past_Timeout()
+    {
+        var timeout = TimeSpan.FromMilliseconds(100);
+        using var timeoutCts = new CancellationTokenSource();
+        timeoutCts.CancelAfter(timeout);
+        using var inner = new SlowChunkedStream([TimeSpan.Zero, TimeSpan.FromMilliseconds(500)]);
+        using var sut = new SlidingTimeoutStream(inner, timeoutCts, timeout);
+
+        var buffer = new byte[16];
+        sut.Read(buffer, 0, buffer.Length).Should().Be(1);
+
+        var act = () => sut.Read(buffer, 0, buffer.Length);
+
+        act.Should().Throw<OperationCanceledException>();
+    }
+
+    [Fact]
+    public void ReadByte_Should_Reset_Deadline_On_Each_Successful_Read()
+    {
+        var timeout = TimeSpan.FromMilliseconds(200);
+        using var timeoutCts = new CancellationTokenSource();
+        timeoutCts.CancelAfter(timeout);
+        using var inner = new SlowChunkedStream(
+            chunkCount: 4,
+            delayBetweenChunks: TimeSpan.FromMilliseconds(120));
+        using var sut = new SlidingTimeoutStream(inner, timeoutCts, timeout);
+
+        var totalRead = 0;
+        while (sut.ReadByte() >= 0)
+        {
+            totalRead++;
+        }
+
+        totalRead.Should().Be(4);
+        timeoutCts.IsCancellationRequested.Should().BeFalse();
+    }
+
+    [Fact]
+    public void ReadByte_Should_Throw_When_Read_Stalls_Past_Timeout()
+    {
+        var timeout = TimeSpan.FromMilliseconds(100);
+        using var timeoutCts = new CancellationTokenSource();
+        timeoutCts.CancelAfter(timeout);
+        using var inner = new SlowChunkedStream([TimeSpan.Zero, TimeSpan.FromMilliseconds(500)]);
+        using var sut = new SlidingTimeoutStream(inner, timeoutCts, timeout);
+
+        sut.ReadByte().Should().Be(1);
+
+        var act = () => sut.ReadByte();
+
+        act.Should().Throw<OperationCanceledException>();
+    }
+
+    [Fact]
     public void Members_Should_Delegate_To_Inner_Stream()
     {
         using var timeoutCts = new CancellationTokenSource();
