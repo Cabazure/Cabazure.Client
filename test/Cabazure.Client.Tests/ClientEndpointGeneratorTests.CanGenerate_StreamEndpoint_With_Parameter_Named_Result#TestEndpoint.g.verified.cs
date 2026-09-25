@@ -24,14 +24,14 @@ namespace Test
         }
 
         public async Task<StreamResponse> ExecuteAsync(
-            string id,
+            string result,
             CancellationToken cancellationToken)
         {
             var client = factory.CreateClient("ClientName");
     
             using var requestMessage = requestFactory
-                .FromTemplate("ClientName", "/items/{id}")
-                .WithPathParameter("id", id)
+                .FromTemplate("ClientName", "/items/{result}")
+                .WithPathParameter("result", result)
                 .Build(HttpMethod.Get);
     
             var streamSendResult = await client

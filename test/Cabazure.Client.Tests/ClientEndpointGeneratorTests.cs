@@ -245,6 +245,21 @@ public class ClientEndpointGeneratorTests
             """);
 
     [Fact]
+    public Task CanGenerate_StreamEndpoint_With_Parameter_Named_Result()
+        => TestHelper.VerifyEndpoint("""
+            namespace Test;
+
+            [ClientEndpoint("ClientName")]
+            public interface ITestEndpoint
+            {
+                [Get("/items/{result}")]
+                public Task<StreamResponse> ExecuteAsync(
+                    [Path] string result,
+                    CancellationToken cancellationToken);
+            }
+            """);
+
+    [Fact]
     public Task CanGenerate_PutEndpoint()
         => TestHelper.VerifyEndpoint("""
             [ClientEndpoint("ClientName")]

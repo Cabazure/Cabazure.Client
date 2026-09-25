@@ -196,12 +196,12 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                 {{indention}}            .FromTemplate("{{clientName}}", "{{method.RouteTemplate}}"){{requestOptions}}
                 {{indention}}            .Build({{httpMethod}});
                 {{indention}}
-                {{indention}}        var result = await client
+                {{indention}}        var streamSendResult = await client
                 {{indention}}            .SendStreamAsync({{streamSendArgs}});
                 {{indention}}
                 {{indention}}        return await requestFactory
-                {{indention}}            .FromResponse("{{clientName}}", result.Response){{successResponseCalls}}
-                {{indention}}            .WithStreamTimeout(result.TimeoutCts, result.Timeout)
+                {{indention}}            .FromResponse("{{clientName}}", streamSendResult.Response){{successResponseCalls}}
+                {{indention}}            .WithStreamTimeout(streamSendResult.TimeoutCts, streamSendResult.Timeout)
                 {{indention}}            .GetStreamAsync({{cancellationToken}});
                 {{indention}}    }
                 """);
