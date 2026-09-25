@@ -51,6 +51,7 @@ The return type of `Task<EndpointResponse<Customer>>`, is a wrapper for the actu
 | `Task<EndpointResponse>`    | Used when there is no response content    |
 | `Task<EndpointResponse<T>>` | Used for endpoints with a response object |
 | `Task<PagedResponse<T[]>>`  | Used for endpoints with a paged response  |
+| `Task<StreamResponse>`      | Used for endpoints returning a raw stream of data (e.g. file downloads) |
 
 The `[Path]` attribute on the `customerId` parameter of the endpoint method, declares that this parameter corresponds to the endpoint path placeholder. Parameters containing data for an endpoint method should have one of the following attributes describing how they are passed to the endpoint: `[Path]`, `[Query]`, `[Header]` or `[Body]`.
 
@@ -207,5 +208,33 @@ public class CustomerNameProvider(
             { OkContent: { } c } => c.Name,
             _ => null,
         };
+}
+```
+
+### Streaming responses
+
+Endpoints returning `Task<StreamResponse>` expose the response body as a raw `Stream` via `OkContent`, along with the response's `Content-Type` header via `ContentType`. Since the returned `Stream` reads directly from the underlying HTTP response, `StreamResponse` implements `IDisposable` and must be disposed once the caller is done reading the stream, to release the underlying HTTP connection:
+
+```csharp
+[ClientEndpoint("CustomerClient")]
+public interface IDownloadCustomerAvatarEndpoint
+{
+    [Get("/v1/customers/{customerId}/avatar")]
+    public Task<StreamResponse> ExecuteAsync(
+      [Path("customerId")] string customerId,
+      ClientRequestOptions options,
+      CancellationToken cancellationToken);
+}
+```
+
+```csharp
+using var response = await endpoint.ExecuteAsync(
+    customerId,
+    new ClientRequestOptions(),
+    cancellationToken);
+
+if (response is { OkContent: { } stream })
+{
+    await stream.CopyToAsync(destination, cancellationToken);
 }
 ```
