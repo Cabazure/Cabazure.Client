@@ -18,5 +18,8 @@ namespace Cabazure.Client.Builder
 
         Task<EndpointResponse> GetAsync(
             CancellationToken cancellationToken);
+
+        Task<StreamResponse> GetStreamAsync(
+            CancellationToken cancellationToken);
     }
 }
