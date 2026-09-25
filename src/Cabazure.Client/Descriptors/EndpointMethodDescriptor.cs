@@ -328,9 +328,11 @@ public record EndpointMethodDescriptor(
             return false;
         }
 
-        if (semanticModel.GetTypeName(endpointType)
+        var endpointTypeName = semanticModel.GetTypeName(endpointType);
+        if (endpointTypeName
             is not TypeConstants.EndpointResponse
-            and not TypeConstants.PagedResponse)
+            and not TypeConstants.PagedResponse
+            and not TypeConstants.StreamResponse)
         {
             return false;
         }
@@ -339,6 +341,10 @@ public record EndpointMethodDescriptor(
         {
             responseType = endpointType.ToString();
             resultType = r.ToString();
+        }
+        else if (endpointTypeName == TypeConstants.StreamResponse)
+        {
+            responseType = nameof(TypeConstants.StreamResponse);
         }
 
         return true;
