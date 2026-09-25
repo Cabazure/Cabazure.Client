@@ -101,6 +101,9 @@ public class AutoFixtureCustomization : ICustomization
         builder
             .AddErrorResponse<object>(default)
             .ReturnsForAnyArgs(builder);
+        builder
+            .WithStreamTimeout(default, default)
+            .ReturnsForAnyArgs(builder);
 
         return builder;
     }

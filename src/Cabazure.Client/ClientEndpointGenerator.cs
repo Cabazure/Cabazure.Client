@@ -185,19 +185,36 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                 """;
 
         var isStreamResponse = method.ResponseType == "StreamResponse";
-        var responseDeclaration = isStreamResponse
-            ? "var response"
-            : "using var response";
-        var terminalCall = isStreamResponse
-            ? $"            .GetStreamAsync({cancellationToken});"
-            : $"            .GetAsync({resultConversion}{cancellationToken});";
-        var sendAsyncArgs = isStreamResponse
-            ? $"requestMessage, {method.OptionsParameter ?? "null"}, HttpCompletionOption.ResponseHeadersRead, {cancellationToken}"
-            : $"requestMessage, {method.OptionsParameter ?? "null"}, {cancellationToken}";
 
         var parameters = string.Join(
             ",",
             method.Parameters.Select(p => $"\n{indention}        {p}"));
+
+        if (isStreamResponse)
+        {
+            var streamSendArgs = $"requestMessage, {method.OptionsParameter ?? "null"}, {cancellationToken}";
+
+            source.AppendLine();
+            source.AppendLine($$"""
+                {{indention}}    public async {{method.ReturnType}} {{method.Name}}({{parameters}})
+                {{indention}}    {
+                {{indention}}        var client = factory.CreateClient("{{clientName}}");
+                {{indention}}
+                {{indention}}        using var requestMessage = requestFactory
+                {{indention}}            .FromTemplate("{{clientName}}", "{{method.RouteTemplate}}"){{requestOptions}}
+                {{indention}}            .Build({{httpMethod}});
+                {{indention}}
+                {{indention}}        var result = await client
+                {{indention}}            .SendStreamAsync({{streamSendArgs}});
+                {{indention}}
+                {{indention}}        return await requestFactory
+                {{indention}}            .FromResponse("{{clientName}}", result.Response){{successResponseCalls}}
+                {{indention}}            .WithStreamTimeout(result.TimeoutCts, result.Timeout)
+                {{indention}}            .GetStreamAsync({{cancellationToken}});
+                {{indention}}    }
+                """);
+            return;
+        }
 
         source.AppendLine();
         source.AppendLine($$"""
@@ -209,12 +226,12 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             {{indention}}            .FromTemplate("{{clientName}}", "{{method.RouteTemplate}}"){{requestOptions}}
             {{indention}}            .Build({{httpMethod}});
             {{indention}}
-            {{indention}}        {{responseDeclaration}} = await client
-            {{indention}}            .SendAsync({{sendAsyncArgs}});
+            {{indention}}        using var response = await client
+            {{indention}}            .SendAsync(requestMessage, {{method.OptionsParameter ?? "null"}}, {{cancellationToken}});
             {{indention}}
             {{indention}}        return await requestFactory
             {{indention}}            .FromResponse("{{clientName}}", response){{successResponseCalls}}
-            {{indention}}{{terminalCall}}
+            {{indention}}            .GetAsync({{resultConversion}}{{cancellationToken}});
             {{indention}}    }
             """);
     }

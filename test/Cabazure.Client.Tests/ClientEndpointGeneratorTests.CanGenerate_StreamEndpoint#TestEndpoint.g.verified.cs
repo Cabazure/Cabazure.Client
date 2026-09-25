@@ -34,12 +34,13 @@ namespace Test
                 .WithPathParameter("id", id)
                 .Build(HttpMethod.Get);
     
-            var response = await client
-                .SendAsync(requestMessage, null, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            var result = await client
+                .SendStreamAsync(requestMessage, null, cancellationToken);
     
             return await requestFactory
-                .FromResponse("ClientName", response)
+                .FromResponse("ClientName", result.Response)
                 .AddSuccessResponse(HttpStatusCode.OK)
+                .WithStreamTimeout(result.TimeoutCts, result.Timeout)
                 .GetStreamAsync(cancellationToken);
         }
     }
