@@ -176,14 +176,6 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                 """);
         }
 
-        var resultConversion = method.ResponseType == null
-            ? null
-            : $"""
-
-                {indention}                response => new {method.ResponseType}(response),
-                {indention}                
-                """;
-
         var isStreamResponse = method.ResponseType == "StreamResponse";
 
         var parameters = string.Join(
@@ -215,6 +207,14 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                 """);
             return;
         }
+
+        var resultConversion = method.ResponseType == null
+            ? null
+            : $"""
+
+                {indention}                response => new {method.ResponseType}(response),
+                {indention}                
+                """;
 
         source.AppendLine();
         source.AppendLine($$"""
