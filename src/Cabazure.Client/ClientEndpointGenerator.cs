@@ -184,6 +184,14 @@ public class ClientEndpointGenerator : IIncrementalGenerator
                 {indention}                
                 """;
 
+        var isStreamResponse = method.ResponseType == "StreamResponse";
+        var responseDeclaration = isStreamResponse
+            ? "var response"
+            : "using var response";
+        var terminalCall = isStreamResponse
+            ? $"            .GetStreamAsync({cancellationToken});"
+            : $"            .GetAsync({resultConversion}{cancellationToken});";
+
         var parameters = string.Join(
             ",",
             method.Parameters.Select(p => $"\n{indention}        {p}"));
@@ -198,12 +206,12 @@ public class ClientEndpointGenerator : IIncrementalGenerator
             {{indention}}            .FromTemplate("{{clientName}}", "{{method.RouteTemplate}}"){{requestOptions}}
             {{indention}}            .Build({{httpMethod}});
             {{indention}}
-            {{indention}}        using var response = await client
+            {{indention}}        {{responseDeclaration}} = await client
             {{indention}}            .SendAsync(requestMessage, {{method.OptionsParameter ?? "null"}}, {{cancellationToken}});
             {{indention}}
             {{indention}}        return await requestFactory
             {{indention}}            .FromResponse("{{clientName}}", response){{successResponseCalls}}
-            {{indention}}            .GetAsync({{resultConversion}}{{cancellationToken}});
+            {{indention}}{{terminalCall}}
             {{indention}}    }
             """);
     }
