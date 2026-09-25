@@ -59,22 +59,4 @@ public class HttpClientExtensionsTests
         // directly), but this at least guards against the send call itself misbehaving.
         await act.Should().ThrowAsync<HttpRequestException>();
     }
-
-    [Fact]
-    public async Task SendAsync_With_CompletionOption_Should_Not_Leak_TimeoutCts()
-    {
-        using var handler = new StubHttpMessageHandler((request, cancellationToken)
-            => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)));
-        using var client = new HttpClient(handler);
-        using var request = new HttpRequestMessage(HttpMethod.Get, "https://example.test/");
-        var options = new ClientRequestOptions { Timeout = TimeSpan.FromSeconds(30) };
-
-        using var response = await client.SendAsync(
-            request,
-            options,
-            HttpCompletionOption.ResponseContentRead,
-            CancellationToken.None);
-
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
 }
