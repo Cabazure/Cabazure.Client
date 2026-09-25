@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Threading;
 
 namespace Cabazure.Client;
 
@@ -30,6 +31,7 @@ public record StreamResponse(
     IDisposable
 {
     private readonly HttpResponseMessage? response;
+    private readonly CancellationTokenSource? timeoutCts;
 
     public StreamResponse(
         HttpResponseMessage? response,
@@ -41,6 +43,29 @@ public record StreamResponse(
         string? contentType,
         IReadOnlyDictionary<string, IEnumerable<string>> headers)
         : this(
+            response,
+            isSuccess,
+            statusCode,
+            content,
+            contentObject,
+            okContent,
+            contentType,
+            headers,
+            timeoutCts: null)
+    {
+    }
+
+    public StreamResponse(
+        HttpResponseMessage? response,
+        bool isSuccess,
+        HttpStatusCode statusCode,
+        string? content,
+        object? contentObject,
+        Stream? okContent,
+        string? contentType,
+        IReadOnlyDictionary<string, IEnumerable<string>> headers,
+        CancellationTokenSource? timeoutCts)
+        : this(
             isSuccess,
             statusCode,
             content,
@@ -50,11 +75,13 @@ public record StreamResponse(
             headers)
     {
         this.response = response;
+        this.timeoutCts = timeoutCts;
     }
 
     public void Dispose()
     {
         response?.Dispose();
+        timeoutCts?.Dispose();
         GC.SuppressFinalize(this);
     }
 }
