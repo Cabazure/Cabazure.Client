@@ -50,7 +50,7 @@ The return type of `Task<EndpointResponse<Customer>>`, is a wrapper for the actu
 | --------------------------- | ----------------------------------------- |
 | `Task<EndpointResponse>`    | Used when there is no response content    |
 | `Task<EndpointResponse<T>>` | Used for endpoints with a response object |
-| `Task<PagedResponse<T[]>>`  | Used for endpoints with a paged response  |
+| `Task<PagedResponse<T[]>>`  | Used for paged responses, exposing `x-continuation` and the optional `x-total-item-count` as `TotalCount` |
 | `Task<StreamResponse>`      | Used for endpoints returning a raw stream of data (e.g. file downloads) |
 
 The `[Path]` attribute on the `customerId` parameter of the endpoint method, declares that this parameter corresponds to the endpoint path placeholder. Parameters containing data for an endpoint method should have one of the following attributes describing how they are passed to the endpoint: `[Path]`, `[Query]`, `[Header]` or `[Body]`.
@@ -246,4 +246,3 @@ download. This means a large-but-actively-flowing download is never penalized ju
 longer than `Timeout` in total, while a connection that stalls at any point - waiting for
 headers, waiting for the first byte, or mid-transfer - still gets cancelled once no data has
 arrived within a `Timeout` window.
-
