@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Net;
 
 namespace Cabazure.Client;
 
@@ -30,6 +32,37 @@ public record PagedResponse<T>(
     where T : class
 {
     private const string HeaderContinuation = "x-continuation";
+    private const string HeaderTotalItemCount = "x-total-item-count";
+
+    /// <summary>
+    /// The total number of items across all pages, when provided by the response.
+    /// </summary>
+    public long? TotalCount { get; } = GetTotalCount(Headers);
+
+    [SuppressMessage(
+        "Style",
+        "IDE1006:Naming Styles",
+        Justification = "Parameter names match the positional record properties and preserve consistent named-argument usage.")]
+    public PagedResponse(
+        bool IsSuccess,
+        HttpStatusCode StatusCode,
+        string? Content,
+        object? ContentObject,
+        T? OkContent,
+        string? ContinuationToken,
+        long? TotalCount,
+        IReadOnlyDictionary<string, IEnumerable<string>> Headers)
+        : this(
+            IsSuccess,
+            StatusCode,
+            Content,
+            ContentObject,
+            OkContent,
+            ContinuationToken,
+            Headers)
+    {
+        this.TotalCount = TotalCount;
+    }
 
     public PagedResponse(
         EndpointResponse response)
@@ -42,12 +75,41 @@ public record PagedResponse<T>(
             GetContinuationToken(response.Headers),
             response.Headers)
     {
-        ContentObject = response.ContentObject;
     }
 
     private static string? GetContinuationToken(
         IReadOnlyDictionary<string, IEnumerable<string>> headers)
-        => (headers != null && headers.TryGetValue(HeaderContinuation, out var value))
-            ? value.FirstOrDefault()
+        => GetFirstHeaderValue(headers, HeaderContinuation);
+
+    private static long? GetTotalCount(
+        IReadOnlyDictionary<string, IEnumerable<string>> headers)
+        => long.TryParse(
+                GetFirstHeaderValue(headers, HeaderTotalItemCount),
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out var totalCount)
+            ? totalCount
             : null;
+
+    private static string? GetFirstHeaderValue(
+        IReadOnlyDictionary<string, IEnumerable<string>> headers,
+        string headerName)
+    {
+        if (headers is null)
+        {
+            return null;
+        }
+
+        if (!headers.TryGetValue(headerName, out var values))
+        {
+            values = headers
+                .FirstOrDefault(header => string.Equals(
+                    header.Key,
+                    headerName,
+                    StringComparison.OrdinalIgnoreCase))
+                .Value;
+        }
+
+        return values?.FirstOrDefault();
+    }
 }

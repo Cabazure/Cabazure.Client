@@ -15,6 +15,7 @@ public class PagedResponseTests
         string content,
         TestModel okContent,
         string continuationToken,
+        long totalCount,
         IReadOnlyDictionary<string, IEnumerable<string>> headers)
     {
         var response = new PagedResponse<TestModel>(
@@ -24,6 +25,7 @@ public class PagedResponseTests
             ContentObject: okContent,
             OkContent: okContent,
             ContinuationToken: continuationToken,
+            TotalCount: totalCount,
             Headers: headers);
 
         response.IsSuccess.Should().BeTrue();
@@ -32,6 +34,7 @@ public class PagedResponseTests
         response.ContentObject.Should().Be(okContent);
         response.OkContent.Should().Be(okContent);
         response.ContinuationToken.Should().Be(continuationToken);
+        response.TotalCount.Should().Be(totalCount);
         response.Headers.Should().BeSameAs(headers);
     }
 
@@ -97,6 +100,7 @@ public class PagedResponseTests
         var pagedResponse = new PagedResponse<TestModel>(baseResponse);
 
         pagedResponse.ContinuationToken.Should().BeNull();
+        pagedResponse.TotalCount.Should().BeNull();
     }
 
     [Theory, AutoNSubstituteData]
@@ -113,6 +117,7 @@ public class PagedResponseTests
         var pagedResponse = new PagedResponse<TestModel>(baseResponse);
 
         pagedResponse.ContinuationToken.Should().BeNull();
+        pagedResponse.TotalCount.Should().BeNull();
     }
 
     [Theory, AutoNSubstituteData]
@@ -136,6 +141,96 @@ public class PagedResponseTests
         var pagedResponse = new PagedResponse<TestModel>(baseResponse);
 
         pagedResponse.ContinuationToken.Should().Be(firstToken);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public void Should_Extract_TotalCount_From_Headers(
+        TestModel model,
+        long totalCount)
+    {
+        var headers = new Dictionary<string, IEnumerable<string>>
+        {
+            { "x-total-item-count", new[] { totalCount.ToString(System.Globalization.CultureInfo.InvariantCulture) } }
+        };
+
+        var baseResponse = new EndpointResponse(
+            IsSuccess: true,
+            StatusCode: HttpStatusCode.OK,
+            Content: "{}",
+            ContentObject: model,
+            Headers: headers);
+
+        var pagedResponse = new PagedResponse<TestModel>(baseResponse);
+
+        pagedResponse.TotalCount.Should().Be(totalCount);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public void Should_Extract_Pagination_Headers_Case_Insensitively(
+        TestModel model,
+        string continuationToken,
+        long totalCount)
+    {
+        var baseResponse = new EndpointResponse(
+            IsSuccess: true,
+            StatusCode: HttpStatusCode.OK,
+            Content: "{}",
+            ContentObject: model,
+            Headers: new Dictionary<string, IEnumerable<string>>
+            {
+                { "X-Continuation", new[] { continuationToken } },
+                { "X-Total-Item-Count", new[] { totalCount.ToString(System.Globalization.CultureInfo.InvariantCulture) } }
+            });
+
+        var pagedResponse = new PagedResponse<TestModel>(baseResponse);
+
+        pagedResponse.ContinuationToken.Should().Be(continuationToken);
+        pagedResponse.TotalCount.Should().Be(totalCount);
+    }
+
+    [Theory, AutoNSubstituteData]
+    public void Should_Return_Null_TotalCount_When_Header_Is_Invalid(
+        TestModel model)
+    {
+        var baseResponse = new EndpointResponse(
+            IsSuccess: true,
+            StatusCode: HttpStatusCode.OK,
+            Content: "{}",
+            ContentObject: model,
+            Headers: new Dictionary<string, IEnumerable<string>>
+            {
+                { "x-total-item-count", new[] { "invalid" } }
+            });
+
+        var pagedResponse = new PagedResponse<TestModel>(baseResponse);
+
+        pagedResponse.TotalCount.Should().BeNull();
+    }
+
+    [Theory, AutoNSubstituteData]
+    public void Should_Parse_TotalCount_Only_Once(
+        TestModel model,
+        long totalCount)
+    {
+        var values = Substitute.For<IEnumerable<string>>();
+        values.GetEnumerator().Returns(
+            new[] { totalCount.ToString(System.Globalization.CultureInfo.InvariantCulture) }.AsEnumerable().GetEnumerator());
+
+        var baseResponse = new EndpointResponse(
+            IsSuccess: true,
+            StatusCode: HttpStatusCode.OK,
+            Content: "{}",
+            ContentObject: model,
+            Headers: new Dictionary<string, IEnumerable<string>>
+            {
+                { "x-total-item-count", values }
+            });
+
+        var pagedResponse = new PagedResponse<TestModel>(baseResponse);
+
+        pagedResponse.TotalCount.Should().Be(totalCount);
+        pagedResponse.TotalCount.Should().Be(totalCount);
+        values.Received(1).GetEnumerator();
     }
 
     [Theory, AutoNSubstituteData]
