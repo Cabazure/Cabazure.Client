@@ -63,6 +63,54 @@ Apart from the data parameters, the following parameter types are supported:
 | `PagedRequestOptions` | Allowing the caller to specify further request and pagination options. |
 | `CancellationToken`       | Allowing the caller to cancel the async call to the endpoint.          |
 
+#### Handwritten interface facades
+
+An endpoint interface can expose friendly public methods with default implementations
+that call internal, generated transport methods:
+
+```csharp
+[ClientEndpoint("CustomerClient")]
+public interface IGetCustomerEndpoint
+{
+    public Task<EndpointResponse<Customer>> ExecuteAsync(
+        string customerId,
+        bool refresh,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken)
+        => SendAsync(
+            customerId,
+            refresh ? "no-cache" : null,
+            options,
+            cancellationToken);
+
+    [Get("/v1/customers/{customerId}")]
+    internal Task<EndpointResponse<Customer>> SendAsync(
+        [Path("customerId")] string customerId,
+        [Header("Cache-Control")] string? cacheControl,
+        ClientRequestOptions options,
+        CancellationToken cancellationToken);
+}
+```
+
+Consumers in another assembly call `ExecuteAsync` but cannot call `SendAsync`.
+When `refresh` is false, the null header value is omitted. `no-cache` requests
+cache revalidation; whether it refreshes application-managed data depends on the server.
+
+The generator ignores methods with block or expression bodies, including any HTTP
+attributes on those methods. Only methods without implementations are generated
+and must declare a supported HTTP route. Interfaces containing only default methods
+also receive an implementation and can be registered normally.
+
+This pattern requires C# 8 or later and a runtime supporting default interface
+implementations. Client projects using it cannot target `netstandard2.0` or .NET
+Framework; Cabazure.Client's own runtime library remains `netstandard2.0`.
+
+Internal abstract members also restrict implementations in other assemblies:
+handwritten implementations generally need friend-assembly access to implement
+them. Mocking such interfaces depends on the mocking framework and its access to
+internal members. Do not assume a mock executes default method bodies; exercise
+the real generated implementation when testing facade behavior.
+
 ### 2. Adding a bootstrap
 
 To register relevant dependencies for the Client, the generated `AddCabazureClient` extension method on `IServiceCollection` needs to be called. This will register all the endpoints for the specified `HttpClient` instance as singletons in the `IServiceCollection`.

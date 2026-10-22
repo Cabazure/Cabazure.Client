@@ -61,7 +61,11 @@ public record EndpointDescriptor(
             return null;
         }
 
-        var methods = methodDeclarations
+        var transportMethods = methodDeclarations
+            .Where(m => m.Body == null && m.ExpressionBody == null)
+            .ToArray();
+
+        var methods = transportMethods
             .Select(m => EndpointMethodDescriptor.Create(
                 diagnostics,
                 context.SemanticModel,
@@ -69,7 +73,7 @@ public record EndpointDescriptor(
             .OfType<EndpointMethodDescriptor>()
             .ToImmutableArray();
 
-        if (methods.Length == 0)
+        if (transportMethods.Length > 0 && methods.Length == 0)
         {
             return null;
         }
