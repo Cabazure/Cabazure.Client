@@ -63,6 +63,46 @@ Apart from the data parameters, the following parameter types are supported:
 | `PagedRequestOptions` | Allowing the caller to specify further request and pagination options. |
 | `CancellationToken`       | Allowing the caller to cancel the async call to the endpoint.          |
 
+#### Header parameters and request content
+
+`[Header]` binds a parameter to a header. Content headers are automatically
+routed to the request's content rather than its general headers:
+
+```csharp
+[Post("/items")]
+Task<EndpointResponse> CreateAsync(
+    [Header("Content-Type")] string? contentType,
+    [Header("Content-Language")] string? language,
+    [Body] string payload,
+    CancellationToken cancellationToken);
+```
+
+An explicit `Content-Type` replaces the builder's default `application/json`;
+it does not change JSON body serialization. Null, empty, or whitespace header
+values are omitted, preserving the default content type when none is supplied.
+
+Content header bindings require a `[Body]` parameter, regardless of parameter
+order or whether the header parameter is nullable. Without one, generator error
+`ECL009` identifies the binding and asks for a body or removal of the header.
+Header names are recognized case-insensitively, including names supplied through
+constants. This applies to content headers such as `Content-Type`,
+`Content-Language`, `Content-Length`, and the other standard content headers.
+
+Content-header recognition and missing-body validation happen in the generator,
+not in the runtime builder. Generated methods use `WithContentHeader` for content
+headers and `WithHeader` for general headers. The runtime builder applies content
+headers only when request content exists; otherwise it skips them without creating
+content. An explicit body is retained even if its serializer produces an empty
+string; requests without a body still have no content.
+Custom `IMessageRequestBuilder` implementations must implement `WithContentHeader`
+alongside `WithHeader`.
+
+Parameter bindings retain their existing formatting syntax:
+`[Header("x-number", "D4")] int number`. The second constructor argument is still
+a parameter format string, not a fixed value. Method-level header declarations
+are not supported; use a handwritten facade for fixed or conditional values.
+Header values must satisfy the runtime HTTP parser for the particular header.
+
 #### Handwritten interface facades
 
 An endpoint interface can expose friendly public methods with default implementations

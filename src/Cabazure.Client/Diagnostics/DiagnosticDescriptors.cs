@@ -80,4 +80,13 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor ContentHeaderRequiresBody = new(
+        "ECL009",
+        "Content header requires a request body",
+        "{0}.{1} binds content header '{2}' but has no [Body] parameter. Add a [Body] parameter or remove the content header binding.",
+        DiagnosticCategories.EndpointGenerator,
+        DiagnosticSeverity.Error,
+        true
+    );
 }

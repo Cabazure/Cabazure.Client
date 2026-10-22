@@ -130,9 +130,10 @@ public class ClientEndpointGenerator : IIncrementalGenerator
 
         foreach (var p in method.HeaderParameters)
         {
+            var builderMethod = p.Name.IsContentHeaderName() ? "WithContentHeader" : "WithHeader";
             requestOptions.Append($"""
 
-                {indention}            .WithHeader("{p.Name}", {GetParameterValue(p)})
+                {indention}            .{builderMethod}("{p.Name}", {GetParameterValue(p)})
                 """);
         }
 

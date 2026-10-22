@@ -9,10 +9,11 @@ namespace Cabazure.Client.Builder
         private readonly Dictionary<string, string> pathMapper = [];
         private readonly Dictionary<string, string> queryMapper = [];
         private readonly Dictionary<string, StringValues> headerMapper = [];
+        private readonly Dictionary<string, StringValues> contentHeaderMapper = [];
         private readonly string template;
         private readonly IClientSerializer serializer;
         private readonly string clientName;
-        private string content = string.Empty;
+        private string? content;
         private IRequestOptions? options;
 
         public MessageRequestBuilder(
@@ -32,8 +33,7 @@ namespace Cabazure.Client.Builder
             message.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
             message.RequestUri = BuildRequestUri();
 
-            // Only set content if body is non-empty
-            if (!string.IsNullOrEmpty(content))
+            if (content is not null)
             {
                 message.Content = new StringContent(content);
                 message.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
@@ -47,6 +47,15 @@ namespace Cabazure.Client.Builder
                 message.Headers.Add(header.Key, header.Value.ToArray());
             }
 
+            if (message.Content is { } requestContent)
+            {
+                foreach (var header in contentHeaderMapper)
+                {
+                    requestContent.Headers.Remove(header.Key);
+                    requestContent.Headers.Add(header.Key, header.Value.ToArray());
+                }
+            }
+
             if (options is not null)
             {
                 options.ConfigureHttpRequest(message);
@@ -56,10 +65,19 @@ namespace Cabazure.Client.Builder
         }
 
         public IMessageRequestBuilder WithHeader(string name, StringValues value)
+            => WithHeader(headerMapper, name, value);
+
+        public IMessageRequestBuilder WithContentHeader(string name, StringValues value)
+            => WithHeader(contentHeaderMapper, name, value);
+
+        private MessageRequestBuilder WithHeader(
+            Dictionary<string, StringValues> headers,
+            string name,
+            StringValues value)
         {
             if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(value))
             {
-                headerMapper[name] = value;
+                headers[name] = value;
             }
 
             return this;

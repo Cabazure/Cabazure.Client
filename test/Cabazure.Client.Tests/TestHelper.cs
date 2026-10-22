@@ -66,6 +66,9 @@ public static class TestHelper
     }
 
     public static IEnumerable<DiagnosticDescriptor> GetDiagnostics(params string[] sources)
+        => GetGeneratorDiagnostics(sources).Select(d => d.Descriptor);
+
+    public static Diagnostic[] GetGeneratorDiagnostics(params string[] sources)
     {
         var initialCompilation = CompileSources(sources);
 
@@ -85,7 +88,7 @@ public static class TestHelper
 
         return endpointDiagnostics
             .Union(initializationDiagnostics)
-            .Select(d => d.Descriptor);
+            .ToArray();
     }
 
     public static Diagnostic[] GetConsumerErrors(string endpointSource, string consumerSource)

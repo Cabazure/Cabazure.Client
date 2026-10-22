@@ -192,6 +192,29 @@ public record EndpointMethodDescriptor(
             }
         }
 
+        if (bodyParameter is null)
+        {
+            var contentHeaders = headerParameters
+                .Where(p => p.Name.IsContentHeaderName())
+                .ToArray();
+            if (contentHeaders.Length > 0)
+            {
+                foreach (var header in contentHeaders)
+                {
+                    diagnostics.Invoke(Diagnostic.Create(
+                        DiagnosticDescriptors.ContentHeaderRequiresBody,
+                        method.ParameterList.Parameters
+                            .First(p => p.Identifier.ValueText == header.ParameterName)
+                            .GetLocation(),
+                        method.Parent?.GetIdentifier(),
+                        method.Identifier,
+                        header.Name));
+                }
+
+                return null;
+            }
+        }
+
         foreach (Match m in TokenRegex.Matches(routeTemplate))
         {
             var token = m.Groups["id"].Value;

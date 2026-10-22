@@ -71,6 +71,9 @@ public class AutoFixtureCustomization : ICustomization
             .WithHeader(default, default)
             .ReturnsForAnyArgs(builder);
         builder
+            .WithContentHeader(default, default)
+            .ReturnsForAnyArgs(builder);
+        builder
             .WithPathParameter(default, default)
             .ReturnsForAnyArgs(builder);
         builder
