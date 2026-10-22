@@ -411,6 +411,24 @@ per-user state in either or expect a scoped dependency injected into a handler
 to identify the current incoming request. See the
 [HttpClient factory scope guidance](https://learn.microsoft.com/dotnet/core/extensions/httpclient-factory-troubleshooting#httpclient-doesnt-respect-scoped-lifetime).
 
+### Compatibility and migration
+
+`HeaderAttribute`, `ClientRequestOptions`, and `PagedRequestOptions` retain their
+existing constructors and properties. No generic header collection or ambient
+request context is introduced.
+
+| Surface | Adoption or migration |
+| --- | --- |
+| Friendly or conditional endpoint signatures | Opt into [interface facades](#handwritten-interface-facades) on a runtime supporting default interface implementations. Leave HTTP attributes on the abstract transport methods. |
+| Content-header parameters | Supply a `[Body]` parameter or remove the content-header binding when `ECL009` is reported. Nullable header parameters still require a body declaration. |
+| Repeated header names | Review bindings that differ only by casing: the last non-empty binding now consistently replaces earlier values instead of accidentally appending them. |
+| Custom `IMessageRequestBuilder` implementations | Implement `WithContentHeader` separately from `WithHeader`; generated content-header bindings now call it explicitly. The built-in builder skips content headers when content is absent. |
+| Application-specific user context | Use [typed per-call options and a named-client handler](#custom-handlers-and-per-call-context), rather than storing a user in a singleton endpoint or factory-created handler. |
+
+Method-scoped headers remain unsupported. A facade can supply fixed or conditional
+values to parameter-scoped `[Header]` bindings without exposing wire-level details
+to callers.
+
 ### Streaming responses
 
 Endpoints returning `Task<StreamResponse>` expose the response body as a raw `Stream` via `OkContent`, along with the response's `Content-Type` header via `ContentType`. Since the returned `Stream` reads directly from the underlying HTTP response, `StreamResponse` implements `IDisposable` and must be disposed once the caller is done reading the stream, to release the underlying HTTP connection:

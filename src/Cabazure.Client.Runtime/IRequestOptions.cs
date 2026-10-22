@@ -8,7 +8,7 @@ public interface IRequestOptions
     TimeSpan? Timeout { get; set; }
 
     /// <summary>
-    /// Allows the options implementation to configure the HTTP request message.
+    /// Configures the HTTP request after endpoint parameter bindings and before the HTTP handler pipeline.
     /// </summary>
     /// <param name="request">The http request being sent.</param>
     void ConfigureHttpRequest(HttpRequestMessage request);
