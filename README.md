@@ -259,6 +259,106 @@ public class CustomerNameProvider(
 }
 ```
 
+### Custom handlers and per-call context
+
+Cabazure.Client uses named `HttpClient` instances and supports standard
+`DelegatingHandler` registration. A client bootstrap can add handlers through its
+`IHttpClientBuilder` callback:
+
+```csharp
+services.AddTransient<OnBehalfOfHandler>();
+services.AddCabazureClient(
+    "CustomerClient",
+    j => j.PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    b => b
+        .ConfigureHttpClient(c =>
+            c.BaseAddress = new Uri("https://customer-api.contoso.com"))
+        .AddHttpMessageHandler<OnBehalfOfHandler>());
+```
+
+Alternatively, an application can extend the named client after calling the
+client library's bootstrap:
+
+```csharp
+services.AddCustomerClient();
+services.AddTransient<OnBehalfOfHandler>();
+services.AddHttpClient("CustomerClient")
+    .AddHttpMessageHandler<OnBehalfOfHandler>();
+```
+
+Use the name declared by `[ClientEndpoint]`. Registrations for the same name
+compose; registering a handler for another name does not affect this client.
+
+For per-call context, derive a typed options class and attach metadata to the
+individual request. The following example targets modern .NET:
+
+```csharp
+public static class CustomerRequestContext
+{
+    public static readonly HttpRequestOptionsKey<string> OnBehalfOf =
+        new("CustomerClient.OnBehalfOf");
+}
+
+public class CustomerRequestOptions : ClientRequestOptions
+{
+    public string? OnBehalfOf { get; set; }
+
+    protected override void ConfigureHttpRequest(HttpRequestMessage request)
+    {
+        base.ConfigureHttpRequest(request);
+
+        if (OnBehalfOf is { } userId)
+        {
+            request.Options.Set(CustomerRequestContext.OnBehalfOf, userId);
+        }
+    }
+}
+
+public sealed class OnBehalfOfHandler : DelegatingHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken)
+    {
+        if (!request.Headers.Contains("x-on-behalf-of")
+            && request.Options.TryGetValue(CustomerRequestContext.OnBehalfOf, out var userId))
+        {
+            request.Headers.Add("x-on-behalf-of", userId);
+        }
+
+        return base.SendAsync(request, cancellationToken);
+    }
+}
+```
+
+Pass `new CustomerRequestOptions { OnBehalfOf = trustedUserId }` to an endpoint
+accepting `ClientRequestOptions`, or declare the typed options on the endpoint
+to make this capability discoverable. For pagination, derive the equivalent
+options from `PagedRequestOptions` and call `base.ConfigureHttpRequest` to
+preserve correlation and pagination headers. The same hook and handler pipeline
+also apply to streaming endpoints.
+
+`HttpRequestMessage.Options` requires .NET 5 or later. A client targeting
+`netstandard2.0` can instead use `request.Properties` with a unique string key in
+both the options hook and handler, or conditionally use the APIs for each target.
+The metadata must be read using the same key and type with which it was written.
+
+Endpoint-bound headers are applied before the options hook; handlers run
+afterward in configured pipeline order. This example treats context as a
+fallback and preserves an explicit endpoint header. Options overrides and
+handlers can deliberately remove or replace headers when that is their policy.
+
+Obtain trusted context at the application's request boundary and pass it
+explicitly; no `IHttpContextAccessor` is required. Do not blindly forward a
+caller-supplied identity header or send it to unrelated downstream services.
+Create options per call and do not mutate them while requests are in flight.
+
+Factory-created handlers have their own DI scopes, not the incoming request's
+scope, and Cabazure endpoint implementations are singletons. Do not capture
+per-user state in either or expect a scoped dependency injected into a handler
+to identify the current incoming request. See the
+[HttpClient factory scope guidance](https://learn.microsoft.com/dotnet/core/extensions/httpclient-factory-troubleshooting#httpclient-doesnt-respect-scoped-lifetime).
+
 ### Streaming responses
 
 Endpoints returning `Task<StreamResponse>` expose the response body as a raw `Stream` via `OkContent`, along with the response's `Content-Type` header via `ContentType`. Since the returned `Stream` reads directly from the underlying HTTP response, `StreamResponse` implements `IDisposable` and must be disposed once the caller is done reading the stream, to release the underlying HTTP connection:
