@@ -8,8 +8,8 @@ namespace Cabazure.Client.Builder
     {
         private readonly Dictionary<string, string> pathMapper = [];
         private readonly Dictionary<string, string> queryMapper = [];
-        private readonly Dictionary<string, StringValues> headerMapper = [];
-        private readonly Dictionary<string, StringValues> contentHeaderMapper = [];
+        private readonly Dictionary<string, StringValues> headerMapper = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, StringValues> contentHeaderMapper = new(StringComparer.OrdinalIgnoreCase);
         private readonly string template;
         private readonly IClientSerializer serializer;
         private readonly string clientName;

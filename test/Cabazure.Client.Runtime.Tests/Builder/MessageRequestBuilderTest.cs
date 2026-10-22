@@ -143,6 +143,40 @@ public class MessageRequestBuilderTest
             .Be(headerValue);
     }
 
+    [Theory, AutoNSubstituteData]
+    internal void Should_Replace_Header_Values_CaseInsensitively(
+        MessageRequestBuilder sut)
+    {
+        sut.WithHeader("X-Operation", "first");
+        sut.WithHeader("x-operation", "second");
+        sut.WithHeader("X-Operation", new StringValues(["last", "additional"]));
+        sut.WithHeader("X-OPERATION", StringValues.Empty);
+
+        using var message = sut.Build(HttpMethod.Get);
+
+        message.Headers.GetValues("x-operation").Should().Equal("last", "additional");
+        message.Headers.Should().ContainSingle(h => h.Key.Equals("x-operation", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void Should_Replace_ContentHeader_Values_CaseInsensitively(
+        [Frozen] IClientSerializer serializer,
+        MessageRequestBuilder sut)
+    {
+        serializer.Serialize(Arg.Any<string>(), Arg.Any<object>()).Returns("payload");
+        sut.WithBody("payload");
+        sut.WithContentHeader("Content-Language", "en");
+        sut.WithContentHeader("content-language", "da");
+        sut.WithContentHeader("Content-Language", new StringValues(["fr", "de"]));
+        sut.WithContentHeader("CONTENT-LANGUAGE", StringValues.Empty);
+
+        using var message = sut.Build(HttpMethod.Post);
+
+        message.Content!.Headers.ContentLanguage.Should().Equal("fr", "de");
+        message.Content.Headers.Should()
+            .ContainSingle(h => h.Key.Equals("Content-Language", StringComparison.OrdinalIgnoreCase));
+    }
+
     [Theory]
     [InlineAutoNSubstituteData("Allow", "GET")]
     [InlineAutoNSubstituteData("Content-Disposition", "attachment")]

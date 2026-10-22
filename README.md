@@ -103,6 +103,18 @@ a parameter format string, not a fixed value. Method-level header declarations
 are not supported; use a handwritten facade for fixed or conditional values.
 Header values must satisfy the runtime HTTP parser for the particular header.
 
+Header names are case-insensitive in both builder header collections. The last
+non-empty value supplied for a name replaces its previous values, regardless of
+casing; an empty value does not erase an existing binding. Multiple parameters
+bound to the same header remain supported and are applied in declaration order.
+Multi-value collections supplied directly to the builder retain all their values.
+
+Parameter-bound headers are applied first, followed by the request-options hook
+and then outgoing handlers in configured pipeline order. Options overrides and
+handlers can deliberately remove or replace headers. This ordering also applies
+to paged and streaming requests; correlation and pagination options keep their
+existing behavior.
+
 #### Handwritten interface facades
 
 An endpoint interface can expose friendly public methods with default implementations

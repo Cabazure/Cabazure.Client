@@ -39,6 +39,15 @@ public class HandlerCustomizationTests
             [Header("x-on-behalf-of")] string? explicitUser,
             UserContextRequestOptions options,
             CancellationToken cancellationToken);
+
+        [Get("/items/{id}")]
+        Task<EndpointResponse> GetWithRepeatedHeadersAsync(
+            [Path] string id,
+            [Header("X-On-Behalf-Of")] string firstUser,
+            [Header("x-on-behalf-of")] string secondUser,
+            [Header("X-On-Behalf-Of")] string? lastUser,
+            UserContextRequestOptions options,
+            CancellationToken cancellationToken);
     }
 
     [Theory]
@@ -64,6 +73,84 @@ public class HandlerCustomizationTests
         request.Path.Should().Be("/items/123");
         request.MaxItemCount.Should().Be(kind == RequestKind.Paged ? "25" : null);
         request.ContinuationToken.Should().Be(kind == RequestKind.Paged ? "page-123" : null);
+    }
+
+    [Theory]
+    [InlineData(RequestKind.Buffered)]
+    [InlineData(RequestKind.Paged)]
+    [InlineData(RequestKind.Streaming)]
+    public async Task Should_Apply_Parameters_Then_Options_Then_Handlers(RequestKind kind)
+    {
+        using var handler = new CaptureHandler();
+        var services = CreateServices(handler, true);
+        services.AddHttpClient(ClientName)
+            .AddHttpMessageHandler(() => new ReplaceUserHeaderHandler("options-user", "first-handler"))
+            .AddHttpMessageHandler(() => new ReplaceUserHeaderHandler("first-handler", "last-handler"));
+        using var provider = services.BuildServiceProvider();
+        var endpoint = provider.GetRequiredService<IContextEndpoint>();
+        var options = new HeaderOrderRequestOptions { CorrelationId = "123" };
+        var cancellationToken = TestContext.Current.CancellationToken;
+        EndpointResponse response;
+
+        switch (kind)
+        {
+            case RequestKind.Buffered:
+                response = await endpoint.GetAsync("123", "parameter-user", options, cancellationToken);
+                break;
+
+            case RequestKind.Paged:
+                response = await endpoint.ListAsync("123", "parameter-user", new HeaderOrderPagedOptions
+                {
+                    CorrelationId = "123",
+                    MaxItemCount = 25,
+                    ContinuationToken = "page-123",
+                }, cancellationToken);
+                break;
+
+            case RequestKind.Streaming:
+            {
+                using var stream = await endpoint.DownloadAsync("123", "parameter-user", options, cancellationToken);
+                response = stream;
+                break;
+            }
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+        }
+
+        response.IsSuccess.Should().BeTrue();
+        var request = handler.Requests.Should().ContainSingle().Subject;
+        request.UserIds.Should().Equal("last-handler");
+        request.CorrelationId.Should().Be("123");
+        request.Configured.Should().BeTrue();
+        request.MaxItemCount.Should().Be(kind == RequestKind.Paged ? "25" : null);
+        request.ContinuationToken.Should().Be(kind == RequestKind.Paged ? "page-123" : null);
+    }
+
+    [Theory]
+    [InlineData("last-user", "last-user")]
+    [InlineData(null, "second-user")]
+    [InlineData("", "second-user")]
+    [InlineData(" ", "second-user")]
+    public async Task Should_Use_Last_NonEmpty_HeaderParameter_Regardless_Of_Case(
+        string? lastUser,
+        string expectedUser)
+    {
+        using var handler = new CaptureHandler();
+        using var provider = CreateServices(handler, true).BuildServiceProvider();
+        var endpoint = provider.GetRequiredService<IContextEndpoint>();
+
+        var response = await endpoint.GetWithRepeatedHeadersAsync(
+            "123",
+            "first-user",
+            "second-user",
+            lastUser,
+            new UserContextRequestOptions { CorrelationId = "123", OnBehalfOf = "context-user" },
+            TestContext.Current.CancellationToken);
+
+        response.IsSuccess.Should().BeTrue();
+        handler.Requests.Should().ContainSingle()
+            .Which.UserIds.Should().Equal(expectedUser);
     }
 
     [Theory]
@@ -206,6 +293,44 @@ public class HandlerCustomizationTests
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+        }
+    }
+
+    private static void ReplaceParameterHeader(HttpRequestMessage request)
+    {
+        request.Headers.GetValues("x-on-behalf-of").Should().Equal("parameter-user");
+        request.Headers.Remove("x-on-behalf-of");
+        request.Headers.Add("X-On-Behalf-Of", "options-user");
+    }
+
+    private sealed class HeaderOrderRequestOptions : UserContextRequestOptions
+    {
+        protected override void ConfigureHttpRequest(HttpRequestMessage request)
+        {
+            base.ConfigureHttpRequest(request);
+            ReplaceParameterHeader(request);
+        }
+    }
+
+    private sealed class HeaderOrderPagedOptions : PagedUserContextRequestOptions
+    {
+        protected override void ConfigureHttpRequest(HttpRequestMessage request)
+        {
+            base.ConfigureHttpRequest(request);
+            ReplaceParameterHeader(request);
+        }
+    }
+
+    private sealed class ReplaceUserHeaderHandler(string expectedUser, string replacement) : DelegatingHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            request.Headers.GetValues("x-on-behalf-of").Should().Equal(expectedUser);
+            request.Headers.Remove("x-on-behalf-of");
+            request.Headers.Add("x-on-behalf-of", replacement);
+            return base.SendAsync(request, cancellationToken);
         }
     }
 
