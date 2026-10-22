@@ -144,6 +144,133 @@ public class MessageRequestBuilderTest
     }
 
     [Theory, AutoNSubstituteData]
+    internal void Should_Replace_Header_Values_CaseInsensitively(
+        MessageRequestBuilder sut)
+    {
+        sut.WithHeader("X-Operation", "first");
+        sut.WithHeader("x-operation", "second");
+        sut.WithHeader("X-Operation", new StringValues(["last", "additional"]));
+        sut.WithHeader("X-OPERATION", StringValues.Empty);
+
+        using var message = sut.Build(HttpMethod.Get);
+
+        message.Headers.GetValues("x-operation").Should().Equal("last", "additional");
+        message.Headers.Should().ContainSingle(h => h.Key.Equals("x-operation", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void Should_Replace_ContentHeader_Values_CaseInsensitively(
+        [Frozen] IClientSerializer serializer,
+        MessageRequestBuilder sut)
+    {
+        serializer.Serialize(Arg.Any<string>(), Arg.Any<object>()).Returns("payload");
+        sut.WithBody("payload");
+        sut.WithContentHeader("Content-Language", "en");
+        sut.WithContentHeader("content-language", "da");
+        sut.WithContentHeader("Content-Language", new StringValues(["fr", "de"]));
+        sut.WithContentHeader("CONTENT-LANGUAGE", StringValues.Empty);
+
+        using var message = sut.Build(HttpMethod.Post);
+
+        message.Content!.Headers.ContentLanguage.Should().Equal("fr", "de");
+        message.Content.Headers.Should()
+            .ContainSingle(h => h.Key.Equals("Content-Language", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Theory]
+    [InlineAutoNSubstituteData("Allow", "GET")]
+    [InlineAutoNSubstituteData("Content-Disposition", "attachment")]
+    [InlineAutoNSubstituteData("Content-Encoding", "gzip")]
+    [InlineAutoNSubstituteData("Content-Language", "en")]
+    [InlineAutoNSubstituteData("Content-Length", "12")]
+    [InlineAutoNSubstituteData("Content-Location", "https://example.test/")]
+    [InlineAutoNSubstituteData("Content-MD5", "1B2M2Y8AsgTpgAmY7PhCfg==")]
+    [InlineAutoNSubstituteData("Content-Range", "bytes 0-11/12")]
+    [InlineAutoNSubstituteData("content-type", "application/custom+json")]
+    [InlineAutoNSubstituteData("Expires", "Wed, 21 Oct 2015 07:28:00 GMT")]
+    [InlineAutoNSubstituteData("Last-Modified", "Wed, 21 Oct 2015 07:28:00 GMT")]
+    internal void Should_Route_ContentHeaders_To_Content(
+        string name,
+        string value,
+        [Frozen] IClientSerializer serializer,
+        MessageRequestBuilder sut)
+    {
+        serializer.Serialize(Arg.Any<string>(), Arg.Any<object>()).Returns("payload");
+        sut.WithBody("payload");
+        sut.WithContentHeader(name, value);
+
+        using var message = sut.Build(HttpMethod.Post);
+
+        message.Content!.Headers.GetValues(name).Should().Equal(value);
+        message.Headers.Should().NotContain(h => h.Key.Equals(name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void Should_Preserve_Multiple_ContentHeader_Values(
+        [Frozen] IClientSerializer serializer,
+        MessageRequestBuilder sut)
+    {
+        serializer.Serialize(Arg.Any<string>(), Arg.Any<object>()).Returns("payload");
+        sut.WithBody("payload");
+        sut.WithContentHeader("Content-Language", new StringValues(["en", "da"]));
+
+        using var message = sut.Build(HttpMethod.Post);
+
+        message.Content!.Headers.ContentLanguage.Should().Equal("en", "da");
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void Should_Skip_ContentHeaders_When_No_Body_Is_Supplied(
+        MessageRequestBuilder sut)
+    {
+        sut.WithContentHeader("Content-Type", "application/custom+json");
+        sut.WithContentHeader("Content-Language", "en");
+        sut.WithHeader("x-operation", "get");
+
+        using var message = sut.Build(HttpMethod.Get);
+
+        message.Content.Should().BeNull();
+        message.Headers.GetValues("x-operation").Should().Equal("get");
+        message.Headers.Should().NotContain(h => h.Key.Equals("Content-Type", StringComparison.OrdinalIgnoreCase)
+            || h.Key.Equals("Content-Language", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal async Task Should_Preserve_ExplicitBody_When_Serialization_Is_Empty(
+        [Frozen] IClientSerializer serializer,
+        MessageRequestBuilder sut)
+    {
+        serializer.Serialize(Arg.Any<string>(), Arg.Any<object>()).Returns(string.Empty);
+        sut.WithBody("payload");
+        sut.WithContentHeader("Content-Type", "application/custom+json");
+
+        using var message = sut.Build(HttpMethod.Post);
+
+        message.Content.Should().NotBeNull();
+        message.Content!.Headers.ContentType!.MediaType.Should().Be("application/custom+json");
+        (await message.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))
+            .Should().BeEmpty();
+    }
+
+    [Theory, AutoNSubstituteData]
+    internal void Should_Omit_Empty_ContentHeaders(
+        [Frozen] IClientSerializer serializer,
+        MessageRequestBuilder sut)
+    {
+        serializer.Serialize(Arg.Any<string>(), Arg.Any<object>()).Returns("payload");
+        sut.WithBody("payload");
+        sut.WithContentHeader("Content-Type", string.Empty);
+        sut.WithContentHeader("Content-Language", StringValues.Empty);
+        sut.WithContentHeader("Content-Encoding", " ");
+
+        using var message = sut.Build(HttpMethod.Post);
+
+        message.Content!.Headers.ContentType!.MediaType.Should().Be("application/json");
+        message.Content.Headers.ContentLanguage.Should().BeEmpty();
+        message.Content.Headers.ContentEncoding.Should().BeEmpty();
+    }
+
+    [Theory, AutoNSubstituteData]
     internal void Should_Include_CorrelationId_Header(
         MessageRequestBuilder sut,
         ClientRequestOptions options)
