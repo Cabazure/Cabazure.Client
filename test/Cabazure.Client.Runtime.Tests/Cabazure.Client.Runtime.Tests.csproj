@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cabazure.Test" Version="1.1.1" />
+    <PackageReference Include="Cabazure.Test" Version="1.1.2" />
     <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.12.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
